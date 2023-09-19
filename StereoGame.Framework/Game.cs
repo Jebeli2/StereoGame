@@ -1,6 +1,7 @@
 ﻿namespace StereoGame.Framework
 {
     using StereoGame.Framework.Content;
+    using StereoGame.Framework.Graphics;
     using System.Diagnostics;
 
     public class Game : IDisposable
@@ -24,6 +25,9 @@
 
         private bool shouldExit;
         private bool suppressDraw;
+
+        private IGraphicsDeviceManager graphicsDeviceManager;
+        private IGraphicsDeviceService graphicsDeviceService;
 
         private readonly SortingFilteringCollection<IDrawable> drawables =
                    new(d => d.Visible,
@@ -98,6 +102,46 @@
         public GameComponentCollection Components => components;
         public ContentManager Content => content;
 
+        public GraphicsDevice GraphicsDevice
+        {
+            get
+            {
+                if (graphicsDeviceService == null)
+                {
+                    graphicsDeviceService = (IGraphicsDeviceService)Services.GetService(typeof(IGraphicsDeviceService))!;
+                    if (graphicsDeviceService == null)
+                    {
+                        throw new InvalidOperationException("No Graphcs Device Service");
+                    }
+                }
+                return graphicsDeviceService.GraphicsDevice;
+            }
+        }
+
+        internal GraphicsDeviceManager GraphicsDeviceManager
+        {
+            get
+            {
+                if (graphicsDeviceManager == null)
+                {
+                    graphicsDeviceManager = (IGraphicsDeviceManager)Services.GetService(typeof(IGraphicsDeviceManager))!;
+                }
+                return (GraphicsDeviceManager)graphicsDeviceManager;
+            }
+            set
+            {
+                if (graphicsDeviceManager != null)
+                {
+                    throw new InvalidOperationException("GraphicsDeviceManager already registered for this Game object");
+                }
+                graphicsDeviceManager = value;
+            }
+        }
+
+        public GameWindow Window
+        {
+            get { return platform.Window; }
+        }
         public TimeSpan InactiveSleepTime
         {
             get { return inactiveSleepTime; }
@@ -188,7 +232,7 @@
 
         public void Tick()
         {
-            RetryTick:
+        RetryTick:
             if (!IsActive && InactiveSleepTime.TotalMilliseconds >= 1.0)
             {
                 Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);
@@ -302,8 +346,21 @@
         protected virtual void UnloadContent() { }
         protected virtual void Initialize()
         {
+            InitializeExistingComponents();
+            graphicsDeviceService = (IGraphicsDeviceService)Services.GetService(typeof(IGraphicsDeviceService))!;
+
+            if (graphicsDeviceService != null &&
+                graphicsDeviceService.GraphicsDevice != null)
+            {
+                LoadContent();
+            }
         }
 
+        private void InitializeExistingComponents()
+        {
+            for (int i = 0; i < Components.Count; ++i)
+                Components[i].Initialize();
+        }
         internal void DoUpdate(GameTime gameTime)
         {
             AssertNotDisposed();

@@ -11,6 +11,7 @@
         private bool isDisposed;
         private bool isActive;
         private readonly Game game;
+        private GameWindow window;
 
         public GamePlatform(Game game)
         {
@@ -39,6 +40,18 @@
 
         protected bool IsDisposed => isDisposed;
         public Game Game => game;
+        public GameWindow Window
+        {
+            get { return window; }
+            protected set
+            {
+                if (window == null)
+                {
+
+                }
+                window = value;
+            }
+        }
         public abstract GameRunBehavior DefaultRunBehavior { get; }
         public bool IsActive
         {
