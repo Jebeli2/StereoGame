@@ -1,5 +1,6 @@
 ﻿namespace StereoGame.Framework
 {
+    using StereoGame.Framework.Graphics;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -16,6 +17,7 @@
         public GamePlatform(Game game)
         {
             this.game = game;
+            window = null!;
         }
 
         ~GamePlatform()
@@ -52,6 +54,9 @@
                 window = value;
             }
         }
+
+        public abstract GraphicsDevice CreateGraphicsDevice();
+
         public abstract GameRunBehavior DefaultRunBehavior { get; }
         public bool IsActive
         {
@@ -97,5 +102,8 @@
 
         public virtual void TargetElapsedTimeChanged() { }
         public virtual void Present() { }
+
+        public abstract void BeginScreenDeviceChange(bool willBeFullScreen);
+        public abstract void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight);
     }
 }

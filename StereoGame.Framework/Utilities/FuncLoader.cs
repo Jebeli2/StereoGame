@@ -40,7 +40,7 @@
 
         public static IntPtr LoadLibraryExt(string libname)
         {
-            var ret = IntPtr.Zero;
+            IntPtr ret;
             var assemblyLocation = Path.GetDirectoryName(typeof(FuncLoader).Assembly.Location) ?? "./";
 
             // Try .NET Framework / mono locations
@@ -97,7 +97,7 @@
 
         public static T LoadFunction<T>(IntPtr library, string function, bool throwIfNotFound = false)
         {
-            var ret = IntPtr.Zero;
+            IntPtr ret;
 
             if (CurrentPlatform.OS == OS.Windows)
                 ret = Windows.GetProcAddress(library, function);
@@ -111,7 +111,7 @@
                 if (throwIfNotFound)
                     throw new EntryPointNotFoundException(function);
 
-                return default(T);
+                return default!;
             }
             return (T)(object)Marshal.GetDelegateForFunctionPointer(ret, typeof(T));
         }

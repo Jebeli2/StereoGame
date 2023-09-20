@@ -26,8 +26,9 @@
         private bool shouldExit;
         private bool suppressDraw;
 
-        private IGraphicsDeviceManager graphicsDeviceManager;
-        private IGraphicsDeviceService graphicsDeviceService;
+        private IGraphicsDeviceManager? graphicsDeviceManager;
+        private IGraphicsDeviceService? graphicsDeviceService;
+        private GraphicsDevice? graphicsDevice;
 
         private readonly SortingFilteringCollection<IDrawable> drawables =
                    new(d => d.Visible,
@@ -101,20 +102,29 @@
         public GameServiceContainer Services => services;
         public GameComponentCollection Components => components;
         public ContentManager Content => content;
+        public GamePlatform Platform => platform;
 
         public GraphicsDevice GraphicsDevice
         {
             get
             {
-                if (graphicsDeviceService == null)
+                if (graphicsDevice == null)
                 {
-                    graphicsDeviceService = (IGraphicsDeviceService)Services.GetService(typeof(IGraphicsDeviceService))!;
                     if (graphicsDeviceService == null)
                     {
-                        throw new InvalidOperationException("No Graphcs Device Service");
+                        graphicsDeviceService = (IGraphicsDeviceService)Services.GetService(typeof(IGraphicsDeviceService))!;
+                        if (graphicsDeviceService == null)
+                        {
+                            throw new InvalidOperationException("No Graphics Device Service");
+                        }
+                    }
+                    graphicsDevice = graphicsDeviceService.GraphicsDevice;
+                    if (graphicsDevice == null)
+                    {
+                        throw new InvalidOperationException("No Graphics Device");
                     }
                 }
-                return graphicsDeviceService.GraphicsDevice;
+                return graphicsDevice!;
             }
         }
 
@@ -122,10 +132,7 @@
         {
             get
             {
-                if (graphicsDeviceManager == null)
-                {
-                    graphicsDeviceManager = (IGraphicsDeviceManager)Services.GetService(typeof(IGraphicsDeviceManager))!;
-                }
+                graphicsDeviceManager ??= (IGraphicsDeviceManager)Services.GetService(typeof(IGraphicsDeviceManager))!;
                 return (GraphicsDeviceManager)graphicsDeviceManager;
             }
             set
@@ -232,7 +239,7 @@
 
         public void Tick()
         {
-        RetryTick:
+            RetryTick:
             if (!IsActive && InactiveSleepTime.TotalMilliseconds >= 1.0)
             {
                 Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);
@@ -387,9 +394,10 @@
         internal void DoInitialize()
         {
             AssertNotDisposed();
-            //if (GraphicsDevice == null && graphicsDeviceManager != null)
-            //    _graphicsDeviceManager.CreateDevice();
-
+            if (graphicsDevice == null && graphicsDeviceManager != null)
+            {
+                graphicsDeviceManager.CreateDevice();
+            }
             platform.BeforeInitialize();
             Initialize();
 

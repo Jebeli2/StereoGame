@@ -11,7 +11,7 @@ namespace StereoGame.Framework
     public abstract class GameWindow
     {
         internal bool allowAltF4 = true;
-        private string title;
+        private string title = "";
 
 
         [DefaultValue(false)]

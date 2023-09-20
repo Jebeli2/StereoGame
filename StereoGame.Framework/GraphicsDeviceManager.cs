@@ -11,7 +11,7 @@ namespace StereoGame.Framework
     public partial class GraphicsDeviceManager : IGraphicsDeviceService, IDisposable, IGraphicsDeviceManager
     {
         private readonly Game game;
-        private GraphicsDevice graphicsDevice;
+        private GraphicsDevice? graphicsDevice;
         private bool initialized;
         private SurfaceFormat preferredBackBufferFormat;
         private DepthFormat preferredDepthStencilFormat;
@@ -54,7 +54,17 @@ namespace StereoGame.Framework
                 graphicsProfile = value;
             }
         }
-        public GraphicsDevice GraphicsDevice => graphicsDevice;
+
+        public bool HardwareModeSwitch
+        {
+            get { return hardwareModeSwitch; }
+            set
+            {
+                shouldApplyChanges = true;
+                hardwareModeSwitch = value;
+            }
+        }
+        public GraphicsDevice? GraphicsDevice => graphicsDevice;
 
         public event EventHandler<EventArgs>? DeviceCreated;
 
@@ -66,7 +76,6 @@ namespace StereoGame.Framework
 
         public event EventHandler<EventArgs>? Disposed;
 
-        public event EventHandler<PreparingDeviceSettingsEventArgs>? PreparingDeviceSettings;
 
         protected void OnDeviceCreated(EventArgs e)
         {
@@ -90,7 +99,9 @@ namespace StereoGame.Framework
 
         private void CreateDevice()
         {
-
+            if (graphicsDevice != null) return;
+            graphicsDevice = game.Platform.CreateGraphicsDevice();
+            OnDeviceCreated(EventArgs.Empty);
         }
 
 
@@ -115,10 +126,8 @@ namespace StereoGame.Framework
             {
                 if (disposing)
                 {
-                    if (graphicsDevice != null)
-                    {
-                        graphicsDevice.Dispose();
-                    }
+                    graphicsDevice?.Dispose();
+                    graphicsDevice = null;
                 }
                 disposed = true;
                 EventHelpers.Raise(this, Disposed, EventArgs.Empty);
@@ -139,60 +148,8 @@ namespace StereoGame.Framework
             if (graphicsDevice != null && drawBegun)
             {
                 drawBegun = false;
-                //graphicsDevice.Present();
+                graphicsDevice.Present();
             }
-        }
-        private GraphicsDeviceInformation DoPreparingDeviceSettings()
-        {
-            var gdi = new GraphicsDeviceInformation();
-            PrepareGraphicsDeviceInformation(gdi);
-            var preparingDeviceSettingsHandler = PreparingDeviceSettings;
-
-            if (preparingDeviceSettingsHandler != null)
-            {
-                // this allows users to overwrite settings through the argument
-                var args = new PreparingDeviceSettingsEventArgs(gdi);
-                preparingDeviceSettingsHandler(this, args);
-
-                if (gdi.PresentationParameters == null || gdi.Adapter == null)
-                    throw new NullReferenceException("Members should not be set to null in PreparingDeviceSettingsEventArgs");
-            }
-
-            return gdi;
-        }
-        private void PrepareGraphicsDeviceInformation(GraphicsDeviceInformation gdi)
-        {
-            gdi.Adapter = GraphicsAdapter.DefaultAdapter;
-            gdi.GraphicsProfile = GraphicsProfile;
-            var pp = new PresentationParameters();
-            PreparePresentationParameters(pp);
-            gdi.PresentationParameters = pp;
-        }
-
-        private void PreparePresentationParameters(PresentationParameters presentationParameters)
-        {
-            presentationParameters.BackBufferFormat = preferredBackBufferFormat;
-            presentationParameters.BackBufferWidth = preferredBackBufferWidth;
-            presentationParameters.BackBufferHeight = preferredBackBufferHeight;
-            presentationParameters.DepthStencilFormat = preferredDepthStencilFormat;
-            presentationParameters.IsFullScreen = wantFullScreen;
-            presentationParameters.HardwareModeSwitch = hardwareModeSwitch;
-            presentationParameters.PresentationInterval = synchronizedWithVerticalRetrace ? PresentInterval.One : PresentInterval.Immediate;
-            presentationParameters.DisplayOrientation = game.Window.CurrentOrientation;
-            presentationParameters.DeviceWindowHandle = game.Window.Handle;
-
-            if (preferMultiSampling)
-            {
-                presentationParameters.MultiSampleCount = GraphicsDevice != null
-                    ? GraphicsDevice.GraphicsCapabilities.MaxMultiSampleCount
-                    : 32;
-            }
-            else
-            {
-                presentationParameters.MultiSampleCount = 0;
-            }
-
-            //PlatformPreparePresentationParameters(presentationParameters);
         }
     }
 }
