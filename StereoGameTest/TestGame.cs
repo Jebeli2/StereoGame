@@ -26,8 +26,10 @@
         {
             base.Draw(gameTime);
             GraphicsDevice.DrawTexture(bg);
-            GraphicsDevice.Color = Color.Wheat;
-            GraphicsDevice.DrawRect(10,10,100,100);
+            GraphicsDevice.Color = Color.BlanchedAlmond;
+            GraphicsDevice.BlendMode = BlendMode.Blend;
+            GraphicsDevice.DrawRect(10, 10, 100, 100);
+            GraphicsDevice.DrawLine(10, 109, 109, 10);
         }
     }
 }

@@ -68,6 +68,12 @@
             }
         }
 
+        public override void DrawLine(int x1, int y1, int x2, int y2)
+        {
+            Sdl.Renderer.DrawLine(handle, x1, y1, x2, y2);
+        }
+
+
         protected override void DrawRect(ref Rectangle rect)
         {
             Sdl.Renderer.DrawRect(handle, ref rect);
@@ -75,6 +81,11 @@
         protected override void SetDrawColor(byte r, byte g, byte b, byte a)
         {
             Sdl.Renderer.SetDrawColor(handle, r, g, b, a);
+        }
+
+        protected override void SetDrawBlendMode(BlendMode blendMode)
+        {
+            Sdl.Renderer.SetDrawBlendMode(handle, (int)blendMode);
         }
 
         private bool CheckTexture(Texture? texture, out IntPtr tex)

@@ -10,11 +10,11 @@
     {
         private readonly int width;
         private readonly int height;
-        protected Texture(GraphicsDevice graphicsDevice, int width, int heigth)
+        protected Texture(GraphicsDevice graphicsDevice, int width, int height)
         {
             GraphicsDevice = graphicsDevice;
             this.width = width;
-            this.height = heigth;
+            this.height = height;
         }
 
         public int Width => width;

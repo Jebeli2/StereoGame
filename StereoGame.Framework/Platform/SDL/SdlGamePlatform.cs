@@ -1,6 +1,7 @@
 ﻿namespace StereoGame.Framework.Platform.SDL
 {
     using StereoGame.Framework.Graphics;
+    using StereoGame.Framework.Input;
     using StereoGame.Framework.Utilities;
     using System;
     using System.Collections.Generic;
@@ -64,13 +65,18 @@
                     case Sdl.EventType.ControllerButtonDown:
                     case Sdl.EventType.ControllerAxisMotion:
                         break;
-                    case Sdl.EventType.MouseWheel:
-                        break;
                     case Sdl.EventType.KeyDown:
                         break;
                     case Sdl.EventType.KeyUp:
                         break;
+                    case Sdl.EventType.MouseWheel:
+                        const int wheelDelta = 120;
+                        Mouse.ScrollX = ev.Wheel.X * wheelDelta;
+                        Mouse.ScrollY = ev.Wheel.Y * wheelDelta;
+                        break;
                     case Sdl.EventType.MouseButtonDown:
+
+                        //view.MouseState.
                         break;
                     case Sdl.EventType.MouseButtonup:
                         break;

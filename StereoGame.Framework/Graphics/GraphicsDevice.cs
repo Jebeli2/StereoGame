@@ -12,6 +12,7 @@ namespace StereoGame.Framework.Graphics
         private bool isDisposed;
         private readonly object resourcesLock = new();
         private readonly List<WeakReference> resources = new();
+        private BlendMode blendMode;
         private Color color;
         private byte colorR;
         private byte colorG;
@@ -62,6 +63,12 @@ namespace StereoGame.Framework.Graphics
             set { SetColor(value); }
         }
 
+        public BlendMode BlendMode
+        {
+            get { return blendMode; }
+            set { SetBlendMode(value); }
+        }
+
 
         public abstract void Clear();
         public abstract void Present();
@@ -96,6 +103,8 @@ namespace StereoGame.Framework.Graphics
         }
         protected abstract void DrawTexture(Texture? texture, ref Rectangle src, ref Rectangle dst);
 
+        public abstract void DrawLine(int x1, int y1, int x2, int y2);
+
         public void DrawRect(Rectangle rect)
         {
             DrawRect(ref rect);
@@ -120,6 +129,17 @@ namespace StereoGame.Framework.Graphics
                 colorB = value.B;
                 colorA = value.A;
                 SetDrawColor(colorR, colorG, colorB, colorA);
+            }
+        }
+
+        protected abstract void SetDrawBlendMode(BlendMode value);
+
+        public void SetBlendMode(BlendMode value)
+        {
+            if (blendMode != value)
+            {
+                blendMode = value;
+                SetDrawBlendMode(blendMode);
             }
         }
     }

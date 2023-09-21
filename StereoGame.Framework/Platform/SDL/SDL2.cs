@@ -117,10 +117,12 @@
             public Keyboard.Event Key;
             [FieldOffset(0)]
             public Mouse.MotionEvent Motion;
-            //[FieldOffset(0)]
-            //public Keyboard.TextEditingEvent Edit;
-            //[FieldOffset(0)]
-            //public Keyboard.TextInputEvent Text;
+            [FieldOffset(0)]
+            public Mouse.ButtonEvent Button;
+            [FieldOffset(0)]
+            public Keyboard.TextEditingEvent Edit;
+            [FieldOffset(0)]
+            public Keyboard.TextInputEvent Text;
             [FieldOffset(0)]
             public Mouse.WheelEvent Wheel;
             [FieldOffset(0)]
@@ -815,8 +817,16 @@
             public static readonly d_sdl_rendersetdrawcolor SetDrawColor = FuncLoader.LoadFunction<d_sdl_rendersetdrawcolor>(NativeLibrary, "SDL_SetRenderDrawColor");
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_rendersetdrawblendmode(IntPtr renderer, int blendMode);
+            public static readonly d_sdl_rendersetdrawblendmode SetDrawBlendMode = FuncLoader.LoadFunction<d_sdl_rendersetdrawblendmode>(NativeLibrary, "SDL_SetRenderDrawBlendMode");
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             public delegate int d_sdl_renderdrawrect(IntPtr renderer, ref Rectangle rect);
             public static readonly d_sdl_renderdrawrect DrawRect = FuncLoader.LoadFunction<d_sdl_renderdrawrect>(NativeLibrary, "SDL_RenderDrawRect");
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_renderdrawline(IntPtr renderer, int x1, int y1, int x2, int y2);
+            public static readonly d_sdl_renderdrawline DrawLine = FuncLoader.LoadFunction<d_sdl_renderdrawline>(NativeLibrary, "SDL_RenderDrawLine");
 
 
         }
@@ -1024,14 +1034,30 @@
                 public uint WindowID;
                 public uint Which;
                 public byte State;
-                private readonly byte _padding1;
-                private readonly byte _padding2;
-                private readonly byte _padding3;
+                private readonly byte padding1;
+                private readonly byte padding2;
+                private readonly byte padding3;
                 public int X;
                 public int Y;
                 public int Xrel;
                 public int Yrel;
             }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct ButtonEvent
+            {
+                public EventType type;
+                public uint Timestamp;
+                public uint WindowID;
+                public uint Which;
+                public byte Button;
+                public byte State;
+                public byte Clicks;
+                private readonly byte padding1;
+                public int X;
+                public int Y;
+            }
+
 
             [StructLayout(LayoutKind.Sequential)]
             public struct WheelEvent
@@ -1133,27 +1159,46 @@
                 public Keysym Keysym;
             }
 
-            //[StructLayout(LayoutKind.Sequential)]
-            //public struct TextEditingEvent
-            //{
-            //    public EventType Type;
-            //    public uint Timestamp;
-            //    public uint WindowId;
+            [StructLayout(LayoutKind.Sequential)]
+            public struct TextEditingEvent
+            {
+                public EventType Type;
+                public uint Timestamp;
+                public uint WindowId;
+                public uint Text1;
+                public uint Text2;
+                public uint Text3;
+                public uint Text4;
+                public uint Text5;
+                public uint Text6;
+                public uint Text7;
+                public uint Text8;
+                public int Start;
+                public int Length;
+            }
             //    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
             //    public byte[] Text;
             //    public int Start;
             //    public int Length;
             //}
 
-            //[StructLayout(LayoutKind.Sequential)]
-            //public  struct TextInputEvent
-            //{
-            //    public EventType Type;
-            //    public uint Timestamp;
-            //    public uint WindowId;
-            //    [MarshalAs(UnmanagedType.ByValArray,SizeConst = 32)]
-            //    public byte[] Text;
-            //}
+            [StructLayout(LayoutKind.Sequential)]
+            public  struct TextInputEvent
+            {
+                public EventType Type;
+                public uint Timestamp;
+                public uint WindowId;
+                public uint Text1;
+                public uint Text2;
+                public uint Text3;
+                public uint Text4;
+                public uint Text5;
+                public uint Text6;
+                public uint Text7;
+                public uint Text8;
+                //    [MarshalAs(UnmanagedType.ByValArray,SizeConst = 32)]
+                //    public byte[] Text;
+            }
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             public delegate Keymod d_sdl_getmodstate();

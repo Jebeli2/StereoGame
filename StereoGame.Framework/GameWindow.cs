@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StereoGame.Framework.Input;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -48,6 +49,8 @@ namespace StereoGame.Framework
                 throw new NotImplementedException();
             }
         }
+
+        internal MouseState MouseState;
 
         protected GameWindow()
         {
