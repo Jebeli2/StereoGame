@@ -43,7 +43,7 @@
         {
             Dispose(false);
         }
-
+        public uint ID => id;
         internal void CreateWindow()
         {
             var initflags =
@@ -122,10 +122,27 @@
         {
             get
             {
-                int x = 0;
-                int y = 0;
-                Sdl.Window.GetPosition(handle, out x, out y);
+                Sdl.Window.GetPosition(handle, out int x, out int y);
                 return new Rectangle(x, y, width, height);
+            }
+        }
+
+        public override Size Size
+        {
+            get { return new Size(width, height); }
+            set
+            {
+                if (value.Width != width || value.Height != height)
+                {
+                    var prevBounds = ClientBounds;
+                    width = value.Width;
+                    height = value.Height;
+                    Sdl.Window.GetBorderSize(handle, out int miny, out int minx, out _, out _);
+                    var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - width) / 2), minx);
+                    var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - height) / 2), miny);
+                    Sdl.Window.SetSize(handle, width, height);
+                    Sdl.Window.SetPosition(handle, centerX, centerY);
+                }
             }
         }
 
@@ -212,13 +229,7 @@
 
         public void ClientResize(int width, int height)
         {
-            // SDL reports many resize events even if the Size didn't change.
-            // Only call the code below if it actually changed.
-            if (this.width == width &&
-                this.height == height)
-            {
-                return;
-            }
+            if (this.width == width && this.height == height) { return; }
             //_game.GraphicsDevice.PresentationParameters.BackBufferWidth = width;
             //_game.GraphicsDevice.PresentationParameters.BackBufferHeight = height;
             //_game.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);

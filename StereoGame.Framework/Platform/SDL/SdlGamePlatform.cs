@@ -54,6 +54,50 @@
                     case Sdl.EventType.Quit:
                         isExiting++;
                         break;
+                    case Sdl.EventType.JoyDeviceAdded:
+                        break;
+                    case Sdl.EventType.JoyDeviceRemoved:
+                        break;
+                    case Sdl.EventType.ControllerDeviceRemoved:
+                        break;
+                    case Sdl.EventType.ControllerButtonUp:
+                    case Sdl.EventType.ControllerButtonDown:
+                    case Sdl.EventType.ControllerAxisMotion:
+                        break;
+                    case Sdl.EventType.MouseWheel:
+                        break;
+                    case Sdl.EventType.KeyDown:
+                        break;
+                    case Sdl.EventType.KeyUp:
+                        break;
+                    case Sdl.EventType.MouseButtonDown:
+                        break;
+                    case Sdl.EventType.MouseButtonup:
+                        break;
+                    case Sdl.EventType.MouseMotion:
+                        break;
+                    case Sdl.EventType.WindowEvent:
+                        if (ev.Window.WindowID != view.ID) break;
+                        switch (ev.Window.EventID)
+                        {
+                            case Sdl.Window.EventId.Resized:
+                            case Sdl.Window.EventId.SizeChanged:
+                                view.ClientResize(ev.Window.Data1, ev.Window.Data2);
+                                break;
+                            case Sdl.Window.EventId.FocusGained:
+                                IsActive = true;
+                                break;
+                            case Sdl.Window.EventId.FocusLost:
+                                IsActive = false;
+                                break;
+                            case Sdl.Window.EventId.Moved:
+                                view.Moved();
+                                break;
+                            case Sdl.Window.EventId.Close:
+                                isExiting++;
+                                break;
+                        }
+                        break;
                 }
             }
         }
@@ -63,8 +107,9 @@
             throw new NotSupportedException("The desktop platform does not support asynchronous run loops");
         }
 
-        public override GraphicsDevice CreateGraphicsDevice()
+        public override GraphicsDevice CreateGraphicsDevice(PresentationParameters pp)
         {
+            view.Size = new System.Drawing.Size(pp.BackBufferWidth, pp.BackBufferHeight);
             renderer = new SdlGraphicsDevice(Game, view);
             return renderer;
         }

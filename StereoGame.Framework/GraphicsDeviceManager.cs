@@ -33,6 +33,18 @@ namespace StereoGame.Framework
         public GraphicsDeviceManager(Game game)
         {
             this.game = game;
+            var clientBounds = this.game.Window.ClientBounds;
+            if (clientBounds.Width >= clientBounds.Height)
+            {
+                preferredBackBufferWidth = clientBounds.Width;
+                preferredBackBufferHeight = clientBounds.Height;
+            }
+            else
+            {
+                preferredBackBufferWidth = clientBounds.Height;
+                preferredBackBufferHeight = clientBounds.Width;
+            }
+            wantFullScreen = false;
             GraphicsProfile = GraphicsProfile.Reach;
 
             if (this.game.Services.GetService(typeof(IGraphicsDeviceManager)) != null)
@@ -62,6 +74,31 @@ namespace StereoGame.Framework
             {
                 shouldApplyChanges = true;
                 hardwareModeSwitch = value;
+            }
+        }
+
+        public int PreferredBackBufferHeight
+        {
+            get
+            {
+                return preferredBackBufferHeight;
+            }
+            set
+            {
+                shouldApplyChanges = true;
+                preferredBackBufferHeight = value;
+            }
+        }
+        public int PreferredBackBufferWidth
+        {
+            get
+            {
+                return preferredBackBufferWidth;
+            }
+            set
+            {
+                shouldApplyChanges = true;
+                preferredBackBufferWidth = value;
             }
         }
         public GraphicsDevice? GraphicsDevice => graphicsDevice;
@@ -99,11 +136,16 @@ namespace StereoGame.Framework
 
         private void CreateDevice()
         {
-            if (graphicsDevice != null) return;
-            graphicsDevice = game.Platform.CreateGraphicsDevice();
-            OnDeviceCreated(EventArgs.Empty);
+            var pp = PreparePresentationParameters();
+            CreateDevice(pp);
         }
 
+        private void CreateDevice(PresentationParameters pp)
+        {
+            if (graphicsDevice != null) return;
+            graphicsDevice = game.Platform.CreateGraphicsDevice(pp);
+            OnDeviceCreated(EventArgs.Empty);
+        }
 
         void IGraphicsDeviceManager.CreateDevice()
         {
@@ -150,6 +192,24 @@ namespace StereoGame.Framework
                 drawBegun = false;
                 graphicsDevice.Present();
             }
+        }
+
+        public void ApplyChanges()
+        {
+            if (graphicsDevice == null) { CreateDevice(); }
+            if (!shouldApplyChanges) return;
+            shouldApplyChanges = false;
+
+        }
+
+        private PresentationParameters PreparePresentationParameters()
+        {
+            var pp = new PresentationParameters();
+            pp.BackBufferWidth = preferredBackBufferWidth;
+            pp.BackBufferHeight = preferredBackBufferHeight;
+            pp.HardwareModeSwitch = hardwareModeSwitch;
+            pp.IsFullScreen = wantFullScreen;
+            return pp;
         }
     }
 }

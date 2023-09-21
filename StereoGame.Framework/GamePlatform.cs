@@ -55,7 +55,7 @@
             }
         }
 
-        public abstract GraphicsDevice CreateGraphicsDevice();
+        public abstract GraphicsDevice CreateGraphicsDevice(PresentationParameters pp);
 
         public abstract GameRunBehavior DefaultRunBehavior { get; }
         public bool IsActive

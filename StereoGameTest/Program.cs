@@ -4,4 +4,6 @@ using StereoGameTest;
 
 using TestGame game = new();
 var gdm = new GraphicsDeviceManager(game);
+gdm.PreferredBackBufferWidth = 1024;
+gdm.PreferredBackBufferHeight = 720;
 game.Run();

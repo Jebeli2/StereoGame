@@ -18,6 +18,7 @@ namespace StereoGame.Framework
         public abstract bool AllowUserResizing { get; set; }
 
         public abstract Rectangle ClientBounds { get; }
+        public abstract Size Size { get; set; }
         public virtual bool AllowAltF4 { get { return allowAltF4; } set { allowAltF4 = value; } }
         public abstract Point Position { get; set; }
         public abstract DisplayOrientation CurrentOrientation { get; }
