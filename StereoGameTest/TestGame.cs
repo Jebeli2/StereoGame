@@ -4,6 +4,7 @@
     using StereoGame.Framework.Graphics;
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -25,6 +26,8 @@
         {
             base.Draw(gameTime);
             GraphicsDevice.DrawTexture(bg);
+            GraphicsDevice.Color = Color.Wheat;
+            GraphicsDevice.DrawRect(10,10,100,100);
         }
     }
 }

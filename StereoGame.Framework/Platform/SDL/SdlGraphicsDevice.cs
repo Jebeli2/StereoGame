@@ -68,6 +68,15 @@
             }
         }
 
+        protected override void DrawRect(ref Rectangle rect)
+        {
+            Sdl.Renderer.DrawRect(handle, ref rect);
+        }
+        protected override void SetDrawColor(byte r, byte g, byte b, byte a)
+        {
+            Sdl.Renderer.SetDrawColor(handle, r, g, b, a);
+        }
+
         private bool CheckTexture(Texture? texture, out IntPtr tex)
         {
             tex = IntPtr.Zero;

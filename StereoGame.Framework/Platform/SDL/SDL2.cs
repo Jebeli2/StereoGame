@@ -306,9 +306,9 @@
                 public uint TimeStamp;
                 public uint WindowID;
                 public EventId EventID;
-                private byte padding1;
-                private byte padding2;
-                private byte padding3;
+                private readonly byte padding1;
+                private readonly byte padding2;
+                private readonly byte padding3;
                 public int Data1;
                 public int Data2;
             }
@@ -810,6 +810,15 @@
                 }
             }
 
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_rendersetdrawcolor(IntPtr renderer, byte r, byte g, byte b, byte a);
+            public static readonly d_sdl_rendersetdrawcolor SetDrawColor = FuncLoader.LoadFunction<d_sdl_rendersetdrawcolor>(NativeLibrary, "SDL_SetRenderDrawColor");
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_renderdrawrect(IntPtr renderer, ref Rectangle rect);
+            public static readonly d_sdl_renderdrawrect DrawRect = FuncLoader.LoadFunction<d_sdl_renderdrawrect>(NativeLibrary, "SDL_RenderDrawRect");
+
+
         }
 
         public static class Display
@@ -1015,9 +1024,9 @@
                 public uint WindowID;
                 public uint Which;
                 public byte State;
-                private byte _padding1;
-                private byte _padding2;
-                private byte _padding3;
+                private readonly byte _padding1;
+                private readonly byte _padding2;
+                private readonly byte _padding3;
                 public int X;
                 public int Y;
                 public int Xrel;
@@ -1119,8 +1128,8 @@
                 public uint WindowId;
                 public byte State;
                 public byte Repeat;
-                private byte padding2;
-                private byte padding3;
+                private readonly byte padding2;
+                private readonly byte padding3;
                 public Keysym Keysym;
             }
 
