@@ -69,7 +69,7 @@
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-            EventHelpers.Raise(this, Disposed, EventArgs.Empty);
+            Disposed?.Invoke(this, EventArgs.Empty);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -330,17 +330,17 @@
         protected virtual void OnActivated(object? sender, EventArgs args)
         {
             AssertNotDisposed();
-            EventHelpers.Raise(sender, Activated, args);
+            Activated?.Invoke(sender, args);
         }
         protected virtual void OnDeactivated(object? sender, EventArgs args)
         {
             AssertNotDisposed();
-            EventHelpers.Raise(sender, Deactivated, args);
+            Deactivated?.Invoke(sender, args);
         }
 
         protected virtual void OnExiting(object sender, EventArgs args)
         {
-            EventHelpers.Raise(sender, Exiting, args);
+            Exiting?.Invoke(this, args);
         }
         protected virtual bool BeginDraw() { return true; }
         protected virtual void EndDraw()
@@ -404,6 +404,7 @@
             CategorizeComponents();
             components.ComponentAdded += Components_ComponentAdded;
             components.ComponentRemoved += Components_ComponentRemoved;
+            Log("Game Initialized");
         }
 
         private void Components_ComponentAdded(object? sender, GameComponentCollectionEventArgs e)
@@ -445,6 +446,7 @@
         {
             OnExiting(this, EventArgs.Empty);
             UnloadContent();
+            Log("Game Exited");
         }
 
         protected virtual void Draw(GameTime gameTime)
@@ -456,7 +458,7 @@
         {
             updateables.ForEachFilteredItem(UpdateAction, gameTime);
         }
-        [System.Diagnostics.DebuggerNonUserCode]
+        [DebuggerNonUserCode]
         private void AssertNotDisposed()
         {
             if (isDisposed)
@@ -464,6 +466,12 @@
                 string name = GetType().Name;
                 throw new ObjectDisposedException(name, string.Format("The {0} object was used after being Disposed.", name));
             }
+        }
+
+        [Conditional("DEBUG")]
+        protected void Log(string message)
+        {
+            platform?.Log(message);
         }
 
 

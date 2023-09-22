@@ -72,7 +72,7 @@ namespace StereoGame.Framework
 
         internal void OnClientSizeChanged()
         {
-            EventHelpers.Raise(this, ClientSizeChanged, EventArgs.Empty);
+            ClientSizeChanged?.Invoke(this, EventArgs.Empty);
         }
 
         protected void OnDeactivated()
@@ -80,7 +80,7 @@ namespace StereoGame.Framework
         }
         protected void OnOrientationChanged()
         {
-            EventHelpers.Raise(this, OrientationChanged, EventArgs.Empty);
+            OrientationChanged?.Invoke(this, EventArgs.Empty);
         }
 
         protected void OnPaint()
@@ -88,7 +88,7 @@ namespace StereoGame.Framework
         }
         protected void OnScreenDeviceNameChanged()
         {
-            EventHelpers.Raise(this, ScreenDeviceNameChanged, EventArgs.Empty);
+            ScreenDeviceNameChanged?.Invoke(this, EventArgs.Empty);
         }
 
         protected internal abstract void SetSupportedOrientations(DisplayOrientation orientations);

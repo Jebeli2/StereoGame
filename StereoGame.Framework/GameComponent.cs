@@ -58,11 +58,11 @@
 
         protected virtual void OnUpdateOrderChanged(object sender, EventArgs args)
         {
-            EventHelpers.Raise(sender, UpdateOrderChanged, args);
+            UpdateOrderChanged?.Invoke(this, args);
         }
         protected virtual void OnEnabledChanged(object sender, EventArgs args)
         {
-            EventHelpers.Raise(sender, EnabledChanged, args);
+            EnabledChanged?.Invoke(this, args);
         }
         protected virtual void Dispose(bool disposing) { }
         public void Dispose()

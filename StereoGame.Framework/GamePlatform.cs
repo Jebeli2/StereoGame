@@ -4,6 +4,7 @@
     using StereoGame.Framework.Input;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -67,7 +68,7 @@
                 if (isActive != value)
                 {
                     isActive = value;
-                    EventHelpers.Raise(this, isActive ? Activated : Deactivated, EventArgs.Empty);
+                    if (isActive) { Activated?.Invoke(this, EventArgs.Empty); } else { Deactivated?.Invoke(this, EventArgs.Empty); }
                 }
             }
         }
@@ -78,7 +79,7 @@
 
         protected void RaiseAsyncRunLoopEnded()
         {
-            EventHelpers.Raise(this, AsyncRunLoopEnded, EventArgs.Empty);
+            AsyncRunLoopEnded?.Invoke(this, EventArgs.Empty);
         }
         public virtual void BeforeInitialize()
         {
@@ -88,7 +89,6 @@
         {
             return true;
         }
-
         public abstract void Exit();
 
         public abstract void RunLoop();
@@ -106,5 +106,8 @@
 
         public abstract void BeginScreenDeviceChange(bool willBeFullScreen);
         public abstract void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight);
+
+        [Conditional("DEBUG")]
+        public virtual void Log(string message) { }
     }
 }

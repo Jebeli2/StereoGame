@@ -26,6 +26,9 @@ namespace StereoGame.Framework.Graphics
         {
             Dispose(false);
         }
+
+        public event EventHandler<ResourceCreatedEventArgs>? ResourceCreated;
+        public event EventHandler<ResourceDestroyedEventArgs>? ResourceDestroyed;
         public event EventHandler<EventArgs>? Disposing;
 
         public bool IsDisposed => isDisposed;
@@ -53,8 +56,18 @@ namespace StereoGame.Framework.Graphics
                     }
                 }
                 isDisposed = true;
-                EventHelpers.Raise(this, Disposing, EventArgs.Empty);
+                Disposing?.Invoke(this,EventArgs.Empty);
             }
+        }
+
+        internal void OnResourceCreated(object resource)
+        {
+            ResourceCreated?.Invoke(this, new ResourceCreatedEventArgs(resource));
+        }
+
+        internal void OnResourceDestroyed(object resource, string name)
+        {
+            ResourceDestroyed?.Invoke(this,new ResourceDestroyedEventArgs(resource, name));
         }
 
         public Color Color

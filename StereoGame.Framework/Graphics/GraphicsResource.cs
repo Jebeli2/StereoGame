@@ -58,18 +58,13 @@
             {
                 if (disposing)
                 {
-                    // Release managed objects
-                    // ...
-                }
-
-                if (disposing)
-                {
-                    EventHelpers.Raise(this, Disposing, EventArgs.Empty);
+                    Disposing?.Invoke(this,EventArgs.Empty);    
                 }
 
                 if (graphicsDevice != null && selfReference != null)
                 {
                     graphicsDevice.RemoveResourceReference(selfReference);
+                    graphicsDevice.OnResourceDestroyed(this, Name);
                 }
 
                 selfReference = null;
@@ -85,5 +80,11 @@
         public string Name { get; set; }
 
         public object Tag { get; set; }
+
+        public override string? ToString()
+        {
+            if (!string.IsNullOrEmpty(Name)) return Name;
+            return base.ToString();
+        }
     }
 }

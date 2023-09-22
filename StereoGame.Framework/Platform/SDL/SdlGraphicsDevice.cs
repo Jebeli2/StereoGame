@@ -45,7 +45,10 @@
             IntPtr tex = Sdl.Renderer.CreateTexture(handle, Sdl.Renderer.SDL_PIXELFORMAT_ARGB8888, Sdl.Renderer.SDL_TEXTUREACCESS_TARGET, width, height);
             if (tex != IntPtr.Zero)
             {
-                return new SdlTexture(this, width, height, tex);
+                SdlTexture texture = new SdlTexture(this, width, height, tex);
+                texture.Name = $"Texture {width}x{height}";
+                OnResourceCreated(texture);
+                return texture;
             }
             return null;
         }
@@ -55,7 +58,10 @@
             if (tex != IntPtr.Zero)
             {
                 Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
-                return new SdlTexture(this, w, h, tex);
+                SdlTexture texture = new SdlTexture(this, w, h, tex);
+                texture.Name = path;
+                OnResourceCreated(texture);
+                return texture;
             }
             return null;
         }
@@ -88,7 +94,7 @@
             Sdl.Renderer.SetDrawBlendMode(handle, (int)blendMode);
         }
 
-        private bool CheckTexture(Texture? texture, out IntPtr tex)
+        private static bool CheckTexture(Texture? texture, out IntPtr tex)
         {
             tex = IntPtr.Zero;
             if (texture is SdlTexture sdlTexture)

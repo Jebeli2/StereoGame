@@ -9,7 +9,7 @@
 
     internal class SdlTexture : Texture
     {
-        private IntPtr handle;
+        private readonly IntPtr handle;
         internal SdlTexture(SdlGraphicsDevice graphicsDevice, int width, int height, IntPtr handle)
             : base(graphicsDevice, width, height)
         {

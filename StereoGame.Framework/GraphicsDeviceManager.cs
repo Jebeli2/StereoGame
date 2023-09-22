@@ -116,22 +116,22 @@ namespace StereoGame.Framework
 
         protected void OnDeviceCreated(EventArgs e)
         {
-            EventHelpers.Raise(this, DeviceCreated, e);
+            DeviceCreated?.Invoke(this, e);
         }
 
         protected void OnDeviceDisposing(EventArgs e)
         {
-            EventHelpers.Raise(this, DeviceDisposing, e);
+            DeviceDisposing?.Invoke(this, e);
         }
 
         protected void OnDeviceResetting(EventArgs e)
         {
-            EventHelpers.Raise(this, DeviceResetting, e);
+            DeviceResetting?.Invoke(this, e);
         }
 
         protected void OnDeviceReset(EventArgs e)
         {
-            EventHelpers.Raise(this, DeviceReset, e);
+            DeviceReset?.Invoke(this, e);
         }
 
         private void CreateDevice()
@@ -172,7 +172,7 @@ namespace StereoGame.Framework
                     graphicsDevice = null;
                 }
                 disposed = true;
-                EventHelpers.Raise(this, Disposed, EventArgs.Empty);
+                Disposed?.Invoke(this, EventArgs.Empty);
             }
         }
 

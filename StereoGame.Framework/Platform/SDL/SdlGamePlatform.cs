@@ -174,5 +174,10 @@
         {
             Game.GraphicsDevice.Present();
         }
+
+        public override void Log(string message)
+        {
+            Console.WriteLine(message);
+        }
     }
 }

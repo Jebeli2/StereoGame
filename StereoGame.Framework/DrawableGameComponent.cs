@@ -78,11 +78,11 @@
 
         protected virtual void OnVisibleChanged(object sender, EventArgs args)
         {
-            EventHelpers.Raise(sender, VisibleChanged, args);
+            VisibleChanged?.Invoke(this, args);
         }
         protected virtual void OnDrawOrderChanged(object sender, EventArgs args)
         {
-            EventHelpers.Raise(sender, DrawOrderChanged, args);
+            DrawOrderChanged?.Invoke(this, args);
         }
     }
 }

@@ -31,12 +31,12 @@
 
         private void OnComponentAdded(GameComponentCollectionEventArgs eventArgs)
         {
-            EventHelpers.Raise(this, ComponentAdded, eventArgs);
+            ComponentAdded?.Invoke(this, eventArgs);
         }
 
         private void OnComponentRemoved(GameComponentCollectionEventArgs eventArgs)
         {
-            EventHelpers.Raise(this, ComponentRemoved, eventArgs);
+            ComponentRemoved?.Invoke(this, eventArgs);
         }
 
         protected override void RemoveItem(int index)
