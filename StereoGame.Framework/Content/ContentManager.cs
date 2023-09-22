@@ -9,23 +9,15 @@
     public partial class ContentManager : IDisposable
     {
         private readonly IServiceProvider serviceProvider;
+        private readonly Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         private bool disposed;
         public ContentManager(IServiceProvider serviceProvider)
         {
             if (serviceProvider == null) { throw new ArgumentNullException(nameof(serviceProvider)); }
             this.serviceProvider = serviceProvider;
-            //AddContentManager(this);
         }
 
-        public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
-        {
-            if (serviceProvider == null) { throw new ArgumentNullException(nameof(serviceProvider)); }
-            if (rootDirectory == null) { throw new ArgumentNullException(nameof(rootDirectory)); }
-            //this.RootDirectory = rootDirectory;
-            this.serviceProvider = serviceProvider;
-            //AddContentManager(this);
-        }
         ~ContentManager()
         {
             Dispose(false);
@@ -35,7 +27,6 @@
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-            //RemoveContentManager(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -49,6 +40,30 @@
 
                 disposed = true;
             }
+        }
+
+        public virtual T? Load<T>(string assetName)
+        {
+            var key = assetName.Replace('\\', '/');
+            if (loadedAssets.TryGetValue(key, out object? asset))
+            {
+                if (asset is T result)
+                {
+                    return result;
+                }
+            }
+            T? newResult = ReadAsset<T>(assetName);
+            if (newResult != null)
+            {
+                loadedAssets[key] = newResult;
+                return newResult;
+            }
+            return default;
+        }
+
+        protected T? ReadAsset<T>(string assetName)
+        {
+            return default;
         }
     }
 }
