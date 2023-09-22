@@ -3,19 +3,24 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Resources;
     using System.Text;
     using System.Threading.Tasks;
 
     public partial class ContentManager : IDisposable
     {
-        private readonly IServiceProvider serviceProvider;
-        private readonly Dictionary<string, object> loadedAssets = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        private readonly Game game;
+        private readonly List<IAssetReader> assetReaders = new();
+        private readonly Dictionary<string, object> loadedAssets = new(StringComparer.OrdinalIgnoreCase);
+        private readonly List<ResourceManager> resourceManagers = new();
+        private readonly List<string> knownNames = new();
 
         private bool disposed;
-        public ContentManager(IServiceProvider serviceProvider)
+        public ContentManager(Game game)
         {
-            if (serviceProvider == null) { throw new ArgumentNullException(nameof(serviceProvider)); }
-            this.serviceProvider = serviceProvider;
+            this.game = game;
+            RegisterAssetReader(new TextureReader());
+            RegisterAssetReader(new TextFontReader());
         }
 
         ~ContentManager()
@@ -42,7 +47,23 @@
             }
         }
 
-        public virtual T? Load<T>(string assetName)
+        public Game Game => game;
+
+        public void AddResourceManager(ResourceManager resourceManager)
+        {
+            if (!resourceManagers.Contains(resourceManager))
+            {
+                resourceManagers.Add(resourceManager);
+                knownNames.AddRange(ListResources(resourceManager));
+            }
+        }
+        public void RegisterAssetReader<T>(IAssetReader<T> reader)
+        {
+            reader.ContentManager = this;
+            assetReaders.Add(reader);
+        }
+
+        public virtual T? Load<T>(string assetName, object? parameter = null)
         {
             var key = assetName.Replace('\\', '/');
             if (loadedAssets.TryGetValue(key, out object? asset))
@@ -52,7 +73,7 @@
                     return result;
                 }
             }
-            T? newResult = ReadAsset<T>(assetName);
+            T? newResult = ReadAsset<T>(assetName, parameter);
             if (newResult != null)
             {
                 loadedAssets[key] = newResult;
@@ -61,9 +82,110 @@
             return default;
         }
 
-        protected T? ReadAsset<T>(string assetName)
+        protected T? ReadAsset<T>(string assetName, object? parameter)
         {
+            byte[]? data = FindContent(assetName);
+            foreach (var reader in GetAssetReaders<T>())
+            {
+                T? result = reader.ReadAsset(assetName, data, parameter);
+                if (result != null) return result;
+            }
             return default;
+        }
+
+        public byte[]? FindContent(string assetName)
+        {
+            byte[]? data = null;
+            if (!string.IsNullOrEmpty(assetName))
+            {
+                if (data == null) { data = FindInFileSystem(assetName); }
+                if (data == null) { data = FindInResManagers(assetName); }
+            }
+            return data;
+        }
+
+        private static byte[]? FindInFileSystem(string name)
+        {
+            try
+            {
+                if (File.Exists(name))
+                {
+                    return File.ReadAllBytes(name);
+                }
+            }
+            catch (IOException ioe)
+            {
+                //
+            }
+            return null;
+        }
+
+        private byte[]? FindInResManagers(string name)
+        {
+            name = FindResName(name);
+            foreach (ResourceManager rm in resourceManagers)
+            {
+                object? obj = rm.GetObject(name);
+                if (obj != null)
+                {
+                    if (obj is byte[] data) { return data; }
+                    else if (obj is string str)
+                    {
+                        return Encoding.UTF8.GetBytes(str);
+                    }
+                    else if (obj is UnmanagedMemoryStream ums1)
+                    {
+                        byte[] umsData = new byte[ums1.Length];
+                        ums1.Read(umsData, 0, umsData.Length);
+                        return umsData;
+                    }
+                }
+                UnmanagedMemoryStream? ums = rm.GetStream(name);
+                if (ums != null)
+                {
+                    byte[] umsData = new byte[ums.Length];
+                    ums.Read(umsData, 0, umsData.Length);
+                    return umsData;
+                }
+            }
+            return null;
+        }
+
+        private string FindResName(string name)
+        {
+            if (knownNames.Contains(name)) return name;
+            string testName = name.Replace('_', '-');
+            if (knownNames.Contains(testName)) return testName;
+            testName = name.Replace('_', ' ').Trim();
+            if (knownNames.Contains(testName)) return testName;
+            return name;
+        }
+
+        private IEnumerable<IAssetReader<T>> GetAssetReaders<T>()
+        {
+            foreach (var reader in assetReaders)
+            {
+                if (reader is IAssetReader<T> assetReader)
+                {
+                    yield return assetReader;
+                }
+            }
+        }
+
+        private static IEnumerable<string> ListResources(ResourceManager rm)
+        {
+            ResourceSet? rs = rm.GetResourceSet(System.Globalization.CultureInfo.InvariantCulture, true, false);
+            if (rs != null)
+            {
+                foreach (System.Collections.DictionaryEntry e in rs)
+                {
+                    string? s = e.Key?.ToString();
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        yield return s;
+                    }
+                }
+            }
         }
     }
 }

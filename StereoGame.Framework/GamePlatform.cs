@@ -107,6 +107,8 @@
         public abstract void BeginScreenDeviceChange(bool willBeFullScreen);
         public abstract void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight);
 
+        public abstract TextFont? LoadFont(string path, int ySize);
+
         [Conditional("DEBUG")]
         public virtual void Log(string message) { }
     }

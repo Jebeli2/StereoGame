@@ -15,9 +15,11 @@
         private readonly Stopwatch gameTimer = new();
         private bool initialzed;
         private bool isFixedTimeStep = true;
+        private const double oneSecInMS = 1000.0;
         private TimeSpan targetElapsedTime = TimeSpan.FromTicks(166667);
         private TimeSpan inactiveSleepTime = TimeSpan.FromSeconds(0.02);
         private TimeSpan maxElapsedTime = TimeSpan.FromMilliseconds(500);
+
         private TimeSpan accumulatedElapsedTime;
         private readonly GameTime gameTime = new();
         private long previousTicks;
@@ -54,7 +56,7 @@
             instance = this;
             services = new GameServiceContainer();
             components = new GameComponentCollection();
-            content = new ContentManager(services);
+            content = new ContentManager(this);
             platform = GamePlatform.PlatformCreate(this);
             platform.Activated += OnActivated;
             platform.Deactivated += OnDeactivated;
@@ -193,6 +195,13 @@
             }
         }
 
+        public int TargetFPS
+        {
+            get { return (int)(oneSecInMS / targetElapsedTime.TotalMilliseconds); }
+            set { TargetElapsedTime = TimeSpan.FromMilliseconds(oneSecInMS / value); }
+
+        }
+
         public bool IsFixedTimeStep
         {
             get => isFixedTimeStep;
@@ -239,7 +248,7 @@
 
         public void Tick()
         {
-            RetryTick:
+        RetryTick:
             if (!IsActive && InactiveSleepTime.TotalMilliseconds >= 1.0)
             {
                 Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);

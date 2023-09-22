@@ -13,17 +13,12 @@ namespace StereoGame.Framework
         private readonly Game game;
         private GraphicsDevice? graphicsDevice;
         private bool initialized;
-        private SurfaceFormat preferredBackBufferFormat;
-        private DepthFormat preferredDepthStencilFormat;
-        private bool preferMultiSampling;
         private int preferredBackBufferHeight;
         private int preferredBackBufferWidth;
-        private DisplayOrientation supportedOrientations;
         private bool synchronizedWithVerticalRetrace = true;
         private bool disposed;
         private bool drawBegun;
         private bool hardwareModeSwitch = true;
-        private bool preferHalfPixelOffset = false;
         private bool wantFullScreen;
         private GraphicsProfile graphicsProfile;
         private bool shouldApplyChanges;
@@ -99,6 +94,19 @@ namespace StereoGame.Framework
             {
                 shouldApplyChanges = true;
                 preferredBackBufferWidth = value;
+            }
+        }
+
+        public bool SynchronizeWithVerticalRetrace
+        {
+            get
+            {
+                return synchronizedWithVerticalRetrace;
+            }
+            set
+            {
+                shouldApplyChanges = true;
+                synchronizedWithVerticalRetrace = value;
             }
         }
         public GraphicsDevice? GraphicsDevice => graphicsDevice;
@@ -209,6 +217,7 @@ namespace StereoGame.Framework
             pp.BackBufferHeight = preferredBackBufferHeight;
             pp.HardwareModeSwitch = hardwareModeSwitch;
             pp.IsFullScreen = wantFullScreen;
+            pp.PresentInterval = synchronizedWithVerticalRetrace ? PresentInterval.One : PresentInterval.Immediate;
             return pp;
         }
     }

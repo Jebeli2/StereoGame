@@ -778,6 +778,19 @@
             public static readonly d_sdl_querytexture QueryTexture = FuncLoader.LoadFunction<d_sdl_querytexture>(NativeLibrary, "SDL_QueryTexture");
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate void d_sdl_destroytexture(IntPtr texture);
+            public static readonly d_sdl_destroytexture DestroyTexture = FuncLoader.LoadFunction<d_sdl_destroytexture>(NativeLibrary, "SDL_DestroyTexture");
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate IntPtr d_sdl_cleartexturefromsurface(IntPtr renderer, IntPtr surface);
+            public static readonly d_sdl_cleartexturefromsurface CreateTextureFromSurface = FuncLoader.LoadFunction<d_sdl_cleartexturefromsurface>(NativeLibrary, "SDL_CreateTextureFromSurface");
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_settexturealphamod(IntPtr renderer, byte alpha);
+            public static readonly d_sdl_settexturealphamod SetTextureAlphaMod = FuncLoader.LoadFunction<d_sdl_settexturealphamod>(NativeLibrary, "SDL_SetTextureAlphaMod");
+
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             public delegate int d_sdl_rendercopy_0(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref Rectangle dstRect);
             private static readonly d_sdl_rendercopy_0 RenderCopy0 = FuncLoader.LoadFunction<d_sdl_rendercopy_0>(NativeLibrary, "SDL_RenderCopy");
 
@@ -809,6 +822,42 @@
                 else
                 {
                     RenderCopy0(renderer, texture, ref srcrect, ref dstrect);
+                }
+            }
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_rendercopyF_0(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstRect);
+            private static readonly d_sdl_rendercopyF_0 RenderCopyF0 = FuncLoader.LoadFunction<d_sdl_rendercopyF_0>(NativeLibrary, "SDL_RenderCopyF");
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_rendercopyF_1(IntPtr renderer, IntPtr texture, IntPtr srcrect, ref RectangleF dstRect);
+            private static readonly d_sdl_rendercopyF_1 RenderCopyF1 = FuncLoader.LoadFunction<d_sdl_rendercopyF_1>(NativeLibrary, "SDL_RenderCopyF");
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_rendercopyF_2(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, IntPtr dstRect);
+            private static readonly d_sdl_rendercopyF_2 RenderCopyF2 = FuncLoader.LoadFunction<d_sdl_rendercopyF_2>(NativeLibrary, "SDL_RenderCopyF");
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_rendercopyF_3(IntPtr renderer, IntPtr texture, IntPtr srcrect, IntPtr dstRect);
+            private static readonly d_sdl_rendercopyF_3 RenderCopyF3 = FuncLoader.LoadFunction<d_sdl_rendercopyF_3>(NativeLibrary, "SDL_RenderCopyF");
+
+            public static  void RenderCopyF(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstrect)
+            {
+                if (srcrect.IsEmpty && dstrect.IsEmpty)
+                {
+                    RenderCopyF3(renderer, texture, IntPtr.Zero, IntPtr.Zero);
+                }
+                else if (srcrect.IsEmpty && !dstrect.IsEmpty)
+                {
+                    RenderCopyF1(renderer, texture, IntPtr.Zero, ref dstrect);
+                }
+                else if (!srcrect.IsEmpty && dstrect.IsEmpty)
+                {
+                    RenderCopyF2(renderer, texture, ref srcrect, IntPtr.Zero);
+                }
+                else
+                {
+                    RenderCopyF0(renderer, texture, ref srcrect, ref dstrect);
                 }
             }
 
@@ -1183,7 +1232,7 @@
             //}
 
             [StructLayout(LayoutKind.Sequential)]
-            public  struct TextInputEvent
+            public struct TextInputEvent
             {
                 public EventType Type;
                 public uint Timestamp;

@@ -17,5 +17,11 @@
         }
 
         public IntPtr Handle => handle;
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            Sdl.Renderer.DestroyTexture(handle);
+        }
     }
 }

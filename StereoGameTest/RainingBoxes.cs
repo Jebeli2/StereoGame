@@ -15,8 +15,7 @@
         private static readonly Random random = new();
         private const float GRAVITY = 750.0f;
         private readonly List<Square> squares = new();
-        //private int addX = -1;
-        //private int addY = -1;
+        private double lastTime;
 
 
         public RainingBoxes(Game game)
@@ -25,7 +24,8 @@
 
         protected override void LoadContent()
         {
-            box = GraphicsDevice.LoadTexture(@"C:\Local\box.jpg");
+            //box = Game.Content.Load<Texture>(@"C:\Local\box.jpg");
+            box = Game.Content.Load<Texture>("box");
         }
 
         protected override void UnloadContent()
@@ -37,9 +37,12 @@
         public override void Update(GameTime gameTime)
         {
             double time = gameTime.TotalGameTime.TotalMilliseconds / 1000;
+            double timeSinceLastAdded = time - lastTime;
             MouseState ms = Mouse.GetState();
-            if (ms.LeftButton == ButtonState.Pressed)
+            if (ms.LeftButton == ButtonState.Pressed && timeSinceLastAdded > 0.01)
             {
+                //Console.WriteLine(timeSinceLastAdded);                
+                lastTime = time;
                 int addX = ms.X;
                 int addY = ms.Y;
                 squares.Add(new Square(addX, addY, time));
@@ -74,9 +77,9 @@
         public override void Draw(GameTime gameTime)
         {
             GraphicsDevice.BlendMode = BlendMode.Blend;
-            foreach(Square s in squares)
+            foreach (Square s in squares)
             {
-                GraphicsDevice.DrawTexture(box,(int)s.x,(int)s.y,(int)s.w, (int)s.h);
+                GraphicsDevice.DrawTexture(box, (int)s.x, (int)s.y, (int)s.w, (int)s.h);
             }
         }
 

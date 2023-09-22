@@ -24,6 +24,7 @@
             Sdl.Init((int)(Sdl.InitFlags.Video | Sdl.InitFlags.Joystick | Sdl.InitFlags.GameController | Sdl.InitFlags.Haptic));
             Sdl.DisableScreenSaver();
             SDL2Image.IMG_Init(SDL2Image.IMG_InitFlags.IMG_INIT_PNG);
+            SDL2TTF.TTF_Init();
             Window = view = new SdlGameWindow(game);
         }
 
@@ -128,7 +129,7 @@
         public override GraphicsDevice CreateGraphicsDevice(PresentationParameters pp)
         {
             view.Size = new System.Drawing.Size(pp.BackBufferWidth, pp.BackBufferHeight);
-            renderer = new SdlGraphicsDevice(Game, view);
+            renderer = new SdlGraphicsDevice(Game, view, pp);
             return renderer;
         }
 
@@ -155,6 +156,7 @@
         protected override void Dispose(bool disposing)
         {
             view.Dispose();
+            SDL2TTF.TTF_Quit();
             SDL2Image.IMG_Quit();
             Sdl.Quit();
             base.Dispose(disposing);
@@ -174,6 +176,18 @@
         {
             Game.GraphicsDevice.Present();
         }
+
+        public override TextFont? LoadFont(string path, int ySize)
+        {
+            IntPtr font = SDL2TTF.TTF_OpenFont(path, ySize);
+            if (font != IntPtr.Zero)
+            {
+                SdlTextFont textFont = new SdlTextFont(font, ySize);
+                return textFont;
+            }
+            return null;
+        }
+
 
         public override void Log(string message)
         {

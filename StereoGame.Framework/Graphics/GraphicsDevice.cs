@@ -56,7 +56,7 @@ namespace StereoGame.Framework.Graphics
                     }
                 }
                 isDisposed = true;
-                Disposing?.Invoke(this,EventArgs.Empty);
+                Disposing?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -67,7 +67,7 @@ namespace StereoGame.Framework.Graphics
 
         internal void OnResourceDestroyed(object resource, string name)
         {
-            ResourceDestroyed?.Invoke(this,new ResourceDestroyedEventArgs(resource, name));
+            ResourceDestroyed?.Invoke(this, new ResourceDestroyedEventArgs(resource, name));
         }
 
         public Color Color
@@ -104,6 +104,7 @@ namespace StereoGame.Framework.Graphics
 
         public abstract Texture? CreateTexture(int width, int height);
         public abstract Texture? LoadTexture(string path);
+        public abstract Texture? LoadTexture(string path, byte[] data);
 
         public void DrawTexture(Texture? texture)
         {
@@ -139,6 +140,12 @@ namespace StereoGame.Framework.Graphics
 
         protected abstract void DrawRect(ref Rectangle rect);
 
+        public void DrawText(TextFont? font, ReadOnlySpan<char> text, float x, float y)
+        {
+            DrawText(font, text, x, y, 0, 0, Color.White, HorizontalAlignment.Left, VerticalAlignment.Top, 0, 0);
+        }
+
+        protected abstract void DrawText(TextFont? font, ReadOnlySpan<char> text, float x, float y, float width, float height, Color color, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment, float offsetX, float offsetY);
 
         protected abstract void SetDrawColor(byte r, byte g, byte b, byte a);
 

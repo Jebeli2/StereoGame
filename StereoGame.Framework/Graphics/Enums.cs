@@ -219,4 +219,39 @@ namespace StereoGame.Framework.Graphics
         Mul = 0x00000008,
         Invalid = 0x7FFFFFFF
     }
+
+    [Flags]
+    public enum FontStyle
+    {
+        Normal = 0x00,
+        Bold = 0x01,
+        Italic = 0x02,
+        Underline = 0x04,
+        Strikethrough = 0x08
+    }
+
+    public enum FontHinting
+    {
+        Normal = 0,
+        Light = 1,
+        Mono = 2,
+        None = 3,
+        LightSubPixel = 4
+    }
+
+    public enum HorizontalAlignment
+    {
+        Left,
+        Right,
+        Center,
+        Stretch
+    }
+
+    public enum VerticalAlignment
+    {
+        Top,
+        Bottom,
+        Center,
+        Stretch
+    }
 }

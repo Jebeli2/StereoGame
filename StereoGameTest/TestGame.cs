@@ -1,6 +1,7 @@
 ﻿namespace StereoGameTest
 {
     using StereoGame.Framework;
+    using StereoGame.Framework.Components;
     using StereoGame.Framework.Graphics;
     using System;
     using System.Collections.Generic;
@@ -12,10 +13,15 @@
     internal class TestGame : Game
     {
         private Texture? bg;
+        private TextFont? font;
+        private readonly FramesPerSecondCounterComponent fps;
 
         public TestGame()
         {
-
+            TargetFPS = 120;
+            fps = new FramesPerSecondCounterComponent(this);
+            Components.Add(fps);
+            Content.AddResourceManager(Properties.Resources.ResourceManager);
         }
 
         protected override void Initialize()
@@ -29,22 +35,27 @@
 
         protected override void LoadContent()
         {
-            bg = GraphicsDevice.LoadTexture(@"c:\Local\mods\fantasycore\images\menus\backgrounds\badlands.png");
+            //bg = Content.Load<Texture>(@"c:\Local\mods\fantasycore\images\menus\backgrounds\badlands.png");
+            bg = Content.Load<Texture>(@"badlands");
+            //font =  Platform.LoadFont(@"c:\Local\mods\fantasycore\fonts\LiberationSans-Regular.ttf", 16);
+            font = Content.Load<TextFont>(@"c:\Local\mods\fantasycore\fonts\LiberationSans-Regular.ttf", 16);
         }
 
         protected override void UnloadContent()
         {
+            font?.Dispose();
             bg?.Dispose();
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.DrawTexture(bg);
-            GraphicsDevice.Color = Color.BlanchedAlmond;
-            GraphicsDevice.BlendMode = BlendMode.Blend;
-            GraphicsDevice.DrawRect(10, 10, 100, 100);
-            GraphicsDevice.DrawLine(10, 109, 109, 10);
+            //GraphicsDevice.Color = Color.BlanchedAlmond;
+            //GraphicsDevice.BlendMode = BlendMode.Blend;
+            //GraphicsDevice.DrawRect(10, 10, 100, 100);
+            //GraphicsDevice.DrawLine(10, 109, 109, 10);
             base.Draw(gameTime);
+            GraphicsDevice.DrawText(font, fps.FramesPerSecondText, 10, 10);
         }
 
         private void GraphicsDevice_ResourceDestroyed(object? sender, ResourceDestroyedEventArgs e)

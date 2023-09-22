@@ -16,8 +16,8 @@
         {
             if (CurrentPlatform.OS == OS.Windows)
                 return FuncLoader.LoadLibraryExt("SDL2_image.dll");
-            else if (CurrentPlatform.OS == OS.Linux)
-                return FuncLoader.LoadLibraryExt("libSDL2_2.0.so.0");
+            //else if (CurrentPlatform.OS == OS.Linux)
+            //    return FuncLoader.LoadLibraryExt("libSDL2_2.0.so.0");
             else if (CurrentPlatform.OS == OS.MacOSX)
                 return FuncLoader.LoadLibraryExt("libSDL2_image.dylib");
             else
@@ -44,6 +44,10 @@
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate IntPtr d_sdl_image_load_texture(IntPtr renderer, string file);
         public static readonly d_sdl_image_load_texture IMG_LoadTexture = FuncLoader.LoadFunction<d_sdl_image_load_texture>(NativeLibrary, "IMG_LoadTexture");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_image_load_texture_rw(IntPtr renderer, IntPtr rw, int freesrc);
+        public static readonly d_sdl_image_load_texture_rw IMG_LoadTexture_RW = FuncLoader.LoadFunction<d_sdl_image_load_texture_rw>(NativeLibrary, "IMG_LoadTexture_RW");
 
     }
 }

@@ -12,6 +12,7 @@
         private int backBufferWidth = GraphicsDeviceManager.DefaultBackBufferWidth;
         private bool isFullScreen;
         private bool hardwareModeSwitch = true;
+        private PresentInterval presentInterval = PresentInterval.Default;
 
         public int BackBufferHeight
         {
@@ -35,6 +36,12 @@
         {
             get { return hardwareModeSwitch; }
             set { hardwareModeSwitch = value; }
+        }
+
+        public PresentInterval PresentInterval
+        {
+            get { return presentInterval; }
+            set { presentInterval = value; }
         }
     }
 }
