@@ -71,16 +71,18 @@
                         break;
                     case Sdl.EventType.MouseWheel:
                         const int wheelDelta = 120;
-                        Mouse.ScrollX = ev.Wheel.X * wheelDelta;
-                        Mouse.ScrollY = ev.Wheel.Y * wheelDelta;
+                        view.MouseState.ScrollWheelValue = ev.Wheel.X * wheelDelta;
+                        view.MouseState.HorizontalScrollWheelValue = ev.Wheel.Y * wheelDelta;
                         break;
                     case Sdl.EventType.MouseButtonDown:
-
-                        //view.MouseState.
+                        view.MouseState.Buttons |= SdlMouseButtons2Buttons((Sdl.Mouse.Button)ev.Button.Button);
                         break;
                     case Sdl.EventType.MouseButtonup:
+                        view.MouseState.Buttons &= (byte)~SdlMouseButtons2Buttons((Sdl.Mouse.Button)ev.Button.Button);
                         break;
                     case Sdl.EventType.MouseMotion:
+                        view.MouseState.X = ev.Button.X;
+                        view.MouseState.Y = ev.Button.Y;
                         break;
                     case Sdl.EventType.WindowEvent:
                         if (ev.Window.WindowID != view.ID) break;
@@ -108,6 +110,16 @@
             }
         }
 
+        private static byte SdlMouseButtons2Buttons(Sdl.Mouse.Button state)
+        {
+            byte res = 0;
+            if ((state & Sdl.Mouse.Button.Left) != 0) { res |= MouseState.LeftButtonFlag; }
+            if ((state & Sdl.Mouse.Button.Middle) != 0) { res |= MouseState.MiddleButtonFlag; }
+            if ((state & Sdl.Mouse.Button.Right) != 0) { res |= MouseState.RightButtonFlag; }
+            if ((state & Sdl.Mouse.Button.X1Mask) != 0) { res |= MouseState.XButton1Flag; }
+            if ((state & Sdl.Mouse.Button.X2Mask) != 0) { res |= MouseState.XButton2Flag; }
+            return res;
+        }
         public override void StartRunLoop()
         {
             throw new NotSupportedException("The desktop platform does not support asynchronous run loops");

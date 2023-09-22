@@ -101,6 +101,16 @@ namespace StereoGame.Framework.Graphics
                 DrawTexture(texture, ref src, ref dst);
             }
         }
+
+        public void DrawTexture(Texture? texture, int x, int y, int w, int h)
+        {
+            if (texture != null)
+            {
+                Rectangle src = new(0, 0, texture.Width, texture.Height);
+                Rectangle dst = new(x, y, w, h);
+                DrawTexture(texture, ref src, ref dst);
+            }
+        }
         protected abstract void DrawTexture(Texture? texture, ref Rectangle src, ref Rectangle dst);
 
         public abstract void DrawLine(int x1, int y1, int x2, int y2);

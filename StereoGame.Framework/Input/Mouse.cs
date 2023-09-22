@@ -11,10 +11,15 @@ namespace StereoGame.Framework.Input
         private static GameWindow? primaryWindow;
         private static readonly MouseState defaultState = new();
 
+        internal static GameWindow? PrimaryWindow
+        {
+            get => primaryWindow;
+            set => primaryWindow = value;
+        }
 
         public static MouseState GetState(GameWindow window)
         {
-            return PlatformGetState(window);
+            return window.MouseState;
         }
 
         public static MouseState GetState()

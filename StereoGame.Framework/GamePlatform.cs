@@ -1,6 +1,7 @@
 ﻿namespace StereoGame.Framework
 {
     using StereoGame.Framework.Graphics;
+    using StereoGame.Framework.Input;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -49,7 +50,7 @@
             {
                 if (window == null)
                 {
-
+                    Mouse.PrimaryWindow = value;
                 }
                 window = value;
             }

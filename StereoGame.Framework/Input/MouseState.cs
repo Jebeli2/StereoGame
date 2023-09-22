@@ -10,11 +10,11 @@ namespace StereoGame.Framework.Input
 {
     public struct MouseState
     {
-        private const byte LeftButtonFlag = 1;
-        private const byte RightButtonFlag = 2;
-        private const byte MiddleButtonFlag = 4;
-        private const byte XButton1Flag = 8;
-        private const byte XButton2Flag = 16;
+        internal const byte LeftButtonFlag = 1;
+        internal const byte RightButtonFlag = 2;
+        internal const byte MiddleButtonFlag = 4;
+        internal const byte XButton1Flag = 8;
+        internal const byte XButton2Flag = 16;
 
         private int x;
         private int y;
@@ -163,6 +163,12 @@ namespace StereoGame.Framework.Input
         }
 
         public readonly Point Position => new(x, y);
+
+        public byte Buttons
+        {
+            get => buttons;
+            set => buttons = value;
+        }
 
         public ButtonState LeftButton
         {
