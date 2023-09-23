@@ -17,7 +17,8 @@
         private static readonly Random random = new();
         private const float GRAVITY = 750.0f;
         private readonly List<Square> squares = new();
-        private double lastTime;
+        private TimeSpan lastTime;
+        private readonly static TimeSpan addSpeed = TimeSpan.FromMilliseconds(16);
         private bool mousePressed;
 
 
@@ -34,18 +35,17 @@
         public override void Update(GameTime gameTime)
         {
             double time = gameTime.TotalGameTime.TotalMilliseconds / 1000;
-            double timeSinceLastAdded = time - lastTime;
+            //double timeSinceLastAdded = time - lastTime;
             MouseState ms = Mouse.GetState();
             if (ms.LeftButton == ButtonState.Pressed)
             {
-                if (timeSinceLastAdded > 0.01)
+                if (gameTime.HasTimePassed(addSpeed, ref lastTime))
                 {
                     if (!mousePressed)
                     {
                         AudioDevice.PlaySound(swish);
                     }
                     mousePressed = true;
-                    lastTime = time;
                     int addX = ms.X;
                     int addY = ms.Y;
                     squares.Add(new Square(addX, addY, time));

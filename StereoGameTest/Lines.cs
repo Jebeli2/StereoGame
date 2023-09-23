@@ -18,34 +18,23 @@
             public int y1;
             public int x2;
             public int y2;
-            public Color color;
         }
         private int lastWidth;
         private int lastHeight;
         private int linesPerQuadrant = 80;
-        private int lineStep = 10;
+        private int lineStep = 8;
+        private static readonly TimeSpan lineSpeed = TimeSpan.FromMilliseconds(32);
+        private static readonly TimeSpan colorSpeed = TimeSpan.FromMilliseconds(8);
+        private TimeSpan lastLineTime;
+        private TimeSpan lastColorTime;
 
-        private byte amigaRed = 0;
-        private byte amigaGreen = 80;
-        private byte amigaBlue = 160;
 
         private int lineIndex = 0;
         private int lineCount;
         private IList<Line> lines = Array.Empty<Line>();
+        private IList<Color> colors = Array.Empty<Color>();
 
-        private int delay;
-        private int delayFrames = 3;
-        private bool useAA = false;
-
-        //private byte cB;
-        //private byte cR;
-        //private byte cG;
-        private static double shift = 0.1;
-        private static double hue = 90;
-        private static double sat = 0.75;
-        private static double lum = 0.75;
-        private static double val = 0.75;
-        private static int alpha = 64;
+        private int colShift = 0;
         public Lines(Game game)
             : base(game)
         {
@@ -54,14 +43,16 @@
         protected override void LoadContent()
         {
             Init();
+            colors = MakeColors(linesPerQuadrant);
+
         }
 
         public override void Update(GameTime gameTime)
         {
 
             Init();
-            
-            UpdateLines();
+
+            UpdateLines(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
@@ -71,55 +62,36 @@
 
         private void PaintLines(GraphicsDevice gfx)
         {
-            int scale = Math.Max(1, lineCount);
-            //float rs = (255.0f - amigaRed) / scale;
-            //float gs = (255.0f - amigaGreen) / scale;
-            //float bs = (255.0f - amigaBlue) / scale;
-            //int r = amigaRed;
-            //int g = amigaGreen;
-            //int b = amigaBlue;
             int lineNum = lineIndex;
-
-            for (int i = 0; i < lineCount && lineNum < lines.Count; ++i)
+            int colNum = (lineIndex + colShift) % colors.Count;
+            for (int i = 0; i < lineCount && lineNum < lines.Count && colNum < colors.Count; ++i)
             {
                 Line l = lines[lineNum];
-                //hue += 1;
-                //if (hue > 360)
-                //{
-                //    hue = 1;
-                //}
-                //if (r > 255) { r = amigaRed; }
-                //if (g > 255) { g = amigaGreen; }
-                //if (b > 255) { b = amigaBlue; }
-                gfx.Color = l.color;
-                if (useAA)
-                {
-                    //gfx.AALine(l.x1, l.y1, l.x2, l.y2);
-                }
-                else
-                {
-                    gfx.DrawLine(l.x1, l.y1, l.x2, l.y2);
-                }
+                Color c = colors[colNum];
+                gfx.Color = c;
+                gfx.DrawLine(l.x1, l.y1, l.x2, l.y2);
                 lineNum++;
                 lineNum %= lines.Count;
+                colNum++;
+                colNum %= colors.Count;
             }
         }
-        private void UpdateLines()
+        private void UpdateLines(GameTime gameTime)
         {
-            if (lines.Count > 0)
+            if (gameTime.HasTimePassed(lineSpeed, ref lastLineTime))
             {
-                delay++;
-                if (delayFrames < delay)
+                lineIndex++;
+                lineIndex %= lines.Count;
+                lineCount++;
+                if (lineCount > linesPerQuadrant * 2)
                 {
-                    delay = 0;
-                    lineIndex++;
-                    lineIndex %= lines.Count;
-                    lineCount++;
-                    if (lineCount > linesPerQuadrant * 2)
-                    {
-                        lineCount = linesPerQuadrant * 2;
-                    }
+                    lineCount = linesPerQuadrant * 2;
                 }
+            }
+            if (gameTime.HasTimePassed(colorSpeed, ref lastColorTime))
+            {
+                colShift++;
+                colShift %= colors.Count;
             }
         }
         private void Init()
@@ -130,7 +102,24 @@
                 lastHeight = Height;
                 lines = MakeLines(linesPerQuadrant, lineStep, 0, 0, Width - 1, Height - 1);
                 lineIndex = 0;
+                lineCount = 0;
             }
+        }
+
+        private static IList<Color> MakeColors(int linesPerQuadrant)
+        {
+            Color[] list = new Color[linesPerQuadrant * 4];
+            double hue = 180;
+            double sat = 0.6;
+            double val = 1.0;
+            int alpha = 128;
+
+            for (int i = 0; i < list.Length; i++)
+            {
+                list[i] = ColorExtensions.ColorFromHSV(hue, sat, val, alpha);
+                Shift(ref hue, ref sat, ref val, ref alpha);
+            }
+            return list;
         }
 
         private static IList<Line> MakeLines(int linesPerQuadrant, int lineStep, int left, int top, int right, int bottom)
@@ -156,23 +145,16 @@
             return list;
         }
 
-        private static void ShiftColor()
+        private static void Shift(ref double hue, ref double sat, ref double val, ref int alpha)
         {
-            //shift += 1;
-            //if (shift > 6) { shift = 0; }   
-
-            hue += 1 ;
+            hue += 1;
             if (hue > 360) { hue = 0; }
-            val -= 0.1;
-            if (val < 0.6) { val = 1; }
-            //sat -= 0.1;
-            //if (sat < 0.4) { sat = 1; }
+            val += 0.1;
+            if (val > 0.9) { val = 0.6; }
         }
         private static Line CreateLine(int x1, int y1, int x2, int y2)
         {
-            ShiftColor();
-            Color color = ColorExtensions.ColorFromHSV(hue, sat, val, alpha);
-            return new Line { x1 = x1, y1 = y1, x2 = x2, y2 = y2, color = color };
+            return new Line { x1 = x1, y1 = y1, x2 = x2, y2 = y2 };
         }
     }
 }

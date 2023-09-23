@@ -40,5 +40,19 @@
             this.elapsedGameTime = elapsedGameTime;
             this.isRunningSlowly = isRunningSlowly;
         }
+
+        public bool HasTimePassed(TimeSpan howMuch, ref TimeSpan lastTime)
+        {
+            if (totalGameTime - lastTime > howMuch)
+            {
+                lastTime = totalGameTime;
+                return true;
+            }
+            return false;
+        }
+        public TimeSpan Since(TimeSpan lastTime)
+        {
+            return totalGameTime - lastTime;
+        }
     }
 }
