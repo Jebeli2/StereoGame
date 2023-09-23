@@ -10,5 +10,6 @@ gdm.PreferredBackBufferHeight = 720;
 gdm.SynchronizeWithVerticalRetrace = false;
 
 
+game.Components.Add(new Lines(game));
 game.Components.Add(new RainingBoxes(game));
 game.Run();

@@ -17,6 +17,9 @@
         {
         }
 
+        public int Width => Game.Window.Size.Width;
+        public int Height => Game.Window.Size.Height;
+
         public Graphics.GraphicsDevice GraphicsDevice
         {
             get { return Game.GraphicsDevice; }
