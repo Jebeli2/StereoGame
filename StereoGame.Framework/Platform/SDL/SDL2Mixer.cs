@@ -24,6 +24,8 @@
                 return FuncLoader.LoadLibraryExt("SDL2_mixer");
         }
 
+
+
         [Flags]
         public enum MIX_InitFlags
         {
@@ -34,6 +36,9 @@
             MIX_INIT_MID = 0x00000020,
             MIX_INIT_OPUS = 0x00000040
         }
+
+        public const byte MIX_MAX_VOLUME = 128;
+
 
         public const ushort AUDIO_U8 = 0x0008;
         public const ushort AUDIO_S8 = 0x8008;
@@ -51,6 +56,13 @@
         public const ushort AUDIO_F32 = AUDIO_F32LSB;
 
         public static readonly ushort MIX_DEFAULT_FORMAT = BitConverter.IsLittleEndian ? AUDIO_S16LSB : AUDIO_S16MSB;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void MusicFinishedDelegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void ChannelFinishedDelegate(int channel);
+
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_mix_init(MIX_InitFlags flags);
@@ -107,6 +119,54 @@
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_mix_rewindmusic();
         public static readonly d_sdl_mix_rewindmusic Mix_RewindMusic = FuncLoader.LoadFunction<d_sdl_mix_rewindmusic>(NativeLibrary, "Mix_RewindMusic");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_mix_freechunk(IntPtr sound);
+        public static readonly d_sdl_mix_freechunk Mix_FreeChunk = FuncLoader.LoadFunction<d_sdl_mix_freechunk>(NativeLibrary, "Mix_FreeChunk");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_mix_loadwav(string file);
+        public static readonly d_sdl_mix_loadwav Mix_LoadWAV = FuncLoader.LoadFunction<d_sdl_mix_loadwav>(NativeLibrary, "Mix_LoadWAV");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_mix_loadwavrw(IntPtr rw, int freesrc);
+        public static readonly d_sdl_mix_loadwavrw Mix_LoadWAV_RW = FuncLoader.LoadFunction<d_sdl_mix_loadwavrw>(NativeLibrary, "Mix_LoadWAV_RW");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_mix_playchanneltimed(int channel, IntPtr sound, int loops, int ticks);
+        public static readonly d_sdl_mix_playchanneltimed Mix_PlayChannelTimed = FuncLoader.LoadFunction<d_sdl_mix_playchanneltimed>(NativeLibrary, "Mix_PlayChannelTimed");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_mix_volume(int channel, int volume);
+        public static readonly d_sdl_mix_volume Mix_Volume = FuncLoader.LoadFunction<d_sdl_mix_volume>(NativeLibrary, "Mix_Volume");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_mix_volumechunk(IntPtr sound, int volume);
+        public static readonly d_sdl_mix_volumechunk Mix_VolumeChunk = FuncLoader.LoadFunction<d_sdl_mix_volumechunk>(NativeLibrary, "Mix_VolumeChunk");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_mix_haltchannel(int channel);
+        public static readonly d_sdl_mix_haltchannel Mix_HaltChannel = FuncLoader.LoadFunction<d_sdl_mix_haltchannel>(NativeLibrary, "Mix_HaltChannel");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_mix_setposition(int channel, short angle, byte distance);
+        public static readonly d_sdl_mix_setposition Mix_SetPosition = FuncLoader.LoadFunction<d_sdl_mix_setposition>(NativeLibrary, "Mix_SetPosition");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int d_sdl_mix_setdistance(int channel, byte distance);
+        public static readonly d_sdl_mix_setdistance Mix_SetDistance = FuncLoader.LoadFunction<d_sdl_mix_setdistance>(NativeLibrary, "Mix_SetDistance");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_mix_channelfinished(ChannelFinishedDelegate? channelFinished);
+        public static readonly d_sdl_mix_channelfinished Mix_ChannelFinished = FuncLoader.LoadFunction<d_sdl_mix_channelfinished>(NativeLibrary, "Mix_ChannelFinished");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_mix_pause(int channel);
+        public static readonly d_sdl_mix_pause Mix_Pause = FuncLoader.LoadFunction<d_sdl_mix_pause>(NativeLibrary, "Mix_Pause");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_mix_resume(int channel);
+        public static readonly d_sdl_mix_resume Mix_Resume = FuncLoader.LoadFunction<d_sdl_mix_resume>(NativeLibrary, "Mix_Resume");
 
     }
 }

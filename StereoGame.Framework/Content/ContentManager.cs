@@ -23,6 +23,7 @@
             RegisterAssetReader(new TextureReader());
             RegisterAssetReader(new TextFontReader());
             RegisterAssetReader(new MusicReader());
+            RegisterAssetReader(new SoundReader());
         }
 
         ~ContentManager()

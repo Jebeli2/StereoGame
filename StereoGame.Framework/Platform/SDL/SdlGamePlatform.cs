@@ -225,6 +225,7 @@
 
         public override void Log(string message)
         {
+            Console.Write(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff "));
             Console.WriteLine(message);
         }
     }

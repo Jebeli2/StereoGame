@@ -11,8 +11,8 @@
         private readonly int width;
         private readonly int height;
         protected Texture(GraphicsDevice graphicsDevice, int width, int height)
+            : base(graphicsDevice)
         {
-            GraphicsDevice = graphicsDevice;
             this.width = width;
             this.height = height;
         }

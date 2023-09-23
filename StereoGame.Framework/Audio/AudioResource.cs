@@ -14,9 +14,9 @@
         private AudioDevice? audioDevice;
         private WeakReference? selfReference;
 
-        internal AudioResource()
+        protected AudioResource(AudioDevice audioDevice)
         {
-
+            AudioDevice = audioDevice;
         }
         ~AudioResource()
         {

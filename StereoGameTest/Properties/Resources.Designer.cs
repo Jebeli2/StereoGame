@@ -119,5 +119,14 @@ namespace StereoGameTest.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream swish_11 {
+            get {
+                return ResourceManager.GetStream("swish-11", resourceCulture);
+            }
+        }
     }
 }

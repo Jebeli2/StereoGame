@@ -397,7 +397,7 @@
             if (platform.BeforeUpdate(gameTime))
             {
                 //FrameworkDispatcher.Update();
-
+                audioDevice?.UpdateSounds();
                 Update(gameTime);
 
                 //The TouchPanel needs to know the time for when touches arrive

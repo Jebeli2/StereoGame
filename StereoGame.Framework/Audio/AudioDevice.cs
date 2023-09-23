@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Drawing;
     using System.Linq;
     using System.Resources;
     using System.Text;
@@ -14,6 +15,7 @@
         private bool isDisposed;
         private readonly object resourcesLock = new();
         private readonly List<WeakReference> resources = new();
+        protected PointF lastPos;
 
         protected AudioDevice() { }
 
@@ -47,8 +49,27 @@
         public abstract Music? LoadMusic(string path);
         public abstract Music? LoadMusic(string path, byte[] data);
 
-        public abstract void PlayMusic(Music? music);
+        public abstract Sound? LoadSound(string path);
+        public abstract Sound? LoadSound(string path, byte[] data);
+
+        public abstract void PlayMusic(Music? music, int loops = -1);
         public abstract void StopMusic();
+
+        public void PlaySound(Sound? sound)
+        {
+            PlaySound(sound, null, PointF.Empty, false);
+        }
+        public void PlaySound(Sound? sound, PointF pos, bool loop = false)
+        {
+            PlaySound(sound, null, pos, loop);
+        }
+        public abstract void PlaySound(Sound? sound, string? channel, PointF pos, bool loop = false);
+
+        public void UpdateSounds()
+        {
+            UpdateSounds(lastPos.X, lastPos.Y);
+        }
+        public abstract void UpdateSounds(float x, float y);
 
         internal void AddResourceReference(WeakReference resourceReference)
         {

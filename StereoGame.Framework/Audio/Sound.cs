@@ -6,10 +6,9 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public abstract class Music : AudioResource
+    public class Sound : AudioResource
     {
-
-        protected Music(AudioDevice audioDevice)
+        protected Sound(AudioDevice audioDevice)
             : base(audioDevice)
         {
         }

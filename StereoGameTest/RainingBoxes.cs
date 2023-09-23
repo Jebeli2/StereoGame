@@ -1,6 +1,7 @@
 ﻿namespace StereoGameTest
 {
     using StereoGame.Framework;
+    using StereoGame.Framework.Audio;
     using StereoGame.Framework.Graphics;
     using StereoGame.Framework.Input;
     using System;
@@ -12,10 +13,12 @@
     internal class RainingBoxes : DrawableGameComponent
     {
         private Texture? box;
+        private Sound? swish;
         private static readonly Random random = new();
         private const float GRAVITY = 750.0f;
         private readonly List<Square> squares = new();
         private double lastTime;
+        private bool mousePressed;
 
 
         public RainingBoxes(Game game)
@@ -24,12 +27,8 @@
 
         protected override void LoadContent()
         {
-            box = Game.Content.Load<Texture>("box");
-        }
-
-        protected override void UnloadContent()
-        {
-            Game.Content.UnloadAsset("box");
+            box = Game.Content.Load<Texture>(nameof(Properties.Resources.box));
+            swish = Game.Content.Load<Sound>(nameof(Properties.Resources.swish_11));
         }
 
         public override void Update(GameTime gameTime)
@@ -37,13 +36,24 @@
             double time = gameTime.TotalGameTime.TotalMilliseconds / 1000;
             double timeSinceLastAdded = time - lastTime;
             MouseState ms = Mouse.GetState();
-            if (ms.LeftButton == ButtonState.Pressed && timeSinceLastAdded > 0.01)
+            if (ms.LeftButton == ButtonState.Pressed)
             {
-                //Console.WriteLine(timeSinceLastAdded);                
-                lastTime = time;
-                int addX = ms.X;
-                int addY = ms.Y;
-                squares.Add(new Square(addX, addY, time));
+                if (timeSinceLastAdded > 0.01)
+                {
+                    if (!mousePressed)
+                    {
+                        AudioDevice.PlaySound(swish);
+                    }
+                    mousePressed = true;
+                    lastTime = time;
+                    int addX = ms.X;
+                    int addY = ms.Y;
+                    squares.Add(new Square(addX, addY, time));
+                }
+            }
+            else
+            {
+                mousePressed = false;
             }
             int index = 0;
             int h = Game.Window.Size.Height;

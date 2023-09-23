@@ -22,6 +22,11 @@
             get { return Game.GraphicsDevice; }
         }
 
+        public Audio.AudioDevice AudioDevice
+        {
+            get { return Game.AudioDevice; }
+        }
+
         public int DrawOrder
         {
             get { return drawOrder; }

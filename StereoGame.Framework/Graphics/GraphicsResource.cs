@@ -13,9 +13,9 @@
         private GraphicsDevice? graphicsDevice;
         private WeakReference? selfReference;
 
-        internal GraphicsResource()
+        protected GraphicsResource(GraphicsDevice graphicsDevice)
         {
-
+            GraphicsDevice = graphicsDevice;
         }
         ~GraphicsResource()
         {
