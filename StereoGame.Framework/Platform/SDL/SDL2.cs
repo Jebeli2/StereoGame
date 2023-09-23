@@ -33,6 +33,7 @@
         [Flags]
         public enum InitFlags
         {
+            Audio = 0x00000010,
             Video = 0x00000020,
             Joystick = 0x00000200,
             Haptic = 0x00001000,

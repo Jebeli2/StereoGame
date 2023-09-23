@@ -1,5 +1,6 @@
 ﻿namespace StereoGame.Framework
 {
+    using StereoGame.Framework.Audio;
     using StereoGame.Framework.Content;
     using StereoGame.Framework.Graphics;
     using System.Diagnostics;
@@ -31,6 +32,7 @@
         private IGraphicsDeviceManager? graphicsDeviceManager;
         private IGraphicsDeviceService? graphicsDeviceService;
         private GraphicsDevice? graphicsDevice;
+        private AudioDevice? audioDevice;
 
         private readonly SortingFilteringCollection<IDrawable> drawables =
                    new(d => d.Visible,
@@ -106,6 +108,18 @@
         public ContentManager Content => content;
         public GamePlatform Platform => platform;
 
+        public AudioDevice AudioDevice
+        {
+            get
+            {
+                if (audioDevice == null)
+                {
+                    audioDevice = platform.CreateAudioDevice();
+                }
+                return audioDevice;
+            }
+        }
+
         public GraphicsDevice GraphicsDevice
         {
             get
@@ -126,7 +140,7 @@
                         throw new InvalidOperationException("No Graphics Device");
                     }
                 }
-                return graphicsDevice!;
+                return graphicsDevice;
             }
         }
 
@@ -248,7 +262,7 @@
 
         public void Tick()
         {
-        RetryTick:
+            RetryTick:
             if (!IsActive && InactiveSleepTime.TotalMilliseconds >= 1.0)
             {
                 Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);

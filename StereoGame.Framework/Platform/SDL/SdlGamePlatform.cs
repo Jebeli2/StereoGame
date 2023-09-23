@@ -1,5 +1,6 @@
 ﻿namespace StereoGame.Framework.Platform.SDL
 {
+    using StereoGame.Framework.Audio;
     using StereoGame.Framework.Graphics;
     using StereoGame.Framework.Input;
     using StereoGame.Framework.Utilities;
@@ -16,16 +17,18 @@
         private int isExiting;
         private readonly SdlGameWindow view;
         private SdlGraphicsDevice? renderer;
+        private SdlAudioDevice? audio;
         public SdlGamePlatform(Game game) : base(game)
         {
             if (CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
             {
                 Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
             }
-            Sdl.Init((int)(Sdl.InitFlags.Video | Sdl.InitFlags.Joystick | Sdl.InitFlags.GameController | Sdl.InitFlags.Haptic));
+            Sdl.Init((int)(Sdl.InitFlags.Audio | Sdl.InitFlags.Video | Sdl.InitFlags.Joystick | Sdl.InitFlags.GameController | Sdl.InitFlags.Haptic));
             Sdl.DisableScreenSaver();
             SDL2Image.IMG_Init(SDL2Image.IMG_InitFlags.IMG_INIT_PNG);
             SDL2TTF.TTF_Init();
+            SDL2Mixer.Mix_Init(SDL2Mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL2Mixer.MIX_InitFlags.MIX_INIT_OGG | SDL2Mixer.MIX_InitFlags.MIX_INIT_MID);
             Window = view = new SdlGameWindow(game);
         }
 
@@ -134,6 +137,12 @@
             return renderer;
         }
 
+        public override AudioDevice CreateAudioDevice()
+        {
+            audio = new SdlAudioDevice(Game);
+            return audio;
+        }
+
         public override void Exit()
         {
             Interlocked.Increment(ref isExiting);
@@ -157,6 +166,7 @@
         protected override void Dispose(bool disposing)
         {
             view.Dispose();
+            SDL2Mixer.Mix_Quit();
             SDL2TTF.TTF_Quit();
             SDL2Image.IMG_Quit();
             Sdl.Quit();
@@ -183,7 +193,7 @@
             IntPtr font = SDL2TTF.TTF_OpenFont(path, ySize);
             if (font != IntPtr.Zero)
             {
-                SdlTextFont textFont = new SdlTextFont(font, ySize);
+                SdlTextFont textFont = new(font, ySize);
                 return textFont;
             }
             return null;
@@ -200,7 +210,7 @@
                 IntPtr font = SDL2TTF.TTF_OpenFontRW(rw, 1, ySize);
                 if (font != IntPtr.Zero)
                 {
-                    SdlTextFont textFont = new SdlTextFont(font, ySize, mem);
+                    SdlTextFont textFont = new(font, ySize, mem);
                     return textFont;
                 }
                 else

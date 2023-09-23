@@ -22,6 +22,7 @@
             this.game = game;
             RegisterAssetReader(new TextureReader());
             RegisterAssetReader(new TextFontReader());
+            RegisterAssetReader(new MusicReader());
         }
 
         ~ContentManager()
@@ -90,7 +91,7 @@
 
         public virtual void UnloadAssets(params string[] assets)
         {
-            foreach(var asset in assets) { UnloadAsset(asset); }
+            foreach (var asset in assets) { UnloadAsset(asset); }
         }
 
         public virtual T? Load<T>(string assetName, object? parameter = null)
@@ -215,7 +216,7 @@
 
         private string? FindKey(object asset)
         {
-            foreach(var kvp in loadedAssets)
+            foreach (var kvp in loadedAssets)
             {
                 if (kvp.Value == asset) return kvp.Key;
             }

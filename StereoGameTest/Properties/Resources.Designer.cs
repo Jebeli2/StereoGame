@@ -103,6 +103,16 @@ namespace StereoGameTest.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] JesuJoy {
+            get {
+                object obj = ResourceManager.GetObject("JesuJoy", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] LiberationSans_Regular {
             get {
                 object obj = ResourceManager.GetObject("LiberationSans-Regular", resourceCulture);

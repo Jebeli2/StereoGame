@@ -1,5 +1,6 @@
 ﻿namespace StereoGame.Framework
 {
+    using StereoGame.Framework.Audio;
     using StereoGame.Framework.Graphics;
     using StereoGame.Framework.Input;
     using System;
@@ -58,6 +59,8 @@
         }
 
         public abstract GraphicsDevice CreateGraphicsDevice(PresentationParameters pp);
+
+        public abstract AudioDevice CreateAudioDevice();
 
         public abstract GameRunBehavior DefaultRunBehavior { get; }
         public bool IsActive

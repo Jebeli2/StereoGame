@@ -1,4 +1,5 @@
-﻿using StereoGame.Framework.Graphics;
+﻿using StereoGame.Framework.Audio;
+using StereoGame.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,11 @@ namespace StereoGame.Framework.Content
         public GraphicsDevice? GetGraphicsDevice()
         {
             return contentManager?.Game.GraphicsDevice;
+        }
+
+        public AudioDevice? GetAudioDevice()
+        {
+            return contentManager?.Game.AudioDevice;
         }
     }
 }

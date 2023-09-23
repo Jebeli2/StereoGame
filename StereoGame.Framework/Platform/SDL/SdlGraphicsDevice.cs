@@ -60,8 +60,7 @@
             IntPtr tex = Sdl.Renderer.CreateTexture(handle, Sdl.Renderer.SDL_PIXELFORMAT_ARGB8888, Sdl.Renderer.SDL_TEXTUREACCESS_TARGET, width, height);
             if (tex != IntPtr.Zero)
             {
-                SdlTexture texture = new SdlTexture(this, width, height, tex);
-                texture.Name = $"Texture {width}x{height}";
+                SdlTexture texture = new(this, width, height, tex) { Name = $"Texture {width}x{height}" };
                 OnResourceCreated(texture);
                 return texture;
             }
@@ -73,15 +72,14 @@
             if (tex != IntPtr.Zero)
             {
                 Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
-                SdlTexture texture = new SdlTexture(this, w, h, tex);
-                texture.Name = path;
+                SdlTexture texture = new(this, w, h, tex) { Name = path };
                 OnResourceCreated(texture);
                 return texture;
             }
             return null;
         }
 
-        public override  Texture? LoadTexture(string path, byte[] data)
+        public override Texture? LoadTexture(string path, byte[] data)
         {
             IntPtr rw = Sdl.RwFromMem(data, data.Length);
             if (rw != IntPtr.Zero)
@@ -90,8 +88,7 @@
                 if (tex != IntPtr.Zero)
                 {
                     Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
-                    SdlTexture texture = new SdlTexture(this, w, h, tex);
-                    texture.Name = path;
+                    SdlTexture texture = new(this, w, h, tex) { Name = path };
                     OnResourceCreated(texture);
                     return texture;
                 }
@@ -164,7 +161,7 @@
             {
                 int len = textCacheKeys.Count / 2;
                 var halfKeys = textCacheKeys.GetRange(0, len);
-                textCacheKeys.RemoveRange(0, len);                
+                textCacheKeys.RemoveRange(0, len);
                 //SDLLog.Verbose(LogCategory.RENDER, $"Text cache limit {textCacheLimit} reached. Cleaning up...");
                 ClearTextCache(halfKeys);
             }

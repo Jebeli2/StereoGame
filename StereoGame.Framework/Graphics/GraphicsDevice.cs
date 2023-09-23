@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -62,11 +63,13 @@ namespace StereoGame.Framework.Graphics
 
         internal void OnResourceCreated(object resource)
         {
+            Log($"{resource} created");
             ResourceCreated?.Invoke(this, new ResourceCreatedEventArgs(resource));
         }
 
         internal void OnResourceDestroyed(object resource, string name)
         {
+            Log($"{resource} destroyed");
             ResourceDestroyed?.Invoke(this, new ResourceDestroyedEventArgs(resource, name));
         }
 
@@ -171,6 +174,12 @@ namespace StereoGame.Framework.Graphics
                 blendMode = value;
                 SetDrawBlendMode(blendMode);
             }
+        }
+
+        [Conditional("DEBUG")]
+        public void Log(string message)
+        {
+            Game.Instance.Platform.Log(message);
         }
     }
 }
