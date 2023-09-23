@@ -24,14 +24,12 @@
 
         protected override void LoadContent()
         {
-            //box = Game.Content.Load<Texture>(@"C:\Local\box.jpg");
             box = Game.Content.Load<Texture>("box");
         }
 
         protected override void UnloadContent()
         {
-            box?.Dispose();
-            box = null;
+            Game.Content.UnloadAsset("box");
         }
 
         public override void Update(GameTime gameTime)

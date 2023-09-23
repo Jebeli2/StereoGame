@@ -37,14 +37,12 @@
         {
             //bg = Content.Load<Texture>(@"c:\Local\mods\fantasycore\images\menus\backgrounds\badlands.png");
             bg = Content.Load<Texture>(@"badlands");
-            //font =  Platform.LoadFont(@"c:\Local\mods\fantasycore\fonts\LiberationSans-Regular.ttf", 16);
-            font = Content.Load<TextFont>(@"c:\Local\mods\fantasycore\fonts\LiberationSans-Regular.ttf", 16);
+            //font = Content.Load<TextFont>(@"c:\Local\mods\fantasycore\fonts\LiberationSans-Regular.ttf", 16);
+            font = Content.Load<TextFont>(@"LiberationSans-Regular", 16);
         }
 
         protected override void UnloadContent()
         {
-            font?.Dispose();
-            bg?.Dispose();
         }
 
         protected override void Draw(GameTime gameTime)

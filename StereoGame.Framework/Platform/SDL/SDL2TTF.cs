@@ -45,6 +45,10 @@ namespace StereoGame.Framework.Platform.SDL
         public static readonly d_sdl_ttf_openfont TTF_OpenFont = FuncLoader.LoadFunction<d_sdl_ttf_openfont>(NativeLibrary, "TTF_OpenFont");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr d_sdl_ttf_openfontrw(IntPtr src, int freesrc, int ptsize);
+        public static readonly d_sdl_ttf_openfontrw TTF_OpenFontRW = FuncLoader.LoadFunction<d_sdl_ttf_openfontrw>(NativeLibrary, "TTF_OpenFontRW");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_ttf_getfontstyle(IntPtr font);
         public static readonly d_sdl_ttf_getfontstyle TTF_GetFontStyle = FuncLoader.LoadFunction<d_sdl_ttf_getfontstyle>(NativeLibrary, "TTF_GetFontStyle");
 

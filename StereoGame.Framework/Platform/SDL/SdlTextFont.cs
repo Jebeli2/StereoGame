@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,11 +11,18 @@ namespace StereoGame.Framework.Platform.SDL
     internal class SdlTextFont : TextFont
     {
         private readonly IntPtr handle;
+        private readonly IntPtr mem;
 
         public SdlTextFont(IntPtr handle, int ptSize)
+            :this(handle, ptSize, IntPtr.Zero)
+        {
+
+        }
+        public SdlTextFont(IntPtr handle, int ptSize, IntPtr mem)
             : base(ptSize)
         {
             this.handle = handle;
+            this.mem = mem;
             fontStyle = (FontStyle)SDL2TTF.TTF_GetFontStyle(handle);
             fontOutline = SDL2TTF.TTF_GetFontOutline(handle);
             fontHinting = (FontHinting)SDL2TTF.TTF_GetFontHinting(handle);
@@ -33,6 +41,7 @@ namespace StereoGame.Framework.Platform.SDL
         {
             base.Dispose(disposing);
             SDL2TTF.TTF_CloseFont(handle);
+            if (mem != IntPtr.Zero) { Marshal.FreeHGlobal(mem); }   
         }
     }
 }

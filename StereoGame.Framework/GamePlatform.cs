@@ -108,6 +108,7 @@
         public abstract void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight);
 
         public abstract TextFont? LoadFont(string path, int ySize);
+        public abstract TextFont? LoadFont(string name, byte[] data, int ySize);
 
         [Conditional("DEBUG")]
         public virtual void Log(string message) { }

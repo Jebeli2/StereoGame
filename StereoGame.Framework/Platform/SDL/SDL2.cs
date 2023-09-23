@@ -246,12 +246,25 @@
         public static readonly d_sdl_quit Quit = FuncLoader.LoadFunction<d_sdl_quit>(NativeLibrary, "SDL_Quit");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_freerw(IntPtr rw);
+        public static readonly d_sdl_freerw FreeRW = FuncLoader.LoadFunction<d_sdl_freerw>(NativeLibrary, "SDL_FreeRW");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr d_sdl_rwfrommem(byte[] mem, int size);
         private static readonly d_sdl_rwfrommem SDL_RWFromMem = FuncLoader.LoadFunction<d_sdl_rwfrommem>(NativeLibrary, "SDL_RWFromMem");
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate IntPtr d_sdl_rwfrommem2(IntPtr mem, int size);
+        private static readonly d_sdl_rwfrommem2 SDL_RWFromMem2 = FuncLoader.LoadFunction<d_sdl_rwfrommem2>(NativeLibrary, "SDL_RWFromMem");
 
         public static IntPtr RwFromMem(byte[] mem, int size)
         {
             return GetError(SDL_RWFromMem(mem, size));
+        }
+
+        public static IntPtr RwFromMem(IntPtr mem, int size)
+        {
+            return GetError(SDL_RWFromMem2(mem, size));
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -841,7 +854,7 @@
             public delegate int d_sdl_rendercopyF_3(IntPtr renderer, IntPtr texture, IntPtr srcrect, IntPtr dstRect);
             private static readonly d_sdl_rendercopyF_3 RenderCopyF3 = FuncLoader.LoadFunction<d_sdl_rendercopyF_3>(NativeLibrary, "SDL_RenderCopyF");
 
-            public static  void RenderCopyF(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstrect)
+            public static void RenderCopyF(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstrect)
             {
                 if (srcrect.IsEmpty && dstrect.IsEmpty)
                 {

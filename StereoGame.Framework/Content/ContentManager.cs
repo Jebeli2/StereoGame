@@ -7,11 +7,12 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public partial class ContentManager : IDisposable
+    public class ContentManager : IDisposable
     {
         private readonly Game game;
         private readonly List<IAssetReader> assetReaders = new();
         private readonly Dictionary<string, object> loadedAssets = new(StringComparer.OrdinalIgnoreCase);
+        private readonly List<IDisposable> disposableAssets = new();
         private readonly List<ResourceManager> resourceManagers = new();
         private readonly List<string> knownNames = new();
 
@@ -40,9 +41,8 @@
             {
                 if (disposing)
                 {
-                    //Unload();
+                    Unload();
                 }
-
                 disposed = true;
             }
         }
@@ -63,6 +63,36 @@
             assetReaders.Add(reader);
         }
 
+        public virtual void UnloadAsset(object asset)
+        {
+            string? key = FindKey(asset);
+            if (key != null) { UnloadAsset(key); }
+        }
+
+        public virtual void UnloadAsset(string assetName)
+        {
+            var key = assetName.Replace('\\', '/');
+            if (loadedAssets.TryGetValue(key, out var asset))
+            {
+                if (asset is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                    disposableAssets.Remove(disposable);
+                }
+                loadedAssets.Remove(key);
+            }
+        }
+
+        public virtual void UnloadAssets(IEnumerable<string> assets)
+        {
+            foreach (var asset in assets) { UnloadAsset(asset); }
+        }
+
+        public virtual void UnloadAssets(params string[] assets)
+        {
+            foreach(var asset in assets) { UnloadAsset(asset); }
+        }
+
         public virtual T? Load<T>(string assetName, object? parameter = null)
         {
             var key = assetName.Replace('\\', '/');
@@ -77,6 +107,7 @@
             if (newResult != null)
             {
                 loadedAssets[key] = newResult;
+                RecordDisposable(newResult as IDisposable);
                 return newResult;
             }
             return default;
@@ -91,6 +122,27 @@
                 if (result != null) return result;
             }
             return default;
+        }
+
+        public virtual void Unload()
+        {
+            foreach (var disposable in disposableAssets)
+            {
+                disposable?.Dispose();
+            }
+            disposableAssets.Clear();
+            loadedAssets.Clear();
+        }
+
+        private void RecordDisposable(IDisposable? disposable)
+        {
+            if (disposable != null)
+            {
+                if (!disposableAssets.Contains(disposable))
+                {
+                    disposableAssets.Add(disposable);
+                }
+            }
         }
 
         public byte[]? FindContent(string assetName)
@@ -159,6 +211,15 @@
             testName = name.Replace('_', ' ').Trim();
             if (knownNames.Contains(testName)) return testName;
             return name;
+        }
+
+        private string? FindKey(object asset)
+        {
+            foreach(var kvp in loadedAssets)
+            {
+                if (kvp.Value == asset) return kvp.Key;
+            }
+            return null;
         }
 
         private IEnumerable<IAssetReader<T>> GetAssetReaders<T>()

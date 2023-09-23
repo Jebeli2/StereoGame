@@ -20,9 +20,14 @@ namespace StereoGame.Framework.Content
             var plat = GetPlatform();
             if (plat != null && parameter is int ySize)
             {
-                TextFont? textFont = plat.LoadFont(name, ySize);
-
-                return textFont;
+                if (data != null)
+                {
+                    return plat.LoadFont(name, data, ySize);
+                }
+                else
+                {
+                    return plat.LoadFont(name, ySize);
+                }
             }
             return null;
         }

@@ -7,6 +7,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -184,6 +185,29 @@
             {
                 SdlTextFont textFont = new SdlTextFont(font, ySize);
                 return textFont;
+            }
+            return null;
+        }
+
+        public override TextFont? LoadFont(string name, byte[] data, int ySize)
+        {
+            int size = data.Length;
+            IntPtr mem = Marshal.AllocHGlobal(size);
+            Marshal.Copy(data, 0, mem, size);
+            IntPtr rw = Sdl.RwFromMem(mem, size);
+            if (rw != IntPtr.Zero)
+            {
+                IntPtr font = SDL2TTF.TTF_OpenFontRW(rw, 1, ySize);
+                if (font != IntPtr.Zero)
+                {
+                    SdlTextFont textFont = new SdlTextFont(font, ySize, mem);
+                    return textFont;
+                }
+                else
+                {
+                    Sdl.FreeRW(rw);
+                    Marshal.FreeHGlobal(mem);
+                }
             }
             return null;
         }
