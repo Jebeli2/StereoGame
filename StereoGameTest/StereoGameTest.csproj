@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StereoGame.Extended.Gui\StereoGame.Extended.Gui.csproj" />
     <ProjectReference Include="..\StereoGame.Framework\StereoGame.Framework.csproj" />
   </ItemGroup>
 

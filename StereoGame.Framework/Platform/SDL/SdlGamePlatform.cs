@@ -29,6 +29,10 @@
             SDL2Image.IMG_Init(SDL2Image.IMG_InitFlags.IMG_INIT_PNG);
             SDL2TTF.TTF_Init();
             SDL2Mixer.Mix_Init(SDL2Mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL2Mixer.MIX_InitFlags.MIX_INIT_OGG | SDL2Mixer.MIX_InitFlags.MIX_INIT_MID);
+            Sdl.SetHint("SDL_HINT_RENDER_DRIVER", "direct3d");
+            Sdl.SetHint("SDL_HINT_RENDER_BATCHING", "1");
+            Sdl.SetHint("SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH", "1");
+            Sdl.SetHint("SDL_HINT_RENDER_SCALE_QUALITY", "1");
             Window = view = new SdlGameWindow(game);
         }
 

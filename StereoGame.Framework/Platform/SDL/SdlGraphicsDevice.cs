@@ -33,6 +33,7 @@
                     flags |= Sdl.Renderer.SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC;
                     break;
             }
+
             handle = Sdl.Renderer.Create(window.Handle, 0, flags);
         }
 
