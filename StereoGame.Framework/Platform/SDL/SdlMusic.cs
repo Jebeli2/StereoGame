@@ -24,7 +24,7 @@
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            SDL2Mixer.Mix_FreeMusic(handle);
+            SDL2Mixer.FreeMusic(handle);
         }
     }
 }

@@ -20,15 +20,18 @@
         private SdlAudioDevice? audio;
         public SdlGamePlatform(Game game) : base(game)
         {
+            string dllDir = Path.Combine(Environment.CurrentDirectory, IntPtr.Size == 4 ? "x86" : "x64");
+            Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH") + ";" + dllDir);
             if (CurrentPlatform.OS == OS.Windows && Debugger.IsAttached)
             {
                 Sdl.SetHint("SDL_WINDOWS_DISABLE_THREAD_NAMING", "1");
             }
+            Sdl.SetMainReady();
             Sdl.Init((int)(Sdl.InitFlags.Audio | Sdl.InitFlags.Video | Sdl.InitFlags.Joystick | Sdl.InitFlags.GameController | Sdl.InitFlags.Haptic));
             Sdl.DisableScreenSaver();
             SDL2Image.IMG_Init(SDL2Image.IMG_InitFlags.IMG_INIT_PNG);
-            SDL2TTF.TTF_Init();
-            SDL2Mixer.Mix_Init(SDL2Mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL2Mixer.MIX_InitFlags.MIX_INIT_OGG | SDL2Mixer.MIX_InitFlags.MIX_INIT_MID);
+            SDL2TTF.Init();
+            SDL2Mixer.Init(SDL2Mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL2Mixer.MIX_InitFlags.MIX_INIT_OGG | SDL2Mixer.MIX_InitFlags.MIX_INIT_MID);
             Sdl.SetHint("SDL_HINT_RENDER_DRIVER", "opengl");
             Sdl.SetHint("SDL_HINT_RENDER_BATCHING", "1");
             Sdl.SetHint("SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH", "1");
@@ -170,8 +173,8 @@
         protected override void Dispose(bool disposing)
         {
             view.Dispose();
-            SDL2Mixer.Mix_Quit();
-            SDL2TTF.TTF_Quit();
+            SDL2Mixer.Quit();
+            SDL2TTF.Quit();
             SDL2Image.IMG_Quit();
             Sdl.Quit();
             base.Dispose(disposing);
@@ -194,7 +197,7 @@
 
         public override TextFont? LoadFont(string path, int ySize)
         {
-            IntPtr font = SDL2TTF.TTF_OpenFont(path, ySize);
+            IntPtr font = SDL2TTF.OpenFont(path, ySize);
             if (font != IntPtr.Zero)
             {
                 SdlTextFont textFont = new(font, ySize);
@@ -211,7 +214,7 @@
             IntPtr rw = Sdl.RwFromMem(mem, size);
             if (rw != IntPtr.Zero)
             {
-                IntPtr font = SDL2TTF.TTF_OpenFontRW(rw, 1, ySize);
+                IntPtr font = SDL2TTF.OpenFontRW(rw, 1, ySize);
                 if (font != IntPtr.Zero)
                 {
                     SdlTextFont textFont = new(font, ySize, mem);

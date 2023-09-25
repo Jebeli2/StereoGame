@@ -23,16 +23,16 @@ namespace StereoGame.Framework.Platform.SDL
         {
             this.handle = handle;
             this.mem = mem;
-            fontStyle = (FontStyle)SDL2TTF.TTF_GetFontStyle(handle);
-            fontOutline = SDL2TTF.TTF_GetFontOutline(handle);
-            fontHinting = (FontHinting)SDL2TTF.TTF_GetFontHinting(handle);
-            fontHeight = SDL2TTF.TTF_FontHeight(handle);
-            fontAscent = SDL2TTF.TTF_FontAscent(handle);
-            fontDescent = SDL2TTF.TTF_FontDescent(handle);
-            fontLineSkip = SDL2TTF.TTF_FontLineSkip(handle);
-            fontKerning = SDL2TTF.TTF_GetFontKerning(handle);
-            familyName = SDL2TTF.TTF_FontFaceFamilyName(handle) ?? "unknown";
-            styleName = SDL2TTF.TTF_FontFaceStyleName(handle) ?? "unkown";
+            fontStyle = (FontStyle)SDL2TTF.GetFontStyle(handle);
+            fontOutline = SDL2TTF.GetFontOutline(handle);
+            fontHinting = (FontHinting)SDL2TTF.GetFontHinting(handle);
+            fontHeight = SDL2TTF.FontHeight(handle);
+            fontAscent = SDL2TTF.FontAscent(handle);
+            fontDescent = SDL2TTF.FontDescent(handle);
+            fontLineSkip = SDL2TTF.FontLineSkip(handle);
+            fontKerning = SDL2TTF.GetFontKerning(handle);
+            familyName = SDL2TTF.FontFaceFamilyName(handle) ?? "unknown";
+            styleName = SDL2TTF.FontFaceStyleName(handle) ?? "unkown";
         }
 
         public IntPtr Handle => handle;
@@ -40,7 +40,7 @@ namespace StereoGame.Framework.Platform.SDL
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            SDL2TTF.TTF_CloseFont(handle);
+            SDL2TTF.CloseFont(handle);
             if (mem != IntPtr.Zero) { Marshal.FreeHGlobal(mem); }   
         }
     }

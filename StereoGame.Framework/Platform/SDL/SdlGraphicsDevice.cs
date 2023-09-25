@@ -110,6 +110,11 @@
             Sdl.Renderer.DrawLine(handle, x1, y1, x2, y2);
         }
 
+        protected override void FillRect(ref Rectangle rect)
+        {
+            Sdl.Renderer.FillRect(handle, ref rect);
+        }
+
 
         protected override void DrawRect(ref Rectangle rect)
         {
@@ -253,7 +258,7 @@
                 stringBuffer.Clear();
                 stringBuffer.Append(text);
                 int hash = string.GetHashCode(text);
-                IntPtr surface = SDL2TTF.TTF_RenderUTF8_Blended(font, stringBuffer, ToSDLColor(color));
+                IntPtr surface = SDL2TTF.RenderUTF8_Blended(font, stringBuffer, ToSDLColor(color));
                 if (surface != IntPtr.Zero)
                 {
                     IntPtr texHandle = Sdl.Renderer.CreateTextureFromSurface(handle, surface);

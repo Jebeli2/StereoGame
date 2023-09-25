@@ -159,6 +159,11 @@
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void d_sdl_setmainready();
+        public static readonly d_sdl_setmainready SetMainReady = FuncLoader.LoadFunction<d_sdl_setmainready>(NativeLibrary, "SDL_SetMainReady");
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_disablescreensaver();
         public static readonly d_sdl_disablescreensaver DisableScreenSaver = FuncLoader.LoadFunction<d_sdl_disablescreensaver>(NativeLibrary, "SDL_DisableScreenSaver");
 
@@ -886,6 +891,10 @@
             [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             public delegate int d_sdl_renderdrawrect(IntPtr renderer, ref Rectangle rect);
             public static readonly d_sdl_renderdrawrect DrawRect = FuncLoader.LoadFunction<d_sdl_renderdrawrect>(NativeLibrary, "SDL_RenderDrawRect");
+
+            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            public delegate int d_sdl_renderfillrect(IntPtr renderer, ref Rectangle rect);
+            public static readonly d_sdl_renderfillrect FillRect = FuncLoader.LoadFunction<d_sdl_renderfillrect>(NativeLibrary, "SDL_RenderFillRect");
 
             [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             public delegate int d_sdl_renderdrawline(IntPtr renderer, int x1, int y1, int x2, int y2);

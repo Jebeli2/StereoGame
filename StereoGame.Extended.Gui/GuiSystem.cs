@@ -15,6 +15,7 @@
         private Control? hoveredControl;
         public GuiSystem(Game game) : base(game)
         {
+            DrawOrder = 1000;
             renderer = new DefaultGuiRenderer(game);
             mouseListener = new MouseListener();
             mouseListener.MouseMoved += MouseListener_MouseMoved;

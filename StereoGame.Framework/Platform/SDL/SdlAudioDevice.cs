@@ -22,21 +22,22 @@
         private int soundVolume = MIX_MAX_VOLUME;
         private readonly Dictionary<int, Playback> playback = new();
         private readonly Dictionary<string, int> channels = new();
-        private readonly ChannelFinishedDelegate? channelFinished;
+        private readonly ChannelFinishedDelegate channelFinished;
 
         public SdlAudioDevice(Game game)
         {
+            channelFinished = OnChannelFinished;
             this.game = game;
-            if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) == 0)
+            if (OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) == 0)
             {
-                Mix_AllocateChannels(NumChannels);
-                channelFinished = OnChannelFinished;
+                AllocateChannels(NumChannels);
+                ChannelFinished(channelFinished);
             }
         }
 
         public override Music? LoadMusic(string path)
         {
-            IntPtr mus = Mix_LoadMUS(path);
+            IntPtr mus = LoadMUS(path);
             if (mus != IntPtr.Zero)
             {
                 SdlMusic music = new(this, mus) { Name = path };
@@ -51,7 +52,7 @@
             IntPtr rw = Sdl.RwFromMem(data, data.Length);
             if (rw != IntPtr.Zero)
             {
-                IntPtr mus = Mix_LoadMUS_RW(rw, 1);
+                IntPtr mus = LoadMUS_RW(rw, 1);
                 if (mus != IntPtr.Zero)
                 {
 
@@ -65,7 +66,7 @@
 
         public override Sound? LoadSound(string path)
         {
-            IntPtr chunk = Mix_LoadWAV(path);
+            IntPtr chunk = LoadWAV(path);
             if (chunk != IntPtr.Zero)
             {
                 SdlSound sound = new(this, chunk) { Name = path };
@@ -80,7 +81,7 @@
             IntPtr rw = Sdl.RwFromMem(data, data.Length);
             if (rw != IntPtr.Zero)
             {
-                IntPtr chunk = Mix_LoadWAV_RW(rw, 1);
+                IntPtr chunk = LoadWAV_RW(rw, 1);
                 if (chunk != IntPtr.Zero)
                 {
 
@@ -96,13 +97,13 @@
         {
             if (CheckMusic(music, out IntPtr mus))
             {
-                Mix_PlayMusic(mus, loops);
+                SDL2Mixer.PlayMusic(mus, loops);
             }
         }
 
         public override void StopMusic()
         {
-            Mix_HaltMusic();
+            HaltMusic();
         }
 
         public override void PlaySound(Sound? sound, string? channel, PointF pos, bool loop = false)
@@ -136,19 +137,19 @@
                 {
                     if (v < 1.0f && play.Paused)
                     {
-                        Mix_Resume(channel);
+                        Resume(channel);
                         play.Paused = false;
                     }
                     else if (v > 1.0f && !play.Paused)
                     {
-                        Mix_Pause(channel);
+                        Pause(channel);
                         play.Paused = true;
                         continue;
                     }
                 }
                 v = Math.Min(Math.Max(v, 0.0f), 1.0f);
                 byte dist = (byte)(255.0f * v);
-                _ = Mix_SetPosition(channel, 0, dist);
+                _ = SetPosition(channel, 0, dist);
             }
             while (cleanup.Count > 0)
             {
@@ -183,8 +184,8 @@
 
         protected override void Dispose(bool disposing)
         {
-            Mix_ChannelFinished(null);
-            Mix_CloseAudio();
+            ClearChannelFinished();
+            CloseAudio();
             base.Dispose(disposing);
         }
 
@@ -195,20 +196,19 @@
             {
                 if (channels.TryGetValue(pb.Channel, out int vc))
                 {
-                    _ = Mix_HaltChannel(vc);
+                    _ = HaltChannel(vc);
                     channels.Remove(pb.Channel);
                 }
                 setChannel = true;
             }
-            int channel = Mix_PlayChannelTimed(-1, pb.Sound, pb.Loop ? -1 : 0, -1);
+            int channel = PlayChannelTimed(-1, pb.Sound, pb.Loop ? -1 : 0, -1);
             if (channel == -1)
             {
                 //SDLLog.Error(LogCategory.AUDIO, $"Failed to play sound '{pb.Sound}', no more channels available");
             }
             else
             {
-                _ = Mix_Volume(channel, soundVolume);
-                Mix_ChannelFinished(channelFinished);
+                _ = Volume(channel, soundVolume);
                 //SDLLog.Verbose(LogCategory.AUDIO, $"Playing sound '{pb.Sound}' on channel {channel} ({pb.Channel})");
             }
             byte dist;
@@ -222,7 +222,7 @@
             {
                 dist = 0;
             }
-            _ = Mix_SetDistance(channel, dist);
+            _ = SetDistance(channel, dist);
             if (setChannel) { channels[pb.Channel] = channel; }
             playback[channel] = pb;
         }
@@ -236,7 +236,7 @@
                     play.Finished = true;
                 }
             }
-            _ = Mix_SetDistance(channel,0);
+            _ = SetDistance(channel,0);
         }
         private static float Distance(PointF x, PointF y)
         {

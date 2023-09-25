@@ -128,9 +128,26 @@ namespace StereoGame.Framework.Graphics
                 DrawTexture(texture, ref src, ref dst);
             }
         }
+        public void DrawTexture(Texture? texture, int srcX, int srcY, int srcW, int srcH, int dstX, int dstY)
+        {
+            if (texture != null)
+            {
+                Rectangle src = new(srcX, srcY, srcW, srcH);
+                Rectangle dst = new(dstX, dstY, srcW, srcH);
+                DrawTexture(texture, ref src, ref dst);
+            }
+        }
         protected abstract void DrawTexture(Texture? texture, ref Rectangle src, ref Rectangle dst);
 
         public abstract void DrawLine(int x1, int y1, int x2, int y2);
+
+
+        public void FillRect(Rectangle rect)
+        {
+            FillRect(ref rect);
+        }
+
+        protected abstract void FillRect(ref Rectangle rect);
 
         public void DrawRect(Rectangle rect)
         {

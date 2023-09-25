@@ -37,5 +37,26 @@
                 gd.DrawRect(bounds);
             }
         }
+
+        public void FillRectangle(Rectangle rect, Color color, Rectangle? clippingRect = null)
+        {
+            GraphicsDevice? gd = game.GraphicsDevice;
+            if (gd != null)
+            {
+                gd.Color = color;
+                gd.FillRect(rect);
+            }
+        }
+
+        public void DrawRectangle(Rectangle rect, Color color, float thickness = 1.0f, Rectangle? clippingRect = null)
+        {
+            GraphicsDevice? gd = game.GraphicsDevice;
+            if (gd != null)
+            {
+                gd.Color = color;
+                gd.DrawRect(rect);
+            }
+        }
+
     }
 }

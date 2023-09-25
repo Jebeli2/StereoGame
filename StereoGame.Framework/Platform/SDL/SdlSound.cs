@@ -21,7 +21,7 @@
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            SDL2Mixer.Mix_FreeChunk(handle);
+            SDL2Mixer.FreeChunk(handle);
         }
     }
 }
