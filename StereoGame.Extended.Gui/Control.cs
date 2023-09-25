@@ -230,14 +230,39 @@
 
         public virtual bool Contains(int x, int y)
         {
-            return GetBounds().Contains(x, y);  
+            return GetBounds().Contains(x, y);
         }
 
+        public bool HasParent(Control control)
+        {
+            return parent != null && ((parent == control) || parent.HasParent(control));
+        }
         public virtual void Update(IGuiSystem gui, GameTime gameTime) { }
 
         public virtual void Draw(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime)
         {
             renderer.DrawControl(this);
         }
+
+        public virtual bool OnPointerDown(PointerEventArgs args) { return true; }
+        public virtual bool OnPointerUp(PointerEventArgs args) { return true; }
+        public virtual bool OnPointerMove(PointerEventArgs args) { return true; }
+        public virtual bool OnPointerEnter(PointerEventArgs args)
+        {
+            if (enabled && !hovered)
+            {
+                Hovered = true;
+            }
+            return true;
+        }
+        public virtual bool OnPointerLeave(PointerEventArgs args)
+        {
+            if (enabled && hovered)
+            {
+                Hovered = false;
+            }
+            return true;
+        }
+
     }
 }

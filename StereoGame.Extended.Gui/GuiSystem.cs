@@ -132,6 +132,8 @@
         {
             if (activeScreen == null || !activeScreen.Visible) return;
             preFocusedControl = FindControlAt(e.X, e.Y);
+            var pea = PointerEventArgs.FromMouseEventArgs(e);
+            PropagateDown(hoveredControl, x => x.OnPointerDown(pea));
         }
         private void MouseListener_MouseUp(object? sender, MouseEventArgs e)
         {
@@ -142,33 +144,54 @@
                 SetFocus(postFocusedControl);
             }
             preFocusedControl = null;
+            var pea = PointerEventArgs.FromMouseEventArgs(e);
+            PropagateDown(hoveredControl,x => x.OnPointerUp(pea));
         }
 
         private void MouseListener_MouseMoved(object? sender, MouseEventArgs e)
         {
             if (activeScreen == null || !activeScreen.Visible) return;
             var hc = FindControlAt(e.X, e.Y);
+            var pea = PointerEventArgs.FromMouseEventArgs(e);
             if (hc != hoveredControl)
             {
-                SetHovered(hc);
+                if (hoveredControl != null && (hc == null || !hc.HasParent(hoveredControl)))
+                {
+                    PropagateDown(hoveredControl, x => x.OnPointerLeave(pea));
+                }
+                hoveredControl = hc;
+                PropagateDown(hoveredControl, x => x.OnPointerEnter(pea));
+            }
+            else
+            {
+                PropagateDown(hoveredControl,x => x.OnPointerMove(pea));
             }
         }
 
-        private void SetHovered(Control? control)
+        //private void SetHovered(Control? control)
+        //{
+        //    if (hoveredControl != control)
+        //    {
+        //        if (hoveredControl != null)
+        //        {
+        //            hoveredControl.Hovered = false;
+        //        }
+        //        hoveredControl = control;
+        //        if (hoveredControl != null)
+        //        {
+        //            hoveredControl.Hovered = true;
+        //        }
+        //    }
+        //}
+
+        private static void PropagateDown(Control? control, Func<Control, bool> predicate)
         {
-            if (hoveredControl != control)
+            while (control != null && predicate(control))
             {
-                if (hoveredControl != null)
-                {
-                    hoveredControl.Hovered = false;
-                }
-                hoveredControl = control;
-                if (hoveredControl != null)
-                {
-                    hoveredControl.Hovered = true;
-                }
+                control = control.Parent;
             }
         }
+
 
     }
 }

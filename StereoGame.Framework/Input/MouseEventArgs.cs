@@ -11,16 +11,19 @@
         private readonly MouseState currentState;
         private readonly MouseState previousState;
         private readonly MouseButton button;
-        public MouseEventArgs(MouseState currentState, MouseState previousState, MouseButton button)
+        private readonly TimeSpan time;
+        public MouseEventArgs(MouseState currentState, MouseState previousState, MouseButton button, TimeSpan time)
         {
             this.currentState = currentState;
             this.previousState = previousState;
             this.button = button;
+            this.time = time;
         }
 
         public int X => currentState.X;
         public int Y => currentState.Y;
         public MouseButton Button => button;
+        public TimeSpan Time => time;
 
 
     }

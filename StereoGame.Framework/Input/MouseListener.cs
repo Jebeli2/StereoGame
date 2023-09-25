@@ -8,6 +8,7 @@
 
     public class MouseListener
     {
+        private TimeSpan currentTime;
         private MouseState currentState;
         private MouseState previousState;
 
@@ -26,6 +27,7 @@
         public void Update(GameTime gameTime)
         {
             currentState = Mouse.GetState();
+            currentTime = gameTime.TotalGameTime;
             CheckButtonPressed(s => s.LeftButton, MouseButton.Left);
             CheckButtonPressed(s => s.MiddleButton, MouseButton.Middle);
             CheckButtonPressed(s => s.RightButton, MouseButton.Right);
@@ -39,7 +41,7 @@
 
             if (HasMouseMoved)
             {
-                MouseMoved?.Invoke(this, new MouseEventArgs(currentState, previousState, MouseButton.None));
+                MouseMoved?.Invoke(this, new MouseEventArgs(currentState, previousState, MouseButton.None, currentTime));
             }
 
             previousState = currentState;
@@ -50,7 +52,7 @@
             if ((getButtonState(currentState) == ButtonState.Pressed) &&
                 (getButtonState(previousState) == ButtonState.Released))
             {
-                var args = new MouseEventArgs(currentState, previousState, button);
+                var args = new MouseEventArgs(currentState, previousState, button, currentTime);
 
                 MouseDown?.Invoke(this, args);
             }
@@ -61,7 +63,7 @@
             if ((getButtonState(currentState) == ButtonState.Released) &&
                 (getButtonState(previousState) == ButtonState.Pressed))
             {
-                var args = new MouseEventArgs(currentState, previousState, button);
+                var args = new MouseEventArgs(currentState, previousState, button, currentTime);
 
                 MouseUp?.Invoke(this, args);
             }
