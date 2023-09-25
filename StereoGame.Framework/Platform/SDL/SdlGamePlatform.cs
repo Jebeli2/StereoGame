@@ -29,7 +29,7 @@
             Sdl.SetMainReady();
             Sdl.Init((int)(Sdl.InitFlags.Audio | Sdl.InitFlags.Video | Sdl.InitFlags.Joystick | Sdl.InitFlags.GameController | Sdl.InitFlags.Haptic));
             Sdl.DisableScreenSaver();
-            SDL2Image.IMG_Init(SDL2Image.IMG_InitFlags.IMG_INIT_PNG);
+            SDL2Image.Init(SDL2Image.IMG_InitFlags.IMG_INIT_PNG);
             SDL2TTF.Init();
             SDL2Mixer.Init(SDL2Mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL2Mixer.MIX_InitFlags.MIX_INIT_OGG | SDL2Mixer.MIX_InitFlags.MIX_INIT_MID);
             Sdl.SetHint("SDL_HINT_RENDER_DRIVER", "opengl");
@@ -175,7 +175,7 @@
             view.Dispose();
             SDL2Mixer.Quit();
             SDL2TTF.Quit();
-            SDL2Image.IMG_Quit();
+            SDL2Image.Quit();
             Sdl.Quit();
             base.Dispose(disposing);
         }

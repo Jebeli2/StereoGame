@@ -49,7 +49,7 @@
 
         public override Music? LoadMusic(string path, byte[] data)
         {
-            IntPtr rw = Sdl.RwFromMem(data, data.Length);
+            IntPtr rw = Sdl.RWFromMem(data, data.Length);
             if (rw != IntPtr.Zero)
             {
                 IntPtr mus = LoadMUS_RW(rw, 1);
@@ -78,7 +78,7 @@
 
         public override Sound? LoadSound(string path, byte[] data)
         {
-            IntPtr rw = Sdl.RwFromMem(data, data.Length);
+            IntPtr rw = Sdl.RWFromMem(data, data.Length);
             if (rw != IntPtr.Zero)
             {
                 IntPtr chunk = LoadWAV_RW(rw, 1);

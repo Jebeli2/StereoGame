@@ -69,7 +69,7 @@
         }
         public override Texture? LoadTexture(string path)
         {
-            IntPtr tex = SDL2Image.IMG_LoadTexture(handle, path);
+            IntPtr tex = SDL2Image.LoadTexture(handle, path);
             if (tex != IntPtr.Zero)
             {
                 Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
@@ -85,7 +85,7 @@
             IntPtr rw = Sdl.RwFromMem(data, data.Length);
             if (rw != IntPtr.Zero)
             {
-                IntPtr tex = SDL2Image.IMG_LoadTexture_RW(handle, rw, 1);
+                IntPtr tex = SDL2Image.LoadTexture_RW(handle, rw, 1);
                 if (tex != IntPtr.Zero)
                 {
                     Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);

@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Drawing;
+    using System.IO.Pipes;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
@@ -12,6 +13,104 @@
 
     internal static class Sdl
     {
+        private const string nativeLibName = "SDL2";
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_RWFromFile(string file, string mode);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_AllocRW();
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_FreeRW(IntPtr area);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_RWFromMem(IntPtr mem, int size);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_RWFromMem([In()][MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] mem, int size);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_RWFromConstMem(IntPtr mem, int size);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern long SDL_RWsize(IntPtr context);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_SetMainReady();
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int SDL_Init(uint flags);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int SDL_InitSubSystem(uint flags);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_Quit();
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_QuitSubSystem(uint flags);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern uint SDL_WasInit(uint flags);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_GetPlatform();
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_ClearHints();
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_GetHint(string name);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool SDL_SetHint(string name, string value);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool SDL_SetHintWithPriority(string name, string value, SDL_HintPriority priority);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool SDL_GetHintBoolean(string name, bool default_value);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_ClearError();
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_GetError();
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_SetError(string fmtAndArglist);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_GetErrorMsg(IntPtr errstr, int maxlength);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_GetVersion(out SDL_version ver);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr SDL_GetRevision();
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int SDL_GetRevisionNumber();
+
+
+
+        public static IntPtr RWFromFile(string file, string mode) => SDL_RWFromFile(file, mode);
+        public static IntPtr AllocRW() => SDL_AllocRW();
+        public static void FreeRW(IntPtr area) => SDL_FreeRW(area);
+        public static IntPtr RWFromMem(IntPtr mem, int size) => SDL_RWFromMem(mem,size);
+        public static IntPtr RWFromMem(byte[] mem, int size) => SDL_RWFromMem(mem, size);
+        public static IntPtr RWFromConstMem(IntPtr mem, int size) => SDL_RWFromConstMem(mem, size);
+        public static long RWSize(IntPtr context) => SDL_RWsize(context);
+        public static void SetMainReady() => SDL_SetMainReady();
+        public static int Init(uint flags) => SDL_Init(flags);
+        public static int InitSubSystem(uint flags) => SDL_InitSubSystem(flags);
+        public static void Quit() => SDL_Quit();
+        public static void QuitSubSystem(uint flags) => SDL_QuitSubSystem(flags);
+        public static uint WasInit(uint flags) => SDL_WasInit(flags);
+        public static string? GetPlatform() => InteropHelpers.Utf8ToString(SDL_GetPlatform());
+        
+
+        public static void ClearHints() => SDL_ClearHints();
+        public static string? GetHint(string name) => InteropHelpers.Utf8ToString(SDL_GetHint(name));
+        public static bool SetHint(string name, string value) => SDL_SetHint(name, value);
+        public static bool SetHintWithPriority(string name, string value, SDL_HintPriority priority) => SDL_SetHintWithPriority(name,value,priority);
+        public static bool GetHintBoolean(string name, bool default_value) => SDL_GetHintBoolean(name,default_value);
+        public static void ClearError() => SDL_ClearError();
+        public static string? GetError() => InteropHelpers.Utf8ToString(SDL_GetError());
+        public static void SetError(string fmtAndArglist) => SDL_SetError(fmtAndArglist);
+        public static void GetVersion(out SDL_version ver) => SDL_GetVersion(out ver);
+        public static string? GetRevision() => InteropHelpers.Utf8ToString(SDL_GetRevision());
+        public static int GetRevisionNumber() => SDL_GetRevisionNumber();
+
         public static IntPtr NativeLibrary = GetNativeLibrary();
 
         private static IntPtr GetNativeLibrary()
@@ -38,6 +137,13 @@
             Joystick = 0x00000200,
             Haptic = 0x00001000,
             GameController = 0x00002000,
+        }
+
+        public enum SDL_HintPriority
+        {
+            SDL_HINT_DEFAULT,
+            SDL_HINT_NORMAL,
+            SDL_HINT_OVERRIDE
         }
 
         public enum EventType : uint
@@ -142,34 +248,35 @@
         //    public int Height;
         //}
 
-        public struct Version
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SDL_version
         {
             public byte Major;
             public byte Minor;
             public byte Patch;
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int d_sdl_init(int flags);
-        public static readonly d_sdl_init SDL_Init = FuncLoader.LoadFunction<d_sdl_init>(NativeLibrary, "SDL_Init");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate int d_sdl_init(int flags);
+        //public static readonly d_sdl_init SDL_Init = FuncLoader.LoadFunction<d_sdl_init>(NativeLibrary, "SDL_Init");
 
-        public static void Init(int flags)
-        {
-            GetError(SDL_Init(flags));
-        }
+        //public static void Init(int flags)
+        //{
+        //    GetError(SDL_Init(flags));
+        //}
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void d_sdl_setmainready();
-        public static readonly d_sdl_setmainready SetMainReady = FuncLoader.LoadFunction<d_sdl_setmainready>(NativeLibrary, "SDL_SetMainReady");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate void d_sdl_setmainready();
+        //public static readonly d_sdl_setmainready SetMainReady = FuncLoader.LoadFunction<d_sdl_setmainready>(NativeLibrary, "SDL_SetMainReady");
 
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void d_sdl_disablescreensaver();
         public static readonly d_sdl_disablescreensaver DisableScreenSaver = FuncLoader.LoadFunction<d_sdl_disablescreensaver>(NativeLibrary, "SDL_DisableScreenSaver");
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void d_sdl_getversion(out Version version);
-        public static readonly d_sdl_getversion GetVersion = FuncLoader.LoadFunction<d_sdl_getversion>(NativeLibrary, "SDL_GetVersion");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate void d_sdl_getversion(out Version version);
+        //public static readonly d_sdl_getversion GetVersion = FuncLoader.LoadFunction<d_sdl_getversion>(NativeLibrary, "SDL_GetVersion");
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int d_sdl_pollevent([Out] out Event _event);
@@ -200,14 +307,14 @@
         public delegate void d_sdl_freesurface(IntPtr surface);
         public static readonly d_sdl_freesurface FreeSurface = FuncLoader.LoadFunction<d_sdl_freesurface>(NativeLibrary, "SDL_FreeSurface");
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr d_sdl_geterror();
-        private static readonly d_sdl_geterror SDL_GetError = FuncLoader.LoadFunction<d_sdl_geterror>(NativeLibrary, "SDL_GetError");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //private delegate IntPtr d_sdl_geterror();
+        //private static readonly d_sdl_geterror SDL_GetError = FuncLoader.LoadFunction<d_sdl_geterror>(NativeLibrary, "SDL_GetError");
 
-        public static string? GetError()
-        {
-            return InteropHelpers.Utf8ToString(SDL_GetError());
-        }
+        //public static string? GetError()
+        //{
+        //    return InteropHelpers.Utf8ToString(SDL_GetError());
+        //}
 
         public static int GetError(int value)
         {
@@ -225,57 +332,57 @@
             return pointer;
         }
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void d_sdl_clearerror();
-        public static readonly d_sdl_clearerror ClearError = FuncLoader.LoadFunction<d_sdl_clearerror>(NativeLibrary, "SDL_ClearError");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate void d_sdl_clearerror();
+        //public static readonly d_sdl_clearerror ClearError = FuncLoader.LoadFunction<d_sdl_clearerror>(NativeLibrary, "SDL_ClearError");
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate IntPtr d_sdl_gethint(string name);
-        public static readonly d_sdl_gethint SDL_GetHint = FuncLoader.LoadFunction<d_sdl_gethint>(NativeLibrary, "SDL_GetHint");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate IntPtr d_sdl_gethint(string name);
+        //public static readonly d_sdl_gethint SDL_GetHint = FuncLoader.LoadFunction<d_sdl_gethint>(NativeLibrary, "SDL_GetHint");
 
-        public static string GetHint(string name)
-        {
-            return InteropHelpers.Utf8ToString(SDL_GetHint(name)) ?? "";
-        }
+        //public static string GetHint(string name)
+        //{
+        //    return InteropHelpers.Utf8ToString(SDL_GetHint(name)) ?? "";
+        //}
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr d_sdl_loadbmp_rw(IntPtr src, int freesrc);
-        private static readonly d_sdl_loadbmp_rw SDL_LoadBMP_RW = FuncLoader.LoadFunction<d_sdl_loadbmp_rw>(NativeLibrary, "SDL_LoadBMP_RW");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //private delegate IntPtr d_sdl_loadbmp_rw(IntPtr src, int freesrc);
+        //private static readonly d_sdl_loadbmp_rw SDL_LoadBMP_RW = FuncLoader.LoadFunction<d_sdl_loadbmp_rw>(NativeLibrary, "SDL_LoadBMP_RW");
 
-        public static IntPtr LoadBMP_RW(IntPtr src, int freesrc)
-        {
-            return GetError(SDL_LoadBMP_RW(src, freesrc));
-        }
+        //public static IntPtr LoadBMP_RW(IntPtr src, int freesrc)
+        //{
+        //    return GetError(SDL_LoadBMP_RW(src, freesrc));
+        //}
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void d_sdl_quit();
-        public static readonly d_sdl_quit Quit = FuncLoader.LoadFunction<d_sdl_quit>(NativeLibrary, "SDL_Quit");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate void d_sdl_quit();
+        //public static readonly d_sdl_quit Quit = FuncLoader.LoadFunction<d_sdl_quit>(NativeLibrary, "SDL_Quit");
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void d_sdl_freerw(IntPtr rw);
-        public static readonly d_sdl_freerw FreeRW = FuncLoader.LoadFunction<d_sdl_freerw>(NativeLibrary, "SDL_FreeRW");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate void d_sdl_freerw(IntPtr rw);
+        //public static readonly d_sdl_freerw FreeRW = FuncLoader.LoadFunction<d_sdl_freerw>(NativeLibrary, "SDL_FreeRW");
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr d_sdl_rwfrommem(byte[] mem, int size);
-        private static readonly d_sdl_rwfrommem SDL_RWFromMem = FuncLoader.LoadFunction<d_sdl_rwfrommem>(NativeLibrary, "SDL_RWFromMem");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //private delegate IntPtr d_sdl_rwfrommem(byte[] mem, int size);
+        //private static readonly d_sdl_rwfrommem SDL_RWFromMem = FuncLoader.LoadFunction<d_sdl_rwfrommem>(NativeLibrary, "SDL_RWFromMem");
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr d_sdl_rwfrommem2(IntPtr mem, int size);
-        private static readonly d_sdl_rwfrommem2 SDL_RWFromMem2 = FuncLoader.LoadFunction<d_sdl_rwfrommem2>(NativeLibrary, "SDL_RWFromMem");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //private delegate IntPtr d_sdl_rwfrommem2(IntPtr mem, int size);
+        //private static readonly d_sdl_rwfrommem2 SDL_RWFromMem2 = FuncLoader.LoadFunction<d_sdl_rwfrommem2>(NativeLibrary, "SDL_RWFromMem");
 
-        public static IntPtr RwFromMem(byte[] mem, int size)
-        {
-            return GetError(SDL_RWFromMem(mem, size));
-        }
+        //public static IntPtr RwFromMem(byte[] mem, int size)
+        //{
+        //    return GetError(SDL_RWFromMem(mem, size));
+        //}
 
-        public static IntPtr RwFromMem(IntPtr mem, int size)
-        {
-            return GetError(SDL_RWFromMem2(mem, size));
-        }
+        //public static IntPtr RwFromMem(IntPtr mem, int size)
+        //{
+        //    return GetError(SDL_RWFromMem2(mem, size));
+        //}
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int d_sdl_sethint(string name, string value);
-        public static readonly d_sdl_sethint SetHint = FuncLoader.LoadFunction<d_sdl_sethint>(NativeLibrary, "SDL_SetHint");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate int d_sdl_sethint(string name, string value);
+        //public static readonly d_sdl_sethint SetHint = FuncLoader.LoadFunction<d_sdl_sethint>(NativeLibrary, "SDL_SetHint");
 
         public static class Window
         {
