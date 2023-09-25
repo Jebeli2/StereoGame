@@ -52,7 +52,7 @@
                 Sdl.Window.State.InputFocus |
                 Sdl.Window.State.MouseFocus;
 
-            if (handle != IntPtr.Zero) Sdl.Window.Destroy(handle);
+            if (handle != IntPtr.Zero) Sdl.Window.DestroyWindow(handle);
 
             var winx = Sdl.Window.PosCentered;
             var winy = Sdl.Window.PosCentered;
@@ -67,18 +67,15 @@
             width = GraphicsDeviceManager.DefaultBackBufferWidth;
             height = GraphicsDeviceManager.DefaultBackBufferHeight;
 
-            handle = Sdl.Window.Create(
-                "",
-                winx, winy, width, height, initflags
-            );
+            handle = Sdl.Window.CreateWindow("", winx, winy, width, height, initflags);
 
             id = Sdl.Window.GetWindowId(handle);
 
             //if (_icon != IntPtr.Zero)
             //    Sdl.Window.SetIcon(_handle, _icon);
 
-            Sdl.Window.SetBordered(handle, borderless ? 0 : 1);
-            Sdl.Window.SetResizable(handle, resizable);
+            Sdl.Window.SetWindowBordered(handle, !borderless);
+            Sdl.Window.SetWindowResizable(handle, resizable);
 
             SetCursorVisible(mouseVisible);
         }
@@ -90,7 +87,7 @@
             get { return borderless; }
             set
             {
-                Sdl.Window.SetBordered(handle, value ? 0 : 1);
+                Sdl.Window.SetWindowBordered(handle, !value);
                 borderless = value;
             }
         }
@@ -98,7 +95,7 @@
         public void SetCursorVisible(bool visible)
         {
             mouseVisible = visible;
-            Sdl.Mouse.ShowCursor(visible ? 1 : 0);
+            //Sdl.Mouse.ShowCursor(visible ? 1 : 0);
         }
         public override DisplayOrientation CurrentOrientation => DisplayOrientation.Default;
 
@@ -108,12 +105,12 @@
             {
                 int x = 0;
                 int y = 0;
-                if (!isFullScreen) { Sdl.Window.GetPosition(handle, out x, out y); }
+                if (!isFullScreen) { Sdl.Window.GetWindowPosition(handle, out x, out y); }
                 return new Point(x, y);
             }
             set
             {
-                Sdl.Window.SetPosition(handle, value.X, value.Y);
+                Sdl.Window.SetWindowPosition(handle, value.X, value.Y);
                 wasMoved = true;
             }
         }
@@ -122,7 +119,7 @@
         {
             get
             {
-                Sdl.Window.GetPosition(handle, out int x, out int y);
+                Sdl.Window.GetWindowPosition(handle, out int x, out int y);
                 return new Rectangle(x, y, width, height);
             }
         }
@@ -137,11 +134,11 @@
                     var prevBounds = ClientBounds;
                     width = value.Width;
                     height = value.Height;
-                    Sdl.Window.GetBorderSize(handle, out int miny, out int minx, out _, out _);
+                    Sdl.Window.GetWindowBordersSize(handle, out int miny, out int minx, out _, out _);
                     var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - width) / 2), minx);
                     var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - height) / 2), miny);
-                    Sdl.Window.SetSize(handle, width, height);
-                    Sdl.Window.SetPosition(handle, centerX, centerY);
+                    Sdl.Window.SetWindowSize(handle, width, height);
+                    Sdl.Window.SetWindowPosition(handle, centerX, centerY);
                 }
             }
         }
@@ -151,14 +148,14 @@
             get { return !IsBorderless && resizable; }
             set
             {
-                Sdl.Window.SetResizable(handle, value);
+                Sdl.Window.SetWindowResizable(handle, value);
                 resizable = value;
             }
         }
 
         protected override void SetTitle(string title)
         {
-            Sdl.Window.SetTitle(handle, title);
+            Sdl.Window.SetWindowTitle(handle, title);
         }
 
         protected internal override void SetSupportedOrientations(DisplayOrientation orientations)
@@ -175,12 +172,12 @@
         {
             this.screenDeviceName = screenDeviceName;
             var prevBounds = ClientBounds;
-            var displayIndex = Sdl.Window.GetDisplayIndex(handle);
-            Sdl.Display.GetBounds(displayIndex, out Rectangle displayRect);
+            var displayIndex = Sdl.Window.GetWindowDisplayIndex(handle);
+            Sdl.Display.GetDisplayBounds(displayIndex, out Rectangle displayRect);
             if (willBeFullScreen != isFullScreen || hardwareSwitch != game.GraphicsDeviceManager.HardwareModeSwitch)
             {
-                var fullScreenFlag = game.GraphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop;
-                Sdl.Window.SetFullscreen(handle, willBeFullScreen ? fullScreenFlag : 0);
+                uint fullScreenFlag = (uint)(game.GraphicsDeviceManager.HardwareModeSwitch ? Sdl.Window.State.Fullscreen : Sdl.Window.State.FullscreenDesktop);
+                Sdl.Window.SetWindowFullscreen(handle, willBeFullScreen ? fullScreenFlag : 0);
                 hardwareSwitch = game.GraphicsDeviceManager.HardwareModeSwitch;
             }
             if (CurrentPlatform.OS == OS.Windows)
@@ -189,7 +186,7 @@
             }
             if (!willBeFullScreen || game.GraphicsDeviceManager.HardwareModeSwitch)
             {
-                Sdl.Window.SetSize(handle, clientWidth, clientHeight);
+                Sdl.Window.SetWindowSize(handle, clientWidth, clientHeight);
                 width = clientWidth;
                 height = clientHeight;
             }
@@ -198,16 +195,16 @@
                 width = displayRect.Width;
                 height = displayRect.Height;
             }
-            Sdl.Window.GetBorderSize(handle, out int miny, out int minx, out _, out _);
+            Sdl.Window.GetWindowBordersSize(handle, out int miny, out int minx, out _, out _);
             var centerX = Math.Max(prevBounds.X + ((prevBounds.Width - clientWidth) / 2), minx);
             var centerY = Math.Max(prevBounds.Y + ((prevBounds.Height - clientHeight) / 2), miny);
             if (isFullScreen && !willBeFullScreen)
             {
-                Sdl.Display.GetBounds(displayIndex, out displayRect);
+                Sdl.Display.GetDisplayBounds(displayIndex, out displayRect);
                 centerX = displayRect.X + displayRect.Width / 2 - clientWidth / 2;
                 centerY = displayRect.Y + displayRect.Height / 2 - clientHeight / 2;
             }
-            Sdl.Window.SetPosition(handle, centerX, centerY);
+            Sdl.Window.SetWindowPosition(handle, centerX, centerY);
             if (isFullScreen != willBeFullScreen)
             {
                 OnClientSizeChanged();
@@ -234,7 +231,7 @@
             //_game.GraphicsDevice.PresentationParameters.BackBufferHeight = height;
             //_game.GraphicsDevice.Viewport = new Viewport(0, 0, width, height);
 
-            Sdl.Window.GetSize(handle, out this.width, out this.height);
+            Sdl.Window.GetWindowSize(handle, out this.width, out this.height);
 
             OnClientSizeChanged();
         }
@@ -250,7 +247,7 @@
             if (disposed)
                 return;
 
-            Sdl.Window.Destroy(handle);
+            Sdl.Window.DestroyWindow(handle);
             handle = IntPtr.Zero;
 
             //if (_icon != IntPtr.Zero)

@@ -25,6 +25,7 @@
         {
             base.Dispose(disposing);
             SDL2Mixer.FreeMusic(handle);
+            if (tempFile != null) { File.Delete(tempFile); }
         }
     }
 }

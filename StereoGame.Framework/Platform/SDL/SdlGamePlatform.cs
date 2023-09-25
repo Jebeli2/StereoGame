@@ -48,7 +48,7 @@
 
         public override void RunLoop()
         {
-            Sdl.Window.Show(Window.Handle);
+            Sdl.Window.ShowWindow(Window.Handle);
             while (true)
             {
                 SdlRunLoop();
@@ -211,7 +211,7 @@
             int size = data.Length;
             IntPtr mem = Marshal.AllocHGlobal(size);
             Marshal.Copy(data, 0, mem, size);
-            IntPtr rw = Sdl.RwFromMem(mem, size);
+            IntPtr rw = Sdl.RWFromMem(mem, size);
             if (rw != IntPtr.Zero)
             {
                 IntPtr font = SDL2TTF.OpenFontRW(rw, 1, ySize);

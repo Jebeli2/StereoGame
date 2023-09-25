@@ -80,13 +80,40 @@
 
         [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int SDL_GetRevisionNumber();
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_PumpEvents();
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool SDL_HasEvent(EventType type);
 
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool SDL_HasEvents(EventType minType, EventType maxType);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_FlushEvent(EventType type);
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_FlushEvents(EventType min, EventType max);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int SDL_PollEvent(out Event _event);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int SDL_WaitEvent(out Event _event);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int SDL_WaitEventTimeout(out Event _event, int timeout);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int SDL_PushEvent(ref Event _event);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_DisableScreenSaver();
+
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_EnableScreenSaver();
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SDL_FreeSurface(IntPtr surface);
 
 
         public static IntPtr RWFromFile(string file, string mode) => SDL_RWFromFile(file, mode);
         public static IntPtr AllocRW() => SDL_AllocRW();
         public static void FreeRW(IntPtr area) => SDL_FreeRW(area);
-        public static IntPtr RWFromMem(IntPtr mem, int size) => SDL_RWFromMem(mem,size);
+        public static IntPtr RWFromMem(IntPtr mem, int size) => SDL_RWFromMem(mem, size);
         public static IntPtr RWFromMem(byte[] mem, int size) => SDL_RWFromMem(mem, size);
         public static IntPtr RWFromConstMem(IntPtr mem, int size) => SDL_RWFromConstMem(mem, size);
         public static long RWSize(IntPtr context) => SDL_RWsize(context);
@@ -97,19 +124,25 @@
         public static void QuitSubSystem(uint flags) => SDL_QuitSubSystem(flags);
         public static uint WasInit(uint flags) => SDL_WasInit(flags);
         public static string? GetPlatform() => InteropHelpers.Utf8ToString(SDL_GetPlatform());
-        
+
 
         public static void ClearHints() => SDL_ClearHints();
         public static string? GetHint(string name) => InteropHelpers.Utf8ToString(SDL_GetHint(name));
         public static bool SetHint(string name, string value) => SDL_SetHint(name, value);
-        public static bool SetHintWithPriority(string name, string value, SDL_HintPriority priority) => SDL_SetHintWithPriority(name,value,priority);
-        public static bool GetHintBoolean(string name, bool default_value) => SDL_GetHintBoolean(name,default_value);
+        public static bool SetHintWithPriority(string name, string value, SDL_HintPriority priority) => SDL_SetHintWithPriority(name, value, priority);
+        public static bool GetHintBoolean(string name, bool default_value) => SDL_GetHintBoolean(name, default_value);
         public static void ClearError() => SDL_ClearError();
         public static string? GetError() => InteropHelpers.Utf8ToString(SDL_GetError());
         public static void SetError(string fmtAndArglist) => SDL_SetError(fmtAndArglist);
         public static void GetVersion(out SDL_version ver) => SDL_GetVersion(out ver);
         public static string? GetRevision() => InteropHelpers.Utf8ToString(SDL_GetRevision());
         public static int GetRevisionNumber() => SDL_GetRevisionNumber();
+
+        public static int PollEvent(out Event _event) => SDL_PollEvent(out _event);
+        public static void PumpEvents() => SDL_PumpEvents();
+        public static void DisableScreenSaver() => SDL_DisableScreenSaver();
+        public static void EnableScreenSaver() => SDL_EnableScreenSaver();
+        public static void FreeSurface(IntPtr surface) => SDL_FreeSurface(surface);
 
         public static IntPtr NativeLibrary = GetNativeLibrary();
 
@@ -270,42 +303,42 @@
         //public static readonly d_sdl_setmainready SetMainReady = FuncLoader.LoadFunction<d_sdl_setmainready>(NativeLibrary, "SDL_SetMainReady");
 
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void d_sdl_disablescreensaver();
-        public static readonly d_sdl_disablescreensaver DisableScreenSaver = FuncLoader.LoadFunction<d_sdl_disablescreensaver>(NativeLibrary, "SDL_DisableScreenSaver");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate void d_sdl_disablescreensaver();
+        //public static readonly d_sdl_disablescreensaver DisableScreenSaver = FuncLoader.LoadFunction<d_sdl_disablescreensaver>(NativeLibrary, "SDL_DisableScreenSaver");
 
         //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         //public delegate void d_sdl_getversion(out Version version);
         //public static readonly d_sdl_getversion GetVersion = FuncLoader.LoadFunction<d_sdl_getversion>(NativeLibrary, "SDL_GetVersion");
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int d_sdl_pollevent([Out] out Event _event);
-        public static readonly d_sdl_pollevent PollEvent = FuncLoader.LoadFunction<d_sdl_pollevent>(NativeLibrary, "SDL_PollEvent");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate int d_sdl_pollevent([Out] out Event _event);
+        //public static readonly d_sdl_pollevent PollEvent = FuncLoader.LoadFunction<d_sdl_pollevent>(NativeLibrary, "SDL_PollEvent");
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int d_sdl_pumpevents();
-        public static readonly d_sdl_pumpevents PumpEvents = FuncLoader.LoadFunction<d_sdl_pumpevents>(NativeLibrary, "SDL_PumpEvents");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate int d_sdl_pumpevents();
+        //public static readonly d_sdl_pumpevents PumpEvents = FuncLoader.LoadFunction<d_sdl_pumpevents>(NativeLibrary, "SDL_PumpEvents");
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr d_sdl_creatergbsurfacefrom(IntPtr pixels, int width, int height, int depth, int pitch, uint rMask, uint gMask, uint bMask, uint aMask);
-        private static readonly d_sdl_creatergbsurfacefrom SDL_CreateRGBSurfaceFrom = FuncLoader.LoadFunction<d_sdl_creatergbsurfacefrom>(NativeLibrary, "SDL_CreateRGBSurfaceFrom");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //private delegate IntPtr d_sdl_creatergbsurfacefrom(IntPtr pixels, int width, int height, int depth, int pitch, uint rMask, uint gMask, uint bMask, uint aMask);
+        //private static readonly d_sdl_creatergbsurfacefrom SDL_CreateRGBSurfaceFrom = FuncLoader.LoadFunction<d_sdl_creatergbsurfacefrom>(NativeLibrary, "SDL_CreateRGBSurfaceFrom");
 
-        public static IntPtr CreateRGBSurfaceFrom(byte[] pixels, int width, int height, int depth, int pitch, uint rMask, uint gMask, uint bMask, uint aMask)
-        {
-            var handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
-            try
-            {
-                return SDL_CreateRGBSurfaceFrom(handle.AddrOfPinnedObject(), width, height, depth, pitch, rMask, gMask, bMask, aMask);
-            }
-            finally
-            {
-                handle.Free();
-            }
-        }
+        //public static IntPtr CreateRGBSurfaceFrom(byte[] pixels, int width, int height, int depth, int pitch, uint rMask, uint gMask, uint bMask, uint aMask)
+        //{
+        //    var handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+        //    try
+        //    {
+        //        return SDL_CreateRGBSurfaceFrom(handle.AddrOfPinnedObject(), width, height, depth, pitch, rMask, gMask, bMask, aMask);
+        //    }
+        //    finally
+        //    {
+        //        handle.Free();
+        //    }
+        //}
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void d_sdl_freesurface(IntPtr surface);
-        public static readonly d_sdl_freesurface FreeSurface = FuncLoader.LoadFunction<d_sdl_freesurface>(NativeLibrary, "SDL_FreeSurface");
+        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //public delegate void d_sdl_freesurface(IntPtr surface);
+        //public static readonly d_sdl_freesurface FreeSurface = FuncLoader.LoadFunction<d_sdl_freesurface>(NativeLibrary, "SDL_FreeSurface");
 
         //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         //private delegate IntPtr d_sdl_geterror();
@@ -386,6 +419,42 @@
 
         public static class Window
         {
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr SDL_CreateWindow(string? title, int x, int y, int w, int h, int flags);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_DestroyWindow(IntPtr window);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern uint SDL_GetWindowID(IntPtr window);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_GetWindowDisplayIndex(IntPtr window);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_GetWindowPosition(IntPtr window, out int x, out int y);
+
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_GetWindowSize(IntPtr window, out int w, out int h);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_SetWindowPosition(IntPtr window, int x, int y);
+
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_SetWindowSize(IntPtr window, int w, int h);
+
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_SetWindowBordered(IntPtr window, bool bordered);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_SetWindowResizable(IntPtr window, bool resizable);
+
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_SetWindowAlwaysOnTop(IntPtr window, bool on_top);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_SetWindowTitle(IntPtr window, string? title);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_ShowWindow(IntPtr window);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_GetWindowBordersSize(IntPtr window, out int top, out int left, out int bottom, out int right);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_SetWindowFullscreen(IntPtr window, uint flags);
+
+
             public const int PosUndefined = 0x1FFF0000;
             public const int PosCentered = 0x2FFF0000;
 
@@ -463,94 +532,110 @@
                 public IntPtr window;
             }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_createwindow(string title, int x, int y, int w, int h, int flags);
-            private static readonly d_sdl_createwindow SDL_CreateWindow = FuncLoader.LoadFunction<d_sdl_createwindow>(NativeLibrary, "SDL_CreateWindow");
+            public static IntPtr CreateWindow(string? title, int x, int y, int w, int h, int flags) => SDL_CreateWindow(title, x, y, w, h, flags);
+            public static void DestroyWindow(IntPtr window) => SDL_DestroyWindow(window);
+            public static uint GetWindowId(IntPtr window) => SDL_GetWindowID(window);
+            public static int GetWindowDisplayIndex(IntPtr window) => SDL_GetWindowDisplayIndex(window);
+            public static void GetWindowPosition(IntPtr window, out int x, out int y) => SDL_GetWindowPosition(window, out x, out y);
+            public static void GetWindowSize(IntPtr window, out int w, out int h) => SDL_GetWindowSize(window, out w, out h);
+            public static void SetWindowPosition(IntPtr window, int x, int y) => SDL_SetWindowPosition(window, x, y);
+            public static void SetWindowSize(IntPtr window, int w, int h) => SDL_SetWindowSize(window, w, h);
+            public static void SetWindowBordered(IntPtr window, bool bordered) => SDL_SetWindowBordered(window, bordered);
+            public static void SetWindowResizable(IntPtr window, bool resizable) => SDL_SetWindowResizable(window, resizable);
+            public static void SetWindowAlwaysOnTop(IntPtr window, bool alwaysOnTop) => SDL_SetWindowAlwaysOnTop(window, alwaysOnTop);
+            public static void SetWindowTitle(IntPtr window, string? title) => SDL_SetWindowTitle(window, title);
+            public static void ShowWindow(IntPtr window) => SDL_ShowWindow(window);
+            public static int GetWindowBordersSize(IntPtr window, out int top, out int left, out int bottom, out int right) => SDL_GetWindowBordersSize(window, out top, out left, out bottom, out right);
+            public static int SetWindowFullscreen(IntPtr window, uint flags) => SDL_SetWindowFullscreen(window, flags);
 
-            public static IntPtr Create(string title, int x, int y, int w, int h, int flags)
-            {
-                return GetError(SDL_CreateWindow(title, x, y, w, h, flags));
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_createwindow(string title, int x, int y, int w, int h, int flags);
+            //private static readonly d_sdl_createwindow SDL_CreateWindow = FuncLoader.LoadFunction<d_sdl_createwindow>(NativeLibrary, "SDL_CreateWindow");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_destroywindow(IntPtr window);
-            public static readonly d_sdl_destroywindow Destroy = FuncLoader.LoadFunction<d_sdl_destroywindow>(NativeLibrary, "SDL_DestroyWindow");
+            //public static IntPtr Create(string title, int x, int y, int w, int h, int flags)
+            //{
+            //    return GetError(SDL_CreateWindow(title, x, y, w, h, flags));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate uint d_sdl_getwindowid(IntPtr window);
-            public static readonly d_sdl_getwindowid GetWindowId = FuncLoader.LoadFunction<d_sdl_getwindowid>(NativeLibrary, "SDL_GetWindowID");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_destroywindow(IntPtr window);
+            //public static readonly d_sdl_destroywindow Destroy = FuncLoader.LoadFunction<d_sdl_destroywindow>(NativeLibrary, "SDL_DestroyWindow");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_getwindowdisplayindex(IntPtr window);
-            private static readonly d_sdl_getwindowdisplayindex SDL_GetWindowDisplayIndex = FuncLoader.LoadFunction<d_sdl_getwindowdisplayindex>(NativeLibrary, "SDL_GetWindowDisplayIndex");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate uint d_sdl_getwindowid(IntPtr window);
+            //public static readonly d_sdl_getwindowid GetWindowId = FuncLoader.LoadFunction<d_sdl_getwindowid>(NativeLibrary, "SDL_GetWindowID");
 
-            public static int GetDisplayIndex(IntPtr window)
-            {
-                return GetError(SDL_GetWindowDisplayIndex(window));
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_getwindowdisplayindex(IntPtr window);
+            //private static readonly d_sdl_getwindowdisplayindex SDL_GetWindowDisplayIndex = FuncLoader.LoadFunction<d_sdl_getwindowdisplayindex>(NativeLibrary, "SDL_GetWindowDisplayIndex");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_getwindowflags(IntPtr window);
-            public static readonly d_sdl_getwindowflags GetWindowFlags = FuncLoader.LoadFunction<d_sdl_getwindowflags>(NativeLibrary, "SDL_GetWindowFlags");
+            //public static int GetDisplayIndex(IntPtr window)
+            //{
+            //    return GetError(SDL_GetWindowDisplayIndex(window));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_setwindowicon(IntPtr window, IntPtr icon);
-            public static readonly d_sdl_setwindowicon SetIcon = FuncLoader.LoadFunction<d_sdl_setwindowicon>(NativeLibrary, "SDL_SetWindowIcon");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_getwindowflags(IntPtr window);
+            //public static readonly d_sdl_getwindowflags GetWindowFlags = FuncLoader.LoadFunction<d_sdl_getwindowflags>(NativeLibrary, "SDL_GetWindowFlags");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_getwindowposition(IntPtr window, out int x, out int y);
-            public static readonly d_sdl_getwindowposition GetPosition = FuncLoader.LoadFunction<d_sdl_getwindowposition>(NativeLibrary, "SDL_GetWindowPosition");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_setwindowicon(IntPtr window, IntPtr icon);
+            //public static readonly d_sdl_setwindowicon SetIcon = FuncLoader.LoadFunction<d_sdl_setwindowicon>(NativeLibrary, "SDL_SetWindowIcon");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_getwindowsize(IntPtr window, out int w, out int h);
-            public static readonly d_sdl_getwindowsize GetSize = FuncLoader.LoadFunction<d_sdl_getwindowsize>(NativeLibrary, "SDL_GetWindowSize");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_getwindowposition(IntPtr window, out int x, out int y);
+            //public static readonly d_sdl_getwindowposition GetPosition = FuncLoader.LoadFunction<d_sdl_getwindowposition>(NativeLibrary, "SDL_GetWindowPosition");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_setwindowbordered(IntPtr window, int bordered);
-            public static readonly d_sdl_setwindowbordered SetBordered = FuncLoader.LoadFunction<d_sdl_setwindowbordered>(NativeLibrary, "SDL_SetWindowBordered");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_getwindowsize(IntPtr window, out int w, out int h);
+            //public static readonly d_sdl_getwindowsize GetSize = FuncLoader.LoadFunction<d_sdl_getwindowsize>(NativeLibrary, "SDL_GetWindowSize");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_setwindowfullscreen(IntPtr window, int flags);
-            private static readonly d_sdl_setwindowfullscreen SDL_SetWindowFullscreen = FuncLoader.LoadFunction<d_sdl_setwindowfullscreen>(NativeLibrary, "SDL_SetWindowFullscreen");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_setwindowbordered(IntPtr window, int bordered);
+            //public static readonly d_sdl_setwindowbordered SetBordered = FuncLoader.LoadFunction<d_sdl_setwindowbordered>(NativeLibrary, "SDL_SetWindowBordered");
 
-            public static void SetFullscreen(IntPtr window, int flags)
-            {
-                GetError(SDL_SetWindowFullscreen(window, flags));
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_setwindowfullscreen(IntPtr window, int flags);
+            //private static readonly d_sdl_setwindowfullscreen SDL_SetWindowFullscreen = FuncLoader.LoadFunction<d_sdl_setwindowfullscreen>(NativeLibrary, "SDL_SetWindowFullscreen");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_setwindowposition(IntPtr window, int x, int y);
-            public static readonly d_sdl_setwindowposition SetPosition = FuncLoader.LoadFunction<d_sdl_setwindowposition>(NativeLibrary, "SDL_SetWindowPosition");
+            //public static void SetFullscreen(IntPtr window, int flags)
+            //{
+            //    GetError(SDL_SetWindowFullscreen(window, flags));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_setwindowresizable(IntPtr window, bool resizable);
-            public static readonly d_sdl_setwindowresizable SetResizable = FuncLoader.LoadFunction<d_sdl_setwindowresizable>(NativeLibrary, "SDL_SetWindowResizable");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_setwindowposition(IntPtr window, int x, int y);
+            //public static readonly d_sdl_setwindowposition SetPosition = FuncLoader.LoadFunction<d_sdl_setwindowposition>(NativeLibrary, "SDL_SetWindowPosition");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_setwindowsize(IntPtr window, int w, int h);
-            public static readonly d_sdl_setwindowsize SetSize = FuncLoader.LoadFunction<d_sdl_setwindowsize>(NativeLibrary, "SDL_SetWindowSize");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_setwindowresizable(IntPtr window, bool resizable);
+            //public static readonly d_sdl_setwindowresizable SetResizable = FuncLoader.LoadFunction<d_sdl_setwindowresizable>(NativeLibrary, "SDL_SetWindowResizable");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate void d_sdl_setwindowtitle(IntPtr window, ref byte value);
-            private static readonly d_sdl_setwindowtitle SDL_SetWindowTitle = FuncLoader.LoadFunction<d_sdl_setwindowtitle>(NativeLibrary, "SDL_SetWindowTitle");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_setwindowsize(IntPtr window, int w, int h);
+            //public static readonly d_sdl_setwindowsize SetSize = FuncLoader.LoadFunction<d_sdl_setwindowsize>(NativeLibrary, "SDL_SetWindowSize");
 
-            public static void SetTitle(IntPtr handle, string title)
-            {
-                var bytes = Encoding.UTF8.GetBytes(title);
-                SDL_SetWindowTitle(handle, ref bytes[0]);
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate void d_sdl_setwindowtitle(IntPtr window, ref byte value);
+            //private static readonly d_sdl_setwindowtitle SDL_SetWindowTitle = FuncLoader.LoadFunction<d_sdl_setwindowtitle>(NativeLibrary, "SDL_SetWindowTitle");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_showwindow(IntPtr window);
-            public static readonly d_sdl_showwindow Show = FuncLoader.LoadFunction<d_sdl_showwindow>(NativeLibrary, "SDL_ShowWindow");
+            //public static void SetTitle(IntPtr handle, string title)
+            //{
+            //    var bytes = Encoding.UTF8.GetBytes(title);
+            //    SDL_SetWindowTitle(handle, ref bytes[0]);
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate bool d_sdl_getwindowwminfo(IntPtr window, ref SDL_SysWMinfo sysWMinfo);
-            public static readonly d_sdl_getwindowwminfo GetWindowWMInfo = FuncLoader.LoadFunction<d_sdl_getwindowwminfo>(NativeLibrary, "SDL_GetWindowWMInfo");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_showwindow(IntPtr window);
+            //public static readonly d_sdl_showwindow Show = FuncLoader.LoadFunction<d_sdl_showwindow>(NativeLibrary, "SDL_ShowWindow");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_getwindowborderssize(IntPtr window, out int top, out int left, out int right, out int bottom);
-            public static readonly d_sdl_getwindowborderssize GetBorderSize = FuncLoader.LoadFunction<d_sdl_getwindowborderssize>(NativeLibrary, "SDL_GetWindowBordersSize");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate bool d_sdl_getwindowwminfo(IntPtr window, ref SDL_SysWMinfo sysWMinfo);
+            //public static readonly d_sdl_getwindowwminfo GetWindowWMInfo = FuncLoader.LoadFunction<d_sdl_getwindowwminfo>(NativeLibrary, "SDL_GetWindowWMInfo");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_getwindowborderssize(IntPtr window, out int top, out int left, out int right, out int bottom);
+            //public static readonly d_sdl_getwindowborderssize GetBorderSize = FuncLoader.LoadFunction<d_sdl_getwindowborderssize>(NativeLibrary, "SDL_GetWindowBordersSize");
         }
 
         public static class Renderer
@@ -874,144 +959,213 @@
                     32, 4
                 );
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_createrenderer(IntPtr window, int index, SDL_RendererFlags flags);
-            private static readonly d_sdl_createrenderer SDL_CreateRenderer = FuncLoader.LoadFunction<d_sdl_createrenderer>(NativeLibrary, "SDL_CreateRenderer");
 
-            public static IntPtr Create(IntPtr window, int index, SDL_RendererFlags flags)
-            {
-                return GetError(SDL_CreateRenderer(window, index, flags));
-            }
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr SDL_CreateRenderer(IntPtr window, int index, SDL_RendererFlags flags);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_DestroyRenderer(IntPtr renderer);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_RenderPresent(IntPtr renderer);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderClear(IntPtr renderer);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr SDL_CreateTexture(IntPtr renderer, uint format, int access, int w, int h);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_destroyrenderer(IntPtr renderer);
-            public static readonly d_sdl_destroyrenderer Destroy = FuncLoader.LoadFunction<d_sdl_destroyrenderer>(NativeLibrary, "SDL_DestroyRenderer");
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr SDL_CreateTextureFromSurface(IntPtr renderer, IntPtr surface);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_DestroyTexture(IntPtr texture);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_QueryTexture(IntPtr texture, out uint format, out int access, out int w, out int h);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_SetTextureAlphaMod(IntPtr texture, byte alpha);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_SetRenderDrawBlendMode(IntPtr renderer, int blendMode);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_renderpresent(IntPtr renderer);
-            public static readonly d_sdl_renderpresent Present = FuncLoader.LoadFunction<d_sdl_renderpresent>(NativeLibrary, "SDL_RenderPresent");
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_SetRenderDrawColor(IntPtr renderer, byte r, byte g, byte b, byte a);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_renderclear(IntPtr renderer);
-            public static readonly d_sdl_renderclear Clear = FuncLoader.LoadFunction<d_sdl_renderclear>(NativeLibrary, "SDL_RenderClear");
-
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate IntPtr d_sdl_createtexture(IntPtr renderer, uint format, int access, int w, int h);
-            public static readonly d_sdl_createtexture CreateTexture = FuncLoader.LoadFunction<d_sdl_createtexture>(NativeLibrary, "SDL_CreateTexture");
-
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_querytexture(IntPtr renderer, out uint format, out int access, out int w, out int h);
-            public static readonly d_sdl_querytexture QueryTexture = FuncLoader.LoadFunction<d_sdl_querytexture>(NativeLibrary, "SDL_QueryTexture");
-
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_destroytexture(IntPtr texture);
-            public static readonly d_sdl_destroytexture DestroyTexture = FuncLoader.LoadFunction<d_sdl_destroytexture>(NativeLibrary, "SDL_DestroyTexture");
-
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate IntPtr d_sdl_cleartexturefromsurface(IntPtr renderer, IntPtr surface);
-            public static readonly d_sdl_cleartexturefromsurface CreateTextureFromSurface = FuncLoader.LoadFunction<d_sdl_cleartexturefromsurface>(NativeLibrary, "SDL_CreateTextureFromSurface");
-
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_settexturealphamod(IntPtr renderer, byte alpha);
-            public static readonly d_sdl_settexturealphamod SetTextureAlphaMod = FuncLoader.LoadFunction<d_sdl_settexturealphamod>(NativeLibrary, "SDL_SetTextureAlphaMod");
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderCopy(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref Rectangle dstrect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderCopy(IntPtr renderer, IntPtr texture, IntPtr srcrect, ref Rectangle dstrect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderCopy(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, IntPtr dstrect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderCopy(IntPtr renderer, IntPtr texture, IntPtr srcrect, IntPtr dstrect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderCopyF(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstrect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderCopyF(IntPtr renderer, IntPtr texture, IntPtr srcrect, ref RectangleF dstrect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderCopyF(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, IntPtr dstrect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderCopyF(IntPtr renderer, IntPtr texture, IntPtr srcrect, IntPtr dstrect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderDrawRect(IntPtr renderer, ref Rectangle rect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderFillRect(IntPtr renderer, ref Rectangle rect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderDrawLine(IntPtr renderer, int x1, int y1, int x2, int y2);
 
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendercopy_0(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref Rectangle dstRect);
-            private static readonly d_sdl_rendercopy_0 RenderCopy0 = FuncLoader.LoadFunction<d_sdl_rendercopy_0>(NativeLibrary, "SDL_RenderCopy");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendercopy_1(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, IntPtr dstRect);
-            private static readonly d_sdl_rendercopy_1 RenderCopy1 = FuncLoader.LoadFunction<d_sdl_rendercopy_1>(NativeLibrary, "SDL_RenderCopy");
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendercopy_2(IntPtr renderer, IntPtr texture, IntPtr srcrect, ref Rectangle dstRect);
-            private static readonly d_sdl_rendercopy_2 RenderCopy2 = FuncLoader.LoadFunction<d_sdl_rendercopy_2>(NativeLibrary, "SDL_RenderCopy");
+            public static IntPtr CreateRenderer(IntPtr window, int index, SDL_RendererFlags flags) => SDL_CreateRenderer(window, index, flags);
+            public static void DestroyRenderer(IntPtr renderer) => SDL_DestroyRenderer(renderer);
+            public static void RenderPresent(IntPtr renderer) => SDL_RenderPresent(renderer);
+            public static int RenderClear(IntPtr renderer) => SDL_RenderClear(renderer);
+            public static IntPtr CreateTexture(IntPtr renderer, uint format, int access, int w, int h) => SDL_CreateTexture(renderer, format, access, w, h);
+            public static IntPtr CreateTextureFromSurface(IntPtr renderer, IntPtr surface) => SDL_CreateTextureFromSurface(renderer, surface);
+            public static void DestroyTexture(IntPtr texture) => SDL_DestroyTexture(texture);
+            public static int QueryTexture(IntPtr texture, out uint format, out int access, out int w, out int h) => SDL_QueryTexture(texture, out format, out access, out w, out h);
+            public static int SetTextureAlphaMod(IntPtr texture, byte alpha) => SDL_SetTextureAlphaMod(texture, alpha);
+            public static int SetRenderDrawBlendMode(IntPtr renderer, int blendMode) => SDL_SetRenderDrawBlendMode(renderer, blendMode);
+            public static int SetRenderDrawColor(IntPtr renderer, byte r, byte g, byte b, byte a) => SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendercopy_3(IntPtr renderer, IntPtr texture, IntPtr srcrect, IntPtr dstRect);
-            private static readonly d_sdl_rendercopy_3 RenderCopy3 = FuncLoader.LoadFunction<d_sdl_rendercopy_3>(NativeLibrary, "SDL_RenderCopy");
-
-            public static void RenderCopy(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref Rectangle dstrect)
-            {
-                if (srcrect.IsEmpty && dstrect.IsEmpty)
-                {
-                    RenderCopy3(renderer, texture, IntPtr.Zero, IntPtr.Zero);
-                }
-                else if (srcrect.IsEmpty && !dstrect.IsEmpty)
-                {
-                    RenderCopy2(renderer, texture, IntPtr.Zero, ref dstrect);
-                }
-                else if (!srcrect.IsEmpty && dstrect.IsEmpty)
-                {
-                    RenderCopy1(renderer, texture, ref srcrect, IntPtr.Zero);
-                }
-                else
-                {
-                    RenderCopy0(renderer, texture, ref srcrect, ref dstrect);
-                }
-            }
-
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendercopyF_0(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstRect);
-            private static readonly d_sdl_rendercopyF_0 RenderCopyF0 = FuncLoader.LoadFunction<d_sdl_rendercopyF_0>(NativeLibrary, "SDL_RenderCopyF");
-
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendercopyF_1(IntPtr renderer, IntPtr texture, IntPtr srcrect, ref RectangleF dstRect);
-            private static readonly d_sdl_rendercopyF_1 RenderCopyF1 = FuncLoader.LoadFunction<d_sdl_rendercopyF_1>(NativeLibrary, "SDL_RenderCopyF");
-
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendercopyF_2(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, IntPtr dstRect);
-            private static readonly d_sdl_rendercopyF_2 RenderCopyF2 = FuncLoader.LoadFunction<d_sdl_rendercopyF_2>(NativeLibrary, "SDL_RenderCopyF");
-
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendercopyF_3(IntPtr renderer, IntPtr texture, IntPtr srcrect, IntPtr dstRect);
-            private static readonly d_sdl_rendercopyF_3 RenderCopyF3 = FuncLoader.LoadFunction<d_sdl_rendercopyF_3>(NativeLibrary, "SDL_RenderCopyF");
-
-            public static void RenderCopyF(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstrect)
+            public static int RenderCopy(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref Rectangle dstrect)
             {
                 if (srcrect.IsEmpty && dstrect.IsEmpty)
                 {
-                    RenderCopyF3(renderer, texture, IntPtr.Zero, IntPtr.Zero);
+                    return SDL_RenderCopy(renderer, texture, IntPtr.Zero, IntPtr.Zero);
                 }
                 else if (srcrect.IsEmpty && !dstrect.IsEmpty)
                 {
-                    RenderCopyF1(renderer, texture, IntPtr.Zero, ref dstrect);
+                    return SDL_RenderCopy(renderer, texture, IntPtr.Zero, ref dstrect);
                 }
                 else if (!srcrect.IsEmpty && dstrect.IsEmpty)
                 {
-                    RenderCopyF2(renderer, texture, ref srcrect, IntPtr.Zero);
+                    return SDL_RenderCopy(renderer, texture, ref srcrect, IntPtr.Zero);
                 }
                 else
                 {
-                    RenderCopyF0(renderer, texture, ref srcrect, ref dstrect);
+                    return SDL_RenderCopy(renderer, texture, ref srcrect, ref dstrect);
                 }
             }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendersetdrawcolor(IntPtr renderer, byte r, byte g, byte b, byte a);
-            public static readonly d_sdl_rendersetdrawcolor SetDrawColor = FuncLoader.LoadFunction<d_sdl_rendersetdrawcolor>(NativeLibrary, "SDL_SetRenderDrawColor");
+            public static int RenderCopyF(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstrect)
+            {
+                if (srcrect.IsEmpty && dstrect.IsEmpty)
+                {
+                    return SDL_RenderCopyF(renderer, texture, IntPtr.Zero, IntPtr.Zero);
+                }
+                else if (srcrect.IsEmpty && !dstrect.IsEmpty)
+                {
+                    return SDL_RenderCopyF(renderer, texture, IntPtr.Zero, ref dstrect);
+                }
+                else if (!srcrect.IsEmpty && dstrect.IsEmpty)
+                {
+                    return SDL_RenderCopyF(renderer, texture, ref srcrect, IntPtr.Zero);
+                }
+                else
+                {
+                    return SDL_RenderCopyF(renderer, texture, ref srcrect, ref dstrect);
+                }
+            }
+            public static int RenderDrawRect(IntPtr renderer, ref Rectangle rect) => SDL_RenderDrawRect(renderer, ref rect);
+            public static int RenderFillRect(IntPtr renderer, ref Rectangle rect) => SDL_RenderFillRect(renderer, ref rect);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_rendersetdrawblendmode(IntPtr renderer, int blendMode);
-            public static readonly d_sdl_rendersetdrawblendmode SetDrawBlendMode = FuncLoader.LoadFunction<d_sdl_rendersetdrawblendmode>(NativeLibrary, "SDL_SetRenderDrawBlendMode");
+            public static int RenderDrawLine(IntPtr renderer, int x1, int y1, int x2, int y2) => SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_createrenderer(IntPtr window, int index, SDL_RendererFlags flags);
+            //private static readonly d_sdl_createrenderer SDL_CreateRenderer = FuncLoader.LoadFunction<d_sdl_createrenderer>(NativeLibrary, "SDL_CreateRenderer");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_renderdrawrect(IntPtr renderer, ref Rectangle rect);
-            public static readonly d_sdl_renderdrawrect DrawRect = FuncLoader.LoadFunction<d_sdl_renderdrawrect>(NativeLibrary, "SDL_RenderDrawRect");
+            //public static IntPtr Create(IntPtr window, int index, SDL_RendererFlags flags)
+            //{
+            //    return GetError(SDL_CreateRenderer(window, index, flags));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_renderfillrect(IntPtr renderer, ref Rectangle rect);
-            public static readonly d_sdl_renderfillrect FillRect = FuncLoader.LoadFunction<d_sdl_renderfillrect>(NativeLibrary, "SDL_RenderFillRect");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_destroyrenderer(IntPtr renderer);
+            //public static readonly d_sdl_destroyrenderer Destroy = FuncLoader.LoadFunction<d_sdl_destroyrenderer>(NativeLibrary, "SDL_DestroyRenderer");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_renderdrawline(IntPtr renderer, int x1, int y1, int x2, int y2);
-            public static readonly d_sdl_renderdrawline DrawLine = FuncLoader.LoadFunction<d_sdl_renderdrawline>(NativeLibrary, "SDL_RenderDrawLine");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_renderpresent(IntPtr renderer);
+            //public static readonly d_sdl_renderpresent Present = FuncLoader.LoadFunction<d_sdl_renderpresent>(NativeLibrary, "SDL_RenderPresent");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_renderclear(IntPtr renderer);
+            //public static readonly d_sdl_renderclear Clear = FuncLoader.LoadFunction<d_sdl_renderclear>(NativeLibrary, "SDL_RenderClear");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate IntPtr d_sdl_createtexture(IntPtr renderer, uint format, int access, int w, int h);
+            //public static readonly d_sdl_createtexture CreateTexture = FuncLoader.LoadFunction<d_sdl_createtexture>(NativeLibrary, "SDL_CreateTexture");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_querytexture(IntPtr renderer, out uint format, out int access, out int w, out int h);
+            //public static readonly d_sdl_querytexture QueryTexture = FuncLoader.LoadFunction<d_sdl_querytexture>(NativeLibrary, "SDL_QueryTexture");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_destroytexture(IntPtr texture);
+            //public static readonly d_sdl_destroytexture DestroyTexture = FuncLoader.LoadFunction<d_sdl_destroytexture>(NativeLibrary, "SDL_DestroyTexture");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate IntPtr d_sdl_cleartexturefromsurface(IntPtr renderer, IntPtr surface);
+            //public static readonly d_sdl_cleartexturefromsurface CreateTextureFromSurface = FuncLoader.LoadFunction<d_sdl_cleartexturefromsurface>(NativeLibrary, "SDL_CreateTextureFromSurface");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_settexturealphamod(IntPtr renderer, byte alpha);
+            //public static readonly d_sdl_settexturealphamod SetTextureAlphaMod = FuncLoader.LoadFunction<d_sdl_settexturealphamod>(NativeLibrary, "SDL_SetTextureAlphaMod");
+
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendercopy_0(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref Rectangle dstRect);
+            //private static readonly d_sdl_rendercopy_0 RenderCopy0 = FuncLoader.LoadFunction<d_sdl_rendercopy_0>(NativeLibrary, "SDL_RenderCopy");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendercopy_1(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, IntPtr dstRect);
+            //private static readonly d_sdl_rendercopy_1 RenderCopy1 = FuncLoader.LoadFunction<d_sdl_rendercopy_1>(NativeLibrary, "SDL_RenderCopy");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendercopy_2(IntPtr renderer, IntPtr texture, IntPtr srcrect, ref Rectangle dstRect);
+            //private static readonly d_sdl_rendercopy_2 RenderCopy2 = FuncLoader.LoadFunction<d_sdl_rendercopy_2>(NativeLibrary, "SDL_RenderCopy");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendercopy_3(IntPtr renderer, IntPtr texture, IntPtr srcrect, IntPtr dstRect);
+            //private static readonly d_sdl_rendercopy_3 RenderCopy3 = FuncLoader.LoadFunction<d_sdl_rendercopy_3>(NativeLibrary, "SDL_RenderCopy");
+
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendercopyF_0(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstRect);
+            //private static readonly d_sdl_rendercopyF_0 RenderCopyF0 = FuncLoader.LoadFunction<d_sdl_rendercopyF_0>(NativeLibrary, "SDL_RenderCopyF");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendercopyF_1(IntPtr renderer, IntPtr texture, IntPtr srcrect, ref RectangleF dstRect);
+            //private static readonly d_sdl_rendercopyF_1 RenderCopyF1 = FuncLoader.LoadFunction<d_sdl_rendercopyF_1>(NativeLibrary, "SDL_RenderCopyF");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendercopyF_2(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, IntPtr dstRect);
+            //private static readonly d_sdl_rendercopyF_2 RenderCopyF2 = FuncLoader.LoadFunction<d_sdl_rendercopyF_2>(NativeLibrary, "SDL_RenderCopyF");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendercopyF_3(IntPtr renderer, IntPtr texture, IntPtr srcrect, IntPtr dstRect);
+            //private static readonly d_sdl_rendercopyF_3 RenderCopyF3 = FuncLoader.LoadFunction<d_sdl_rendercopyF_3>(NativeLibrary, "SDL_RenderCopyF");
+
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendersetdrawcolor(IntPtr renderer, byte r, byte g, byte b, byte a);
+            //public static readonly d_sdl_rendersetdrawcolor SetDrawColor = FuncLoader.LoadFunction<d_sdl_rendersetdrawcolor>(NativeLibrary, "SDL_SetRenderDrawColor");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_rendersetdrawblendmode(IntPtr renderer, int blendMode);
+            //public static readonly d_sdl_rendersetdrawblendmode SetDrawBlendMode = FuncLoader.LoadFunction<d_sdl_rendersetdrawblendmode>(NativeLibrary, "SDL_SetRenderDrawBlendMode");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_renderdrawrect(IntPtr renderer, ref Rectangle rect);
+            //public static readonly d_sdl_renderdrawrect DrawRect = FuncLoader.LoadFunction<d_sdl_renderdrawrect>(NativeLibrary, "SDL_RenderDrawRect");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_renderfillrect(IntPtr renderer, ref Rectangle rect);
+            //public static readonly d_sdl_renderfillrect FillRect = FuncLoader.LoadFunction<d_sdl_renderfillrect>(NativeLibrary, "SDL_RenderFillRect");
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_renderdrawline(IntPtr renderer, int x1, int y1, int x2, int y2);
+            //public static readonly d_sdl_renderdrawline DrawLine = FuncLoader.LoadFunction<d_sdl_renderdrawline>(NativeLibrary, "SDL_RenderDrawLine");
 
 
         }
 
         public static class Display
         {
+            [StructLayout(LayoutKind.Sequential)]
             public struct Mode
             {
                 public uint Format;
@@ -1021,161 +1175,163 @@
                 public IntPtr DriverData;
             }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_getdisplaybounds(int displayIndex, out Rectangle rect);
-            private static readonly d_sdl_getdisplaybounds SDL_GetDisplayBounds = FuncLoader.LoadFunction<d_sdl_getdisplaybounds>(NativeLibrary, "SDL_GetDisplayBounds");
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_GetDisplayBounds(int displayIndex, out Rectangle rect);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_GetCurrentDisplayMode(int displayIndex, out Mode mode);
 
-            public static void GetBounds(int displayIndex, out Rectangle rect)
-            {
-                GetError(SDL_GetDisplayBounds(displayIndex, out rect));
-            }
+            public static int GetDisplayBounds(int displayIndex, out Rectangle rect) => SDL_GetDisplayBounds(displayIndex, out rect);
+            public static int GetCurrentDisplayMode(int displayIndex, out Mode mode) => SDL_GetCurrentDisplayMode(displayIndex, out mode);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_getcurrentdisplaymode(int displayIndex, out Mode mode);
-            private static readonly d_sdl_getcurrentdisplaymode SDL_GetCurrentDisplayMode = FuncLoader.LoadFunction<d_sdl_getcurrentdisplaymode>(NativeLibrary, "SDL_GetCurrentDisplayMode");
 
-            public static void GetCurrentDisplayMode(int displayIndex, out Mode mode)
-            {
-                GetError(SDL_GetCurrentDisplayMode(displayIndex, out mode));
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_getdisplaybounds(int displayIndex, out Rectangle rect);
+            //private static readonly d_sdl_getdisplaybounds SDL_GetDisplayBounds = FuncLoader.LoadFunction<d_sdl_getdisplaybounds>(NativeLibrary, "SDL_GetDisplayBounds");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_getdisplaymode(int displayIndex, int modeIndex, out Mode mode);
-            private static readonly d_sdl_getdisplaymode SDL_GetDisplayMode = FuncLoader.LoadFunction<d_sdl_getdisplaymode>(NativeLibrary, "SDL_GetDisplayMode");
+            //public static void GetBounds(int displayIndex, out Rectangle rect)
+            //{
+            //    GetError(SDL_GetDisplayBounds(displayIndex, out rect));
+            //}
 
-            public static void GetDisplayMode(int displayIndex, int modeIndex, out Mode mode)
-            {
-                GetError(SDL_GetDisplayMode(displayIndex, modeIndex, out mode));
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_getcurrentdisplaymode(int displayIndex, out Mode mode);
+            //private static readonly d_sdl_getcurrentdisplaymode SDL_GetCurrentDisplayMode = FuncLoader.LoadFunction<d_sdl_getcurrentdisplaymode>(NativeLibrary, "SDL_GetCurrentDisplayMode");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_getclosestdisplaymode(int displayIndex, Mode mode, out Mode closest);
-            private static readonly d_sdl_getclosestdisplaymode SDL_GetClosestDisplayMode = FuncLoader.LoadFunction<d_sdl_getclosestdisplaymode>(NativeLibrary, "SDL_GetClosestDisplayMode");
+            //public static void GetCurrentDisplayMode(int displayIndex, out Mode mode)
+            //{
+            //    GetError(SDL_GetCurrentDisplayMode(displayIndex, out mode));
+            //}
 
-            public static void GetClosestDisplayMode(int displayIndex, Mode mode, out Mode closest)
-            {
-                GetError(SDL_GetClosestDisplayMode(displayIndex, mode, out closest));
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_getdisplaymode(int displayIndex, int modeIndex, out Mode mode);
+            //private static readonly d_sdl_getdisplaymode SDL_GetDisplayMode = FuncLoader.LoadFunction<d_sdl_getdisplaymode>(NativeLibrary, "SDL_GetDisplayMode");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_getdisplayname(int index);
-            private static readonly d_sdl_getdisplayname SDL_GetDisplayName = FuncLoader.LoadFunction<d_sdl_getdisplayname>(NativeLibrary, "SDL_GetDisplayName");
+            //public static void GetDisplayMode(int displayIndex, int modeIndex, out Mode mode)
+            //{
+            //    GetError(SDL_GetDisplayMode(displayIndex, modeIndex, out mode));
+            //}
 
-            public static string GetDisplayName(int index)
-            {
-                return InteropHelpers.Utf8ToString(GetError(SDL_GetDisplayName(index))) ?? "";
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_getclosestdisplaymode(int displayIndex, Mode mode, out Mode closest);
+            //private static readonly d_sdl_getclosestdisplaymode SDL_GetClosestDisplayMode = FuncLoader.LoadFunction<d_sdl_getclosestdisplaymode>(NativeLibrary, "SDL_GetClosestDisplayMode");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_getnumdisplaymodes(int displayIndex);
-            private static readonly d_sdl_getnumdisplaymodes SDL_GetNumDisplayModes = FuncLoader.LoadFunction<d_sdl_getnumdisplaymodes>(NativeLibrary, "SDL_GetNumDisplayModes");
+            //public static void GetClosestDisplayMode(int displayIndex, Mode mode, out Mode closest)
+            //{
+            //    GetError(SDL_GetClosestDisplayMode(displayIndex, mode, out closest));
+            //}
 
-            public static int GetNumDisplayModes(int displayIndex)
-            {
-                return GetError(SDL_GetNumDisplayModes(displayIndex));
-            }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_getnumvideodisplays();
-            private static readonly d_sdl_getnumvideodisplays SDL_GetNumVideoDisplays = FuncLoader.LoadFunction<d_sdl_getnumvideodisplays>(NativeLibrary, "SDL_GetNumVideoDisplays");
 
-            public static int GetNumVideoDisplays()
-            {
-                return GetError(SDL_GetNumVideoDisplays());
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_getnumdisplaymodes(int displayIndex);
+            //private static readonly d_sdl_getnumdisplaymodes SDL_GetNumDisplayModes = FuncLoader.LoadFunction<d_sdl_getnumdisplaymodes>(NativeLibrary, "SDL_GetNumDisplayModes");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_getwindowdisplayindex(IntPtr window);
-            private static readonly d_sdl_getwindowdisplayindex SDL_GetWindowDisplayIndex = FuncLoader.LoadFunction<d_sdl_getwindowdisplayindex>(NativeLibrary, "SDL_GetWindowDisplayIndex");
+            //public static int GetNumDisplayModes(int displayIndex)
+            //{
+            //    return GetError(SDL_GetNumDisplayModes(displayIndex));
+            //}
 
-            public static int GetWindowDisplayIndex(IntPtr window)
-            {
-                return GetError(SDL_GetWindowDisplayIndex(window));
-            }
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_getnumvideodisplays();
+            //private static readonly d_sdl_getnumvideodisplays SDL_GetNumVideoDisplays = FuncLoader.LoadFunction<d_sdl_getnumvideodisplays>(NativeLibrary, "SDL_GetNumVideoDisplays");
+
+            //public static int GetNumVideoDisplays()
+            //{
+            //    return GetError(SDL_GetNumVideoDisplays());
+            //}
+
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_getwindowdisplayindex(IntPtr window);
+            //private static readonly d_sdl_getwindowdisplayindex SDL_GetWindowDisplayIndex = FuncLoader.LoadFunction<d_sdl_getwindowdisplayindex>(NativeLibrary, "SDL_GetWindowDisplayIndex");
+
+            //public static int GetWindowDisplayIndex(IntPtr window)
+            //{
+            //    return GetError(SDL_GetWindowDisplayIndex(window));
+            //}
         }
 
-        public static class GL
-        {
-            public enum Attribute
-            {
-                RedSize,
-                GreenSize,
-                BlueSize,
-                AlphaSize,
-                BufferSize,
-                DoubleBuffer,
-                DepthSize,
-                StencilSize,
-                AccumRedSize,
-                AccumGreenSize,
-                AccumBlueSize,
-                AccumAlphaSize,
-                Stereo,
-                MultiSampleBuffers,
-                MultiSampleSamples,
-                AcceleratedVisual,
-                RetainedBacking,
-                ContextMajorVersion,
-                ContextMinorVersion,
-                ContextEgl,
-                ContextFlags,
-                ContextProfileMAsl,
-                ShareWithCurrentContext,
-                FramebufferSRGBCapable,
-                ContextReleaseBehaviour,
-            }
+        //public static class GL
+        //{
+        //    public enum Attribute
+        //    {
+        //        RedSize,
+        //        GreenSize,
+        //        BlueSize,
+        //        AlphaSize,
+        //        BufferSize,
+        //        DoubleBuffer,
+        //        DepthSize,
+        //        StencilSize,
+        //        AccumRedSize,
+        //        AccumGreenSize,
+        //        AccumBlueSize,
+        //        AccumAlphaSize,
+        //        Stereo,
+        //        MultiSampleBuffers,
+        //        MultiSampleSamples,
+        //        AcceleratedVisual,
+        //        RetainedBacking,
+        //        ContextMajorVersion,
+        //        ContextMinorVersion,
+        //        ContextEgl,
+        //        ContextFlags,
+        //        ContextProfileMAsl,
+        //        ShareWithCurrentContext,
+        //        FramebufferSRGBCapable,
+        //        ContextReleaseBehaviour,
+        //    }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_gl_createcontext(IntPtr window);
-            private static readonly d_sdl_gl_createcontext SDL_GL_CreateContext = FuncLoader.LoadFunction<d_sdl_gl_createcontext>(NativeLibrary, "SDL_GL_CreateContext");
+        //    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //    private delegate IntPtr d_sdl_gl_createcontext(IntPtr window);
+        //    private static readonly d_sdl_gl_createcontext SDL_GL_CreateContext = FuncLoader.LoadFunction<d_sdl_gl_createcontext>(NativeLibrary, "SDL_GL_CreateContext");
 
-            public static IntPtr CreateContext(IntPtr window)
-            {
-                return GetError(SDL_GL_CreateContext(window));
-            }
+        //    public static IntPtr CreateContext(IntPtr window)
+        //    {
+        //        return GetError(SDL_GL_CreateContext(window));
+        //    }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_gl_deletecontext(IntPtr context);
-            public static readonly d_sdl_gl_deletecontext DeleteContext = FuncLoader.LoadFunction<d_sdl_gl_deletecontext>(NativeLibrary, "SDL_GL_DeleteContext");
+        //    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //    public delegate void d_sdl_gl_deletecontext(IntPtr context);
+        //    public static readonly d_sdl_gl_deletecontext DeleteContext = FuncLoader.LoadFunction<d_sdl_gl_deletecontext>(NativeLibrary, "SDL_GL_DeleteContext");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_gl_getcurrentcontext();
-            private static readonly d_sdl_gl_getcurrentcontext SDL_GL_GetCurrentContext = FuncLoader.LoadFunction<d_sdl_gl_getcurrentcontext>(NativeLibrary, "SDL_GL_GetCurrentContext");
+        //    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //    private delegate IntPtr d_sdl_gl_getcurrentcontext();
+        //    private static readonly d_sdl_gl_getcurrentcontext SDL_GL_GetCurrentContext = FuncLoader.LoadFunction<d_sdl_gl_getcurrentcontext>(NativeLibrary, "SDL_GL_GetCurrentContext");
 
-            public static IntPtr GetCurrentContext()
-            {
-                return GetError(SDL_GL_GetCurrentContext());
-            }
+        //    public static IntPtr GetCurrentContext()
+        //    {
+        //        return GetError(SDL_GL_GetCurrentContext());
+        //    }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate IntPtr d_sdl_gl_getprocaddress(string proc);
-            public static readonly d_sdl_gl_getprocaddress GetProcAddress = FuncLoader.LoadFunction<d_sdl_gl_getprocaddress>(NativeLibrary, "SDL_GL_GetProcAddress");
+        //    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //    public delegate IntPtr d_sdl_gl_getprocaddress(string proc);
+        //    public static readonly d_sdl_gl_getprocaddress GetProcAddress = FuncLoader.LoadFunction<d_sdl_gl_getprocaddress>(NativeLibrary, "SDL_GL_GetProcAddress");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_gl_getswapinterval();
-            public static readonly d_sdl_gl_getswapinterval GetSwapInterval = FuncLoader.LoadFunction<d_sdl_gl_getswapinterval>(NativeLibrary, "SDL_GL_GetSwapInterval");
+        //    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //    public delegate int d_sdl_gl_getswapinterval();
+        //    public static readonly d_sdl_gl_getswapinterval GetSwapInterval = FuncLoader.LoadFunction<d_sdl_gl_getswapinterval>(NativeLibrary, "SDL_GL_GetSwapInterval");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_gl_makecurrent(IntPtr window, IntPtr context);
-            public static readonly d_sdl_gl_makecurrent MakeCurrent = FuncLoader.LoadFunction<d_sdl_gl_makecurrent>(NativeLibrary, "SDL_GL_MakeCurrent");
+        //    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //    public delegate int d_sdl_gl_makecurrent(IntPtr window, IntPtr context);
+        //    public static readonly d_sdl_gl_makecurrent MakeCurrent = FuncLoader.LoadFunction<d_sdl_gl_makecurrent>(NativeLibrary, "SDL_GL_MakeCurrent");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_gl_setattribute(Attribute attr, int value);
-            private static readonly d_sdl_gl_setattribute SDL_GL_SetAttribute = FuncLoader.LoadFunction<d_sdl_gl_setattribute>(NativeLibrary, "SDL_GL_SetAttribute");
+        //    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //    private delegate int d_sdl_gl_setattribute(Attribute attr, int value);
+        //    private static readonly d_sdl_gl_setattribute SDL_GL_SetAttribute = FuncLoader.LoadFunction<d_sdl_gl_setattribute>(NativeLibrary, "SDL_GL_SetAttribute");
 
-            public static int SetAttribute(Attribute attr, int value)
-            {
-                return GetError(SDL_GL_SetAttribute(attr, value));
-            }
+        //    public static int SetAttribute(Attribute attr, int value)
+        //    {
+        //        return GetError(SDL_GL_SetAttribute(attr, value));
+        //    }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_gl_setswapinterval(int interval);
-            public static readonly d_sdl_gl_setswapinterval SetSwapInterval = FuncLoader.LoadFunction<d_sdl_gl_setswapinterval>(NativeLibrary, "SDL_GL_SetSwapInterval");
+        //    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //    public delegate int d_sdl_gl_setswapinterval(int interval);
+        //    public static readonly d_sdl_gl_setswapinterval SetSwapInterval = FuncLoader.LoadFunction<d_sdl_gl_setswapinterval>(NativeLibrary, "SDL_GL_SetSwapInterval");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_gl_swapwindow(IntPtr window);
-            public static readonly d_sdl_gl_swapwindow SwapWindow = FuncLoader.LoadFunction<d_sdl_gl_swapwindow>(NativeLibrary, "SDL_GL_SwapWindow");
-        }
+        //    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        //    public delegate void d_sdl_gl_swapwindow(IntPtr window);
+        //    public static readonly d_sdl_gl_swapwindow SwapWindow = FuncLoader.LoadFunction<d_sdl_gl_swapwindow>(NativeLibrary, "SDL_GL_SwapWindow");
+        //}
 
         public static class Mouse
         {
@@ -1250,47 +1406,47 @@
                 public uint Direction;
             }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_createcolorcursor(IntPtr surface, int x, int y);
-            private static readonly d_sdl_createcolorcursor SDL_CreateColorCursor = FuncLoader.LoadFunction<d_sdl_createcolorcursor>(NativeLibrary, "SDL_CreateColorCursor");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_createcolorcursor(IntPtr surface, int x, int y);
+            //private static readonly d_sdl_createcolorcursor SDL_CreateColorCursor = FuncLoader.LoadFunction<d_sdl_createcolorcursor>(NativeLibrary, "SDL_CreateColorCursor");
 
-            public static IntPtr CreateColorCursor(IntPtr surface, int x, int y)
-            {
-                return GetError(SDL_CreateColorCursor(surface, x, y));
-            }
+            //public static IntPtr CreateColorCursor(IntPtr surface, int x, int y)
+            //{
+            //    return GetError(SDL_CreateColorCursor(surface, x, y));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_createsystemcursor(SystemCursor id);
-            private static readonly d_sdl_createsystemcursor SDL_CreateSystemCursor = FuncLoader.LoadFunction<d_sdl_createsystemcursor>(NativeLibrary, "SDL_CreateSystemCursor");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_createsystemcursor(SystemCursor id);
+            //private static readonly d_sdl_createsystemcursor SDL_CreateSystemCursor = FuncLoader.LoadFunction<d_sdl_createsystemcursor>(NativeLibrary, "SDL_CreateSystemCursor");
 
-            public static IntPtr CreateSystemCursor(SystemCursor id)
-            {
-                return GetError(SDL_CreateSystemCursor(id));
-            }
+            //public static IntPtr CreateSystemCursor(SystemCursor id)
+            //{
+            //    return GetError(SDL_CreateSystemCursor(id));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_freecursor(IntPtr cursor);
-            public static readonly d_sdl_freecursor FreeCursor = FuncLoader.LoadFunction<d_sdl_freecursor>(NativeLibrary, "SDL_FreeCursor");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_freecursor(IntPtr cursor);
+            //public static readonly d_sdl_freecursor FreeCursor = FuncLoader.LoadFunction<d_sdl_freecursor>(NativeLibrary, "SDL_FreeCursor");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate Button d_sdl_getglobalmousestate(out int x, out int y);
-            public static readonly d_sdl_getglobalmousestate GetGlobalState = FuncLoader.LoadFunction<d_sdl_getglobalmousestate>(NativeLibrary, "SDL_GetGlobalMouseState");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate Button d_sdl_getglobalmousestate(out int x, out int y);
+            //public static readonly d_sdl_getglobalmousestate GetGlobalState = FuncLoader.LoadFunction<d_sdl_getglobalmousestate>(NativeLibrary, "SDL_GetGlobalMouseState");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate Button d_sdl_getmousestate(out int x, out int y);
-            public static readonly d_sdl_getmousestate GetState = FuncLoader.LoadFunction<d_sdl_getmousestate>(NativeLibrary, "SDL_GetMouseState");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate Button d_sdl_getmousestate(out int x, out int y);
+            //public static readonly d_sdl_getmousestate GetState = FuncLoader.LoadFunction<d_sdl_getmousestate>(NativeLibrary, "SDL_GetMouseState");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_setcursor(IntPtr cursor);
-            public static readonly d_sdl_setcursor SetCursor = FuncLoader.LoadFunction<d_sdl_setcursor>(NativeLibrary, "SDL_SetCursor");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_setcursor(IntPtr cursor);
+            //public static readonly d_sdl_setcursor SetCursor = FuncLoader.LoadFunction<d_sdl_setcursor>(NativeLibrary, "SDL_SetCursor");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_showcursor(int toggle);
-            public static readonly d_sdl_showcursor ShowCursor = FuncLoader.LoadFunction<d_sdl_showcursor>(NativeLibrary, "SDL_ShowCursor");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_showcursor(int toggle);
+            //public static readonly d_sdl_showcursor ShowCursor = FuncLoader.LoadFunction<d_sdl_showcursor>(NativeLibrary, "SDL_ShowCursor");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_warpmouseinwindow(IntPtr window, int x, int y);
-            public static readonly d_sdl_warpmouseinwindow WarpInWindow = FuncLoader.LoadFunction<d_sdl_warpmouseinwindow>(NativeLibrary, "SDL_WarpMouseInWindow");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_warpmouseinwindow(IntPtr window, int x, int y);
+            //public static readonly d_sdl_warpmouseinwindow WarpInWindow = FuncLoader.LoadFunction<d_sdl_warpmouseinwindow>(NativeLibrary, "SDL_WarpMouseInWindow");
         }
 
         public static class Keyboard
@@ -1379,9 +1535,9 @@
                 //    public byte[] Text;
             }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate Keymod d_sdl_getmodstate();
-            public static readonly d_sdl_getmodstate GetModState = FuncLoader.LoadFunction<d_sdl_getmodstate>(NativeLibrary, "SDL_GetModState");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate Keymod d_sdl_getmodstate();
+            //public static readonly d_sdl_getmodstate GetModState = FuncLoader.LoadFunction<d_sdl_getmodstate>(NativeLibrary, "SDL_GetModState");
         }
 
         public static class Joystick
@@ -1404,92 +1560,92 @@
                 public int Which;
             }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_joystickclose(IntPtr joystick);
-            public static d_sdl_joystickclose Close = FuncLoader.LoadFunction<d_sdl_joystickclose>(NativeLibrary, "SDL_JoystickClose");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_joystickclose(IntPtr joystick);
+            //public static d_sdl_joystickclose Close = FuncLoader.LoadFunction<d_sdl_joystickclose>(NativeLibrary, "SDL_JoystickClose");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_joystickfrominstanceid(int joyid);
-            private static readonly d_sdl_joystickfrominstanceid SDL_JoystickFromInstanceID = FuncLoader.LoadFunction<d_sdl_joystickfrominstanceid>(NativeLibrary, "SDL_JoystickFromInstanceID");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_joystickfrominstanceid(int joyid);
+            //private static readonly d_sdl_joystickfrominstanceid SDL_JoystickFromInstanceID = FuncLoader.LoadFunction<d_sdl_joystickfrominstanceid>(NativeLibrary, "SDL_JoystickFromInstanceID");
 
-            public static IntPtr FromInstanceID(int joyid)
-            {
-                return GetError(SDL_JoystickFromInstanceID(joyid));
-            }
+            //public static IntPtr FromInstanceID(int joyid)
+            //{
+            //    return GetError(SDL_JoystickFromInstanceID(joyid));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate short d_sdl_joystickgetaxis(IntPtr joystick, int axis);
-            public static readonly d_sdl_joystickgetaxis GetAxis = FuncLoader.LoadFunction<d_sdl_joystickgetaxis>(NativeLibrary, "SDL_JoystickGetAxis");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate short d_sdl_joystickgetaxis(IntPtr joystick, int axis);
+            //public static readonly d_sdl_joystickgetaxis GetAxis = FuncLoader.LoadFunction<d_sdl_joystickgetaxis>(NativeLibrary, "SDL_JoystickGetAxis");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate byte d_sdl_joystickgetbutton(IntPtr joystick, int button);
-            public static readonly d_sdl_joystickgetbutton GetButton = FuncLoader.LoadFunction<d_sdl_joystickgetbutton>(NativeLibrary, "SDL_JoystickGetButton");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate byte d_sdl_joystickgetbutton(IntPtr joystick, int button);
+            //public static readonly d_sdl_joystickgetbutton GetButton = FuncLoader.LoadFunction<d_sdl_joystickgetbutton>(NativeLibrary, "SDL_JoystickGetButton");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_joystickname(IntPtr joystick);
-            private static readonly d_sdl_joystickname JoystickName = FuncLoader.LoadFunction<d_sdl_joystickname>(NativeLibrary, "SDL_JoystickName");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_joystickname(IntPtr joystick);
+            //private static readonly d_sdl_joystickname JoystickName = FuncLoader.LoadFunction<d_sdl_joystickname>(NativeLibrary, "SDL_JoystickName");
 
-            public static string GetJoystickName(IntPtr joystick)
-            {
-                return InteropHelpers.Utf8ToString(JoystickName(joystick)) ?? "";
-            }
+            //public static string GetJoystickName(IntPtr joystick)
+            //{
+            //    return InteropHelpers.Utf8ToString(JoystickName(joystick)) ?? "";
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate Guid d_sdl_joystickgetguid(IntPtr joystick);
-            public static readonly d_sdl_joystickgetguid GetGUID = FuncLoader.LoadFunction<d_sdl_joystickgetguid>(NativeLibrary, "SDL_JoystickGetGUID");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate Guid d_sdl_joystickgetguid(IntPtr joystick);
+            //public static readonly d_sdl_joystickgetguid GetGUID = FuncLoader.LoadFunction<d_sdl_joystickgetguid>(NativeLibrary, "SDL_JoystickGetGUID");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate Hat d_sdl_joystickgethat(IntPtr joystick, int hat);
-            public static readonly d_sdl_joystickgethat GetHat = FuncLoader.LoadFunction<d_sdl_joystickgethat>(NativeLibrary, "SDL_JoystickGetHat");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate Hat d_sdl_joystickgethat(IntPtr joystick, int hat);
+            //public static readonly d_sdl_joystickgethat GetHat = FuncLoader.LoadFunction<d_sdl_joystickgethat>(NativeLibrary, "SDL_JoystickGetHat");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_joystickinstanceid(IntPtr joystick);
-            public static readonly d_sdl_joystickinstanceid InstanceID = FuncLoader.LoadFunction<d_sdl_joystickinstanceid>(NativeLibrary, "SDL_JoystickInstanceID");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_joystickinstanceid(IntPtr joystick);
+            //public static readonly d_sdl_joystickinstanceid InstanceID = FuncLoader.LoadFunction<d_sdl_joystickinstanceid>(NativeLibrary, "SDL_JoystickInstanceID");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_joystickopen(int deviceIndex);
-            private static readonly d_sdl_joystickopen SDL_JoystickOpen = FuncLoader.LoadFunction<d_sdl_joystickopen>(NativeLibrary, "SDL_JoystickOpen");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_joystickopen(int deviceIndex);
+            //private static readonly d_sdl_joystickopen SDL_JoystickOpen = FuncLoader.LoadFunction<d_sdl_joystickopen>(NativeLibrary, "SDL_JoystickOpen");
 
-            public static IntPtr Open(int deviceIndex)
-            {
-                return GetError(SDL_JoystickOpen(deviceIndex));
-            }
+            //public static IntPtr Open(int deviceIndex)
+            //{
+            //    return GetError(SDL_JoystickOpen(deviceIndex));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_joysticknumaxes(IntPtr joystick);
-            private static readonly d_sdl_joysticknumaxes SDL_JoystickNumAxes = FuncLoader.LoadFunction<d_sdl_joysticknumaxes>(NativeLibrary, "SDL_JoystickNumAxes");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_joysticknumaxes(IntPtr joystick);
+            //private static readonly d_sdl_joysticknumaxes SDL_JoystickNumAxes = FuncLoader.LoadFunction<d_sdl_joysticknumaxes>(NativeLibrary, "SDL_JoystickNumAxes");
 
-            public static int NumAxes(IntPtr joystick)
-            {
-                return GetError(SDL_JoystickNumAxes(joystick));
-            }
+            //public static int NumAxes(IntPtr joystick)
+            //{
+            //    return GetError(SDL_JoystickNumAxes(joystick));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_joysticknumbuttons(IntPtr joystick);
-            private static readonly d_sdl_joysticknumbuttons SDL_JoystickNumButtons = FuncLoader.LoadFunction<d_sdl_joysticknumbuttons>(NativeLibrary, "SDL_JoystickNumButtons");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_joysticknumbuttons(IntPtr joystick);
+            //private static readonly d_sdl_joysticknumbuttons SDL_JoystickNumButtons = FuncLoader.LoadFunction<d_sdl_joysticknumbuttons>(NativeLibrary, "SDL_JoystickNumButtons");
 
-            public static int NumButtons(IntPtr joystick)
-            {
-                return GetError(SDL_JoystickNumButtons(joystick));
-            }
+            //public static int NumButtons(IntPtr joystick)
+            //{
+            //    return GetError(SDL_JoystickNumButtons(joystick));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_joysticknumhats(IntPtr joystick);
-            private static readonly d_sdl_joysticknumhats SDL_JoystickNumHats = FuncLoader.LoadFunction<d_sdl_joysticknumhats>(NativeLibrary, "SDL_JoystickNumHats");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_joysticknumhats(IntPtr joystick);
+            //private static readonly d_sdl_joysticknumhats SDL_JoystickNumHats = FuncLoader.LoadFunction<d_sdl_joysticknumhats>(NativeLibrary, "SDL_JoystickNumHats");
 
-            public static int NumHats(IntPtr joystick)
-            {
-                return GetError(SDL_JoystickNumHats(joystick));
-            }
+            //public static int NumHats(IntPtr joystick)
+            //{
+            //    return GetError(SDL_JoystickNumHats(joystick));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_numjoysticks();
-            private static readonly d_sdl_numjoysticks SDL_NumJoysticks = FuncLoader.LoadFunction<d_sdl_numjoysticks>(NativeLibrary, "SDL_NumJoysticks");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_numjoysticks();
+            //private static readonly d_sdl_numjoysticks SDL_NumJoysticks = FuncLoader.LoadFunction<d_sdl_numjoysticks>(NativeLibrary, "SDL_NumJoysticks");
 
-            public static int NumJoysticks()
-            {
-                return GetError(SDL_NumJoysticks());
-            }
+            //public static int NumJoysticks()
+            //{
+            //    return GetError(SDL_NumJoysticks());
+            //}
         }
 
         public static class GameController
@@ -1535,97 +1691,97 @@
                 public int Which;
             }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_free(IntPtr ptr);
-            public static readonly d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_free(IntPtr ptr);
+            //public static readonly d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_gamecontrolleraddmapping(string mappingString);
-            public static readonly d_sdl_gamecontrolleraddmapping AddMapping = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmapping>(NativeLibrary, "SDL_GameControllerAddMapping");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_gamecontrolleraddmapping(string mappingString);
+            //public static readonly d_sdl_gamecontrolleraddmapping AddMapping = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmapping>(NativeLibrary, "SDL_GameControllerAddMapping");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_gamecontrolleraddmappingsfromrw(IntPtr rw, int freew);
-            public static readonly d_sdl_gamecontrolleraddmappingsfromrw AddMappingFromRw = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmappingsfromrw>(NativeLibrary, "SDL_GameControllerAddMappingsFromRW");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_gamecontrolleraddmappingsfromrw(IntPtr rw, int freew);
+            //public static readonly d_sdl_gamecontrolleraddmappingsfromrw AddMappingFromRw = FuncLoader.LoadFunction<d_sdl_gamecontrolleraddmappingsfromrw>(NativeLibrary, "SDL_GameControllerAddMappingsFromRW");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_gamecontrollerclose(IntPtr gamecontroller);
-            public static readonly d_sdl_gamecontrollerclose Close = FuncLoader.LoadFunction<d_sdl_gamecontrollerclose>(NativeLibrary, "SDL_GameControllerClose");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_gamecontrollerclose(IntPtr gamecontroller);
+            //public static readonly d_sdl_gamecontrollerclose Close = FuncLoader.LoadFunction<d_sdl_gamecontrollerclose>(NativeLibrary, "SDL_GameControllerClose");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_joystickfrominstanceid(int joyid);
-            private static readonly d_sdl_joystickfrominstanceid SDL_GameControllerFromInstanceID = FuncLoader.LoadFunction<d_sdl_joystickfrominstanceid>(NativeLibrary, "SDL_JoystickFromInstanceID");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_joystickfrominstanceid(int joyid);
+            //private static readonly d_sdl_joystickfrominstanceid SDL_GameControllerFromInstanceID = FuncLoader.LoadFunction<d_sdl_joystickfrominstanceid>(NativeLibrary, "SDL_JoystickFromInstanceID");
 
-            public static IntPtr FromInstanceID(int joyid)
-            {
-                return GetError(SDL_GameControllerFromInstanceID(joyid));
-            }
+            //public static IntPtr FromInstanceID(int joyid)
+            //{
+            //    return GetError(SDL_GameControllerFromInstanceID(joyid));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate short d_sdl_gamecontrollergetaxis(IntPtr gamecontroller, Axis axis);
-            public static readonly d_sdl_gamecontrollergetaxis GetAxis = FuncLoader.LoadFunction<d_sdl_gamecontrollergetaxis>(NativeLibrary, "SDL_GameControllerGetAxis");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate short d_sdl_gamecontrollergetaxis(IntPtr gamecontroller, Axis axis);
+            //public static readonly d_sdl_gamecontrollergetaxis GetAxis = FuncLoader.LoadFunction<d_sdl_gamecontrollergetaxis>(NativeLibrary, "SDL_GameControllerGetAxis");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate byte d_sdl_gamecontrollergetbutton(IntPtr gamecontroller, Button button);
-            public static readonly d_sdl_gamecontrollergetbutton GetButton = FuncLoader.LoadFunction<d_sdl_gamecontrollergetbutton>(NativeLibrary, "SDL_GameControllerGetButton");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate byte d_sdl_gamecontrollergetbutton(IntPtr gamecontroller, Button button);
+            //public static readonly d_sdl_gamecontrollergetbutton GetButton = FuncLoader.LoadFunction<d_sdl_gamecontrollergetbutton>(NativeLibrary, "SDL_GameControllerGetButton");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_gamecontrollergetjoystick(IntPtr gamecontroller);
-            private static readonly d_sdl_gamecontrollergetjoystick SDL_GameControllerGetJoystick = FuncLoader.LoadFunction<d_sdl_gamecontrollergetjoystick>(NativeLibrary, "SDL_GameControllerGetJoystick");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_gamecontrollergetjoystick(IntPtr gamecontroller);
+            //private static readonly d_sdl_gamecontrollergetjoystick SDL_GameControllerGetJoystick = FuncLoader.LoadFunction<d_sdl_gamecontrollergetjoystick>(NativeLibrary, "SDL_GameControllerGetJoystick");
 
-            public static IntPtr GetJoystick(IntPtr gamecontroller)
-            {
-                return GetError(SDL_GameControllerGetJoystick(gamecontroller));
-            }
+            //public static IntPtr GetJoystick(IntPtr gamecontroller)
+            //{
+            //    return GetError(SDL_GameControllerGetJoystick(gamecontroller));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate byte d_sdl_isgamecontroller(int joystickIndex);
-            public static readonly d_sdl_isgamecontroller IsGameController = FuncLoader.LoadFunction<d_sdl_isgamecontroller>(NativeLibrary, "SDL_IsGameController");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate byte d_sdl_isgamecontroller(int joystickIndex);
+            //public static readonly d_sdl_isgamecontroller IsGameController = FuncLoader.LoadFunction<d_sdl_isgamecontroller>(NativeLibrary, "SDL_IsGameController");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_gamecontrollermapping(IntPtr gamecontroller);
-            private static readonly d_sdl_gamecontrollermapping SDL_GameControllerMapping = FuncLoader.LoadFunction<d_sdl_gamecontrollermapping>(NativeLibrary, "SDL_GameControllerMapping");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_gamecontrollermapping(IntPtr gamecontroller);
+            //private static readonly d_sdl_gamecontrollermapping SDL_GameControllerMapping = FuncLoader.LoadFunction<d_sdl_gamecontrollermapping>(NativeLibrary, "SDL_GameControllerMapping");
 
-            public static string GetMapping(IntPtr gamecontroller)
-            {
-                IntPtr nativeStr = SDL_GameControllerMapping(gamecontroller);
-                if (nativeStr == IntPtr.Zero)
-                    return string.Empty;
+            //public static string GetMapping(IntPtr gamecontroller)
+            //{
+            //    IntPtr nativeStr = SDL_GameControllerMapping(gamecontroller);
+            //    if (nativeStr == IntPtr.Zero)
+            //        return string.Empty;
 
-                string mappingStr = InteropHelpers.Utf8ToString(nativeStr) ?? "";
+            //    string mappingStr = InteropHelpers.Utf8ToString(nativeStr) ?? "";
 
-                //The mapping string returned by SDL is owned by us and thus must be freed
-                SDL_Free(nativeStr);
+            //    //The mapping string returned by SDL is owned by us and thus must be freed
+            //    SDL_Free(nativeStr);
 
-                return mappingStr;
-            }
+            //    return mappingStr;
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_gamecontrolleropen(int joystickIndex);
-            private static readonly d_sdl_gamecontrolleropen SDL_GameControllerOpen = FuncLoader.LoadFunction<d_sdl_gamecontrolleropen>(NativeLibrary, "SDL_GameControllerOpen");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_gamecontrolleropen(int joystickIndex);
+            //private static readonly d_sdl_gamecontrolleropen SDL_GameControllerOpen = FuncLoader.LoadFunction<d_sdl_gamecontrolleropen>(NativeLibrary, "SDL_GameControllerOpen");
 
-            public static IntPtr Open(int joystickIndex)
-            {
-                return GetError(SDL_GameControllerOpen(joystickIndex));
-            }
+            //public static IntPtr Open(int joystickIndex)
+            //{
+            //    return GetError(SDL_GameControllerOpen(joystickIndex));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_gamecontrollername(IntPtr gamecontroller);
-            private static readonly d_sdl_gamecontrollername SDL_GameControllerName = FuncLoader.LoadFunction<d_sdl_gamecontrollername>(NativeLibrary, "SDL_GameControllerName");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_gamecontrollername(IntPtr gamecontroller);
+            //private static readonly d_sdl_gamecontrollername SDL_GameControllerName = FuncLoader.LoadFunction<d_sdl_gamecontrollername>(NativeLibrary, "SDL_GameControllerName");
 
-            public static string GetName(IntPtr gamecontroller)
-            {
-                return InteropHelpers.Utf8ToString(SDL_GameControllerName(gamecontroller)) ?? "";
-            }
+            //public static string GetName(IntPtr gamecontroller)
+            //{
+            //    return InteropHelpers.Utf8ToString(SDL_GameControllerName(gamecontroller)) ?? "";
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_gamecontrollerrumble(IntPtr gamecontroller, ushort left, ushort right, uint duration);
-            public static readonly d_sdl_gamecontrollerrumble Rumble = FuncLoader.LoadFunction<d_sdl_gamecontrollerrumble>(NativeLibrary, "SDL_GameControllerRumble");
-            public static readonly d_sdl_gamecontrollerrumble RumbleTriggers = FuncLoader.LoadFunction<d_sdl_gamecontrollerrumble>(NativeLibrary, "SDL_GameControllerRumbleTriggers");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_gamecontrollerrumble(IntPtr gamecontroller, ushort left, ushort right, uint duration);
+            //public static readonly d_sdl_gamecontrollerrumble Rumble = FuncLoader.LoadFunction<d_sdl_gamecontrollerrumble>(NativeLibrary, "SDL_GameControllerRumble");
+            //public static readonly d_sdl_gamecontrollerrumble RumbleTriggers = FuncLoader.LoadFunction<d_sdl_gamecontrollerrumble>(NativeLibrary, "SDL_GameControllerRumbleTriggers");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate byte d_sdl_gamecontrollerhasrumble(IntPtr gamecontroller);
-            public static readonly d_sdl_gamecontrollerhasrumble HasRumble = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasrumble>(NativeLibrary, "SDL_GameControllerHasRumble");
-            public static readonly d_sdl_gamecontrollerhasrumble HasRumbleTriggers = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasrumble>(NativeLibrary, "SDL_GameControllerHasRumbleTriggers");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate byte d_sdl_gamecontrollerhasrumble(IntPtr gamecontroller);
+            //public static readonly d_sdl_gamecontrollerhasrumble HasRumble = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasrumble>(NativeLibrary, "SDL_GameControllerHasRumble");
+            //public static readonly d_sdl_gamecontrollerhasrumble HasRumbleTriggers = FuncLoader.LoadFunction<d_sdl_gamecontrollerhasrumble>(NativeLibrary, "SDL_GameControllerHasRumbleTriggers");
         }
 
         public static class Haptic
@@ -1656,93 +1812,93 @@
                 [FieldOffset(0)] public LeftRight leftright;
             }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_hapticclose(IntPtr haptic);
-            public static readonly d_sdl_hapticclose Close = FuncLoader.LoadFunction<d_sdl_hapticclose>(NativeLibrary, "SDL_HapticClose");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_hapticclose(IntPtr haptic);
+            //public static readonly d_sdl_hapticclose Close = FuncLoader.LoadFunction<d_sdl_hapticclose>(NativeLibrary, "SDL_HapticClose");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_hapticeffectsupported(IntPtr haptic, ref Effect effect);
-            public static readonly d_sdl_hapticeffectsupported EffectSupported = FuncLoader.LoadFunction<d_sdl_hapticeffectsupported>(NativeLibrary, "SDL_HapticEffectSupported");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_hapticeffectsupported(IntPtr haptic, ref Effect effect);
+            //public static readonly d_sdl_hapticeffectsupported EffectSupported = FuncLoader.LoadFunction<d_sdl_hapticeffectsupported>(NativeLibrary, "SDL_HapticEffectSupported");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate int d_sdl_joystickishaptic(IntPtr joystick);
-            public static readonly d_sdl_joystickishaptic IsHaptic = FuncLoader.LoadFunction<d_sdl_joystickishaptic>(NativeLibrary, "SDL_JoystickIsHaptic");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate int d_sdl_joystickishaptic(IntPtr joystick);
+            //public static readonly d_sdl_joystickishaptic IsHaptic = FuncLoader.LoadFunction<d_sdl_joystickishaptic>(NativeLibrary, "SDL_JoystickIsHaptic");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_hapticneweffect(IntPtr haptic, ref Effect effect);
-            private static readonly d_sdl_hapticneweffect SDL_HapticNewEffect = FuncLoader.LoadFunction<d_sdl_hapticneweffect>(NativeLibrary, "SDL_HapticNewEffect");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_hapticneweffect(IntPtr haptic, ref Effect effect);
+            //private static readonly d_sdl_hapticneweffect SDL_HapticNewEffect = FuncLoader.LoadFunction<d_sdl_hapticneweffect>(NativeLibrary, "SDL_HapticNewEffect");
 
-            public static void NewEffect(IntPtr haptic, ref Effect effect)
-            {
-                GetError(SDL_HapticNewEffect(haptic, ref effect));
-            }
+            //public static void NewEffect(IntPtr haptic, ref Effect effect)
+            //{
+            //    GetError(SDL_HapticNewEffect(haptic, ref effect));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate IntPtr d_sdl_hapticopen(int device_index);
-            public static readonly d_sdl_hapticopen Open = FuncLoader.LoadFunction<d_sdl_hapticopen>(NativeLibrary, "SDL_HapticOpen");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate IntPtr d_sdl_hapticopen(int device_index);
+            //public static readonly d_sdl_hapticopen Open = FuncLoader.LoadFunction<d_sdl_hapticopen>(NativeLibrary, "SDL_HapticOpen");
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate IntPtr d_sdl_hapticopenfromjoystick(IntPtr joystick);
-            private static readonly d_sdl_hapticopenfromjoystick SDL_HapticOpenFromJoystick = FuncLoader.LoadFunction<d_sdl_hapticopenfromjoystick>(NativeLibrary, "SDL_HapticOpenFromJoystick");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate IntPtr d_sdl_hapticopenfromjoystick(IntPtr joystick);
+            //private static readonly d_sdl_hapticopenfromjoystick SDL_HapticOpenFromJoystick = FuncLoader.LoadFunction<d_sdl_hapticopenfromjoystick>(NativeLibrary, "SDL_HapticOpenFromJoystick");
 
-            public static IntPtr OpenFromJoystick(IntPtr joystick)
-            {
-                return GetError(SDL_HapticOpenFromJoystick(joystick));
-            }
+            //public static IntPtr OpenFromJoystick(IntPtr joystick)
+            //{
+            //    return GetError(SDL_HapticOpenFromJoystick(joystick));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_hapticrumbleinit(IntPtr haptic);
-            private static readonly d_sdl_hapticrumbleinit SDL_HapticRumbleInit = FuncLoader.LoadFunction<d_sdl_hapticrumbleinit>(NativeLibrary, "SDL_HapticRumbleInit");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_hapticrumbleinit(IntPtr haptic);
+            //private static readonly d_sdl_hapticrumbleinit SDL_HapticRumbleInit = FuncLoader.LoadFunction<d_sdl_hapticrumbleinit>(NativeLibrary, "SDL_HapticRumbleInit");
 
-            public static void RumbleInit(IntPtr haptic)
-            {
-                GetError(SDL_HapticRumbleInit(haptic));
-            }
+            //public static void RumbleInit(IntPtr haptic)
+            //{
+            //    GetError(SDL_HapticRumbleInit(haptic));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_hapticrumbleplay(IntPtr haptic, float strength, uint length);
-            private static readonly d_sdl_hapticrumbleplay SDL_HapticRumblePlay = FuncLoader.LoadFunction<d_sdl_hapticrumbleplay>(NativeLibrary, "SDL_HapticRumblePlay");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_hapticrumbleplay(IntPtr haptic, float strength, uint length);
+            //private static readonly d_sdl_hapticrumbleplay SDL_HapticRumblePlay = FuncLoader.LoadFunction<d_sdl_hapticrumbleplay>(NativeLibrary, "SDL_HapticRumblePlay");
 
-            public static void RumblePlay(IntPtr haptic, float strength, uint length)
-            {
-                GetError(SDL_HapticRumblePlay(haptic, strength, length));
-            }
+            //public static void RumblePlay(IntPtr haptic, float strength, uint length)
+            //{
+            //    GetError(SDL_HapticRumblePlay(haptic, strength, length));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_hapticrumblesupported(IntPtr haptic);
-            private static readonly d_sdl_hapticrumblesupported SDL_HapticRumbleSupported = FuncLoader.LoadFunction<d_sdl_hapticrumblesupported>(NativeLibrary, "SDL_HapticRumbleSupported");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_hapticrumblesupported(IntPtr haptic);
+            //private static readonly d_sdl_hapticrumblesupported SDL_HapticRumbleSupported = FuncLoader.LoadFunction<d_sdl_hapticrumblesupported>(NativeLibrary, "SDL_HapticRumbleSupported");
 
-            public static int RumbleSupported(IntPtr haptic)
-            {
-                return GetError(SDL_HapticRumbleSupported(haptic));
-            }
+            //public static int RumbleSupported(IntPtr haptic)
+            //{
+            //    return GetError(SDL_HapticRumbleSupported(haptic));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_hapticruneffect(IntPtr haptic, int effect, uint iterations);
-            private static readonly d_sdl_hapticruneffect SDL_HapticRunEffect = FuncLoader.LoadFunction<d_sdl_hapticruneffect>(NativeLibrary, "SDL_HapticRunEffect");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_hapticruneffect(IntPtr haptic, int effect, uint iterations);
+            //private static readonly d_sdl_hapticruneffect SDL_HapticRunEffect = FuncLoader.LoadFunction<d_sdl_hapticruneffect>(NativeLibrary, "SDL_HapticRunEffect");
 
-            public static void RunEffect(IntPtr haptic, int effect, uint iterations)
-            {
-                GetError(SDL_HapticRunEffect(haptic, effect, iterations));
-            }
+            //public static void RunEffect(IntPtr haptic, int effect, uint iterations)
+            //{
+            //    GetError(SDL_HapticRunEffect(haptic, effect, iterations));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_hapticstopall(IntPtr haptic);
-            private static readonly d_sdl_hapticstopall SDL_HapticStopAll = FuncLoader.LoadFunction<d_sdl_hapticstopall>(NativeLibrary, "SDL_HapticStopAll");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_hapticstopall(IntPtr haptic);
+            //private static readonly d_sdl_hapticstopall SDL_HapticStopAll = FuncLoader.LoadFunction<d_sdl_hapticstopall>(NativeLibrary, "SDL_HapticStopAll");
 
-            public static void StopAll(IntPtr haptic)
-            {
-                GetError(SDL_HapticStopAll(haptic));
-            }
+            //public static void StopAll(IntPtr haptic)
+            //{
+            //    GetError(SDL_HapticStopAll(haptic));
+            //}
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            private delegate int d_sdl_hapticupdateeffect(IntPtr haptic, int effect, ref Effect data);
-            private static readonly d_sdl_hapticupdateeffect SDL_HapticUpdateEffect = FuncLoader.LoadFunction<d_sdl_hapticupdateeffect>(NativeLibrary, "SDL_HapticUpdateEffect");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //private delegate int d_sdl_hapticupdateeffect(IntPtr haptic, int effect, ref Effect data);
+            //private static readonly d_sdl_hapticupdateeffect SDL_HapticUpdateEffect = FuncLoader.LoadFunction<d_sdl_hapticupdateeffect>(NativeLibrary, "SDL_HapticUpdateEffect");
 
-            public static void UpdateEffect(IntPtr haptic, int effect, ref Effect data)
-            {
-                GetError(SDL_HapticUpdateEffect(haptic, effect, ref data));
-            }
+            //public static void UpdateEffect(IntPtr haptic, int effect, ref Effect data)
+            //{
+            //    GetError(SDL_HapticUpdateEffect(haptic, effect, ref data));
+            //}
         }
 
         public static class Drop
@@ -1756,9 +1912,9 @@
                 public uint WindowId;
             }
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-            public delegate void d_sdl_free(IntPtr ptr);
-            public static readonly d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
+            //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            //public delegate void d_sdl_free(IntPtr ptr);
+            //public static readonly d_sdl_free SDL_Free = FuncLoader.LoadFunction<d_sdl_free>(NativeLibrary, "SDL_free");
         }
     }
 }

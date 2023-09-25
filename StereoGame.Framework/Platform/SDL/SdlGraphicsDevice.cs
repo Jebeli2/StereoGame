@@ -34,16 +34,16 @@
                     break;
             }
 
-            handle = Sdl.Renderer.Create(window.Handle, 0, flags);
+            handle = Sdl.Renderer.CreateRenderer(window.Handle, 0, flags);
         }
 
         public override void Clear()
         {
-            Sdl.Renderer.Clear(handle);
+            Sdl.Renderer.RenderClear(handle);
         }
         public override void Present()
         {
-            Sdl.Renderer.Present(handle);
+            Sdl.Renderer.RenderPresent(handle);
         }
 
         protected override void Dispose(bool disposing)
@@ -51,7 +51,7 @@
             if (disposing)
             {
                 ClearTextCache();
-                Sdl.Renderer.Destroy(handle);
+                Sdl.Renderer.DestroyRenderer(handle);
                 handle = IntPtr.Zero;
             }
             base.Dispose(disposing);
@@ -72,7 +72,7 @@
             IntPtr tex = SDL2Image.LoadTexture(handle, path);
             if (tex != IntPtr.Zero)
             {
-                Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
+                _=Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
                 SdlTexture texture = new(this, w, h, tex) { Name = path };
                 OnResourceCreated(texture);
                 return texture;
@@ -82,13 +82,13 @@
 
         public override Texture? LoadTexture(string path, byte[] data)
         {
-            IntPtr rw = Sdl.RwFromMem(data, data.Length);
+            IntPtr rw = Sdl.RWFromMem(data, data.Length);
             if (rw != IntPtr.Zero)
             {
                 IntPtr tex = SDL2Image.LoadTexture_RW(handle, rw, 1);
                 if (tex != IntPtr.Zero)
                 {
-                    Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
+                    _=Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
                     SdlTexture texture = new(this, w, h, tex) { Name = path };
                     OnResourceCreated(texture);
                     return texture;
@@ -101,24 +101,24 @@
         {
             if (CheckTexture(texture, out IntPtr tex))
             {
-                Sdl.Renderer.RenderCopy(handle, tex, ref src, ref dst);
+                _=Sdl.Renderer.RenderCopy(handle, tex, ref src, ref dst);
             }
         }
 
         public override void DrawLine(int x1, int y1, int x2, int y2)
         {
-            Sdl.Renderer.DrawLine(handle, x1, y1, x2, y2);
+            _=Sdl.Renderer.RenderDrawLine(handle, x1, y1, x2, y2);
         }
 
         protected override void FillRect(ref Rectangle rect)
         {
-            Sdl.Renderer.FillRect(handle, ref rect);
+            _=Sdl.Renderer.RenderFillRect(handle, ref rect);
         }
 
 
         protected override void DrawRect(ref Rectangle rect)
         {
-            Sdl.Renderer.DrawRect(handle, ref rect);
+            _=Sdl.Renderer.RenderDrawRect(handle, ref rect);
         }
 
         protected override void DrawText(TextFont? font, ReadOnlySpan<char> text, float x, float y, float width, float height, Color color, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment, float offsetX, float offsetY)
@@ -133,12 +133,12 @@
 
         protected override void SetDrawColor(byte r, byte g, byte b, byte a)
         {
-            Sdl.Renderer.SetDrawColor(handle, r, g, b, a);
+            Sdl.Renderer.SetRenderDrawColor(handle, r, g, b, a);
         }
 
         protected override void SetDrawBlendMode(BlendMode blendMode)
         {
-            Sdl.Renderer.SetDrawBlendMode(handle, (int)blendMode);
+            Sdl.Renderer.SetRenderDrawBlendMode(handle, (int)blendMode);
         }
 
         private static bool CheckTexture(Texture? texture, out IntPtr tex)

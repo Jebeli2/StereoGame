@@ -2,6 +2,7 @@
 {
     using StereoGame.Framework.Audio;
     using StereoGame.Framework.Graphics;
+    using StereoGame.Framework.Utilities;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
@@ -9,6 +10,7 @@
     using System.Reflection.Metadata;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Xml.Linq;
     using static StereoGame.Framework.Platform.SDL.SDL2Mixer;
 
     internal class SdlAudioDevice : AudioDevice
@@ -20,6 +22,9 @@
         private int soundFallOff = 15;
         private int musicVolume = MIX_MAX_VOLUME;
         private int soundVolume = MIX_MAX_VOLUME;
+        private bool useTmpFileForMusic = true;
+        private bool attemptToDeleteOldTmpFiles = true;
+
         private readonly Dictionary<int, Playback> playback = new();
         private readonly Dictionary<string, int> channels = new();
         private readonly ChannelFinishedDelegate channelFinished;
@@ -49,16 +54,38 @@
 
         public override Music? LoadMusic(string path, byte[] data)
         {
-            IntPtr rw = Sdl.RWFromMem(data, data.Length);
-            if (rw != IntPtr.Zero)
+            if (useTmpFileForMusic)
             {
-                IntPtr mus = LoadMUS_RW(rw, 1);
-                if (mus != IntPtr.Zero)
+                string fileName = FileUtils.GetTempFile(path, attemptToDeleteOldTmpFiles);
+                try
                 {
+                    File.WriteAllBytes(fileName, data);
+                    IntPtr mus = LoadMUS(fileName);
+                    if (mus != IntPtr.Zero)
+                    {
+                        SdlMusic music = new(this, mus, fileName) { Name = path };
+                        OnResourceCreated(music);
+                        return music;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //SDLLog.Error(LogCategory.AUDIO, $"Could not load Music from resource '{name}' (via temporary file '{fileName}'): {ex.Message}");
+                }
+            }
+            else
+            {
+                IntPtr rw = Sdl.RWFromMem(data, data.Length);
+                if (rw != IntPtr.Zero)
+                {
+                    IntPtr mus = LoadMUS_RW(rw, 1);
+                    if (mus != IntPtr.Zero)
+                    {
 
-                    SdlMusic music = new(this, mus) { Name = path };
-                    OnResourceCreated(music);
-                    return music;
+                        SdlMusic music = new(this, mus) { Name = path };
+                        OnResourceCreated(music);
+                        return music;
+                    }
                 }
             }
             return null;
@@ -236,7 +263,7 @@
                     play.Finished = true;
                 }
             }
-            _ = SetDistance(channel,0);
+            _ = SetDistance(channel, 0);
         }
         private static float Distance(PointF x, PointF y)
         {
