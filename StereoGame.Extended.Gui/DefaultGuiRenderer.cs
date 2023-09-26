@@ -38,6 +38,15 @@
             //}
         }
 
+        public void DrawText(TextFont? font, string? text, Rectangle rect, Color color, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, VerticalAlignment verticalAlignment = VerticalAlignment.Center, Rectangle? clippingRect = null)
+        {
+            GraphicsDevice? gd = game.GraphicsDevice;
+            if (gd != null && font != null && !string.IsNullOrEmpty(text))
+            {
+                gd.DrawText(font, text, rect, color, horizontalAlignment, verticalAlignment);
+            }
+        }
+
         public void FillRectangle(Rectangle rect, Color color, Rectangle? clippingRect = null)
         {
             GraphicsDevice? gd = game.GraphicsDevice;

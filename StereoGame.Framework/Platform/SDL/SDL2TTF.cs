@@ -51,8 +51,11 @@ namespace StereoGame.Framework.Platform.SDL
         [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr TTF_FontFaceStyleName(IntPtr font);
         [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr TTF_RenderUTF8_Blended(IntPtr font, [In()][MarshalAs(UnmanagedType.LPUTF8Str)] StringBuilder text, int fg);
-
+        private static extern IntPtr TTF_RenderUTF8_Blended(IntPtr font, StringBuilder text, int fg);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int TTF_SizeUTF8(IntPtr font, StringBuilder text, out int w, out int h);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int TTF_SizeUTF8(IntPtr font, string text, out int w, out int h);
 
         public static int Init() => TTF_Init();
         public static void Quit() => TTF_Quit();
@@ -77,6 +80,9 @@ namespace StereoGame.Framework.Platform.SDL
             return InteropHelpers.Utf8ToString(TTF_FontFaceStyleName(font));
         }
         public static IntPtr RenderUTF8_Blended(IntPtr font, StringBuilder text, int fg) => TTF_RenderUTF8_Blended(font, text, fg);
+
+        public static int SizeUTF8(IntPtr font, StringBuilder text, out int w, out int h) => TTF_SizeUTF8(font, text, out w, out h);
+        public static int SizeUTF8(IntPtr font, string text, out int w, out int h) => TTF_SizeUTF8(font, text, out w, out h);
 
 
         //public static IntPtr NativeLibrary = GetNativeLibrary();

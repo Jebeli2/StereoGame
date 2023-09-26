@@ -8,5 +8,8 @@
 
     public interface IGuiSystem
     {
+        int ScreenWidth { get; }
+        int ScreenHeight { get; }
+
     }
 }

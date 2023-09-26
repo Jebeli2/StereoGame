@@ -1,11 +1,11 @@
 ﻿namespace StereoGame.Extended.Gui
 {
     using StereoGame.Framework;
+    using StereoGame.Framework.Graphics;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
     using System.Linq;
-    using System.Reflection.Metadata.Ecma335;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -20,26 +20,35 @@
         private int y;
         private int width;
         private int height;
+        private int fixedWidth;
+        private int fixedHeight;
+        //private int actualWidth;
+        //private int actualHeight;
         private int minWidth;
         private int minHeight;
         private int maxWidth;
         private int maxHeight;
+        private Padding padding;
+        private Padding margin;
+        private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Stretch;
+        private VerticalAlignment verticalAlignment = VerticalAlignment.Stretch;
         private bool enabled;
         private bool visible;
         private bool focused;
         private bool hovered;
         private bool pressed;
 
+        protected ILayout? layout;
+        private TextFont? font;
         private Color backgroundColor;
         private Color borderColor;
         private int borderThickness;
         private Color textColor;
 
-        //private ControlStyle? hoverStyle;
-        //private ControlStyle? disabledStyle;
-        //private ControlStyle? pressedStyle;
 
         private Skin skin;
+
+        private string? text;
 
 
         protected Control()
@@ -105,6 +114,37 @@
             return false;
         }
 
+        public Size GetFixedSize()
+        {
+            return new Size(fixedWidth, fixedHeight);
+        }
+
+        public virtual Size GetPreferredSize(IGuiSystem context)
+        {
+            return layout?.GetPreferredSize(context, this) ?? new Size(width, height);
+        }
+
+        public void PerformLayout(IGuiSystem context)
+        {
+            if (layout != null)
+            {
+                layout.PerformLayout(context, this);
+            }
+            else
+            {
+                foreach (Control child in children)
+                {
+                    Size pref = child.GetPreferredSize(context);
+                    Size fix = child.GetFixedSize();
+                    int w = fix.Width != 0 ? fix.Width : pref.Width;
+                    int h = fix.Height != 0 ? fix.Height : pref.Height;
+                    child.Width = w;
+                    child.Height = h;
+                    child.PerformLayout(context);
+                }
+            }
+        }
+
         public virtual void InvalidateLayout() { }
 
 
@@ -156,6 +196,31 @@
             }
         }
 
+        public int FixedWidth
+        {
+            get { return fixedWidth; }
+            set
+            {
+                if (fixedWidth != value)
+                {
+                    fixedWidth = value;
+                }
+            }
+        }
+
+        public int FixedHeight
+        {
+            get { return fixedHeight; }
+            set
+            {
+                if (fixedHeight != value)
+                {
+                    fixedHeight = value;
+                }
+            }
+        }
+
+
         public int MinWidth
         {
             get { return minWidth; }
@@ -200,6 +265,53 @@
                 if (maxHeight != value)
                 {
                     maxHeight = value;
+                }
+            }
+        }
+
+        //public int ActualWidth
+        //{
+        //    get { return actualWidth; }
+        //    internal set { actualWidth = value; }
+        //}
+
+        //public int ActualHeight
+        //{
+        //    get { return actualHeight; }
+        //    internal set { actualHeight = value; }
+        //}
+
+        public Padding Margin
+        {
+            get { return margin; }
+            set { margin = value; }
+        }
+        public Padding Padding
+        {
+            get { return padding; }
+            set { padding = value; }
+        }
+
+        public HorizontalAlignment HorizontalAlignment
+        {
+            get { return horizontalAlignment; }
+            set
+            {
+                if (horizontalAlignment != value)
+                {
+                    horizontalAlignment = value;
+                }
+            }
+        }
+
+        public VerticalAlignment VerticalAlignment
+        {
+            get { return verticalAlignment; }
+            set
+            {
+                if (verticalAlignment != value)
+                {
+                    verticalAlignment = value;
                 }
             }
         }
@@ -270,10 +382,10 @@
             }
         }
 
-        public bool IsNormal
-        {
-            get { return !hovered && !pressed && enabled; }
-        }
+        //public bool IsNormal
+        //{
+        //    get { return !hovered && !pressed && enabled; }
+        //}
 
         public Color BackgroundColor
         {
@@ -323,58 +435,53 @@
             }
         }
 
-        //public ControlStyle? NormalStyle
-        //{
-        //    get { return normalStyle; }
-        //    set
-        //    {
-        //        if (normalStyle != value)
-        //        {
-        //            normalStyle = value;
-        //            normalStyle?.ApplyIf(this, IsNormal);
-        //        }
-        //    }
-        //}
-        
+        public TextFont? Font
+        {
+            get
+            {
+                if (font != null) return font;
+                if (parent != null) { return parent.Font; }
+                if (skin != null) { return skin.DefaultFont; }
+                return null;
+            }
+            set
+            {
+                if (font != value)
+                {
+                    font = value;
+                }
+            }
+        }
 
-        //public ControlStyle? HoverStyle
-        //{
-        //    get { return hoverStyle; }
-        //    set
-        //    {
-        //        if (hoverStyle != value)
-        //        {
-        //            hoverStyle = value;
-        //            hoverStyle?.ApplyIf(this, hovered);
-        //        }
-        //    }
-        //}
+        public string? Text
+        {
+            get => text;
+            set
+            {
+                if (text != value)
+                {
+                    text = value;
+                }
+            }
+        }
 
-        //public ControlStyle? DisabledStyle
-        //{
-        //    get { return disabledStyle; }
-        //    set
-        //    {
-        //        if (disabledStyle != value)
-        //        {
-        //            disabledStyle = value;
-        //            disabledStyle?.ApplyIf(this, !enabled);
-        //        }
-        //    }
-        //}
 
-        //public ControlStyle? PressedStyle
-        //{
-        //    get { return pressedStyle; }
-        //    set
-        //    {
-        //        if (pressedStyle != value)
-        //        {
-        //            pressedStyle = value;
-        //            pressedStyle?.ApplyIf(this, pressed);
-        //        }
-        //    }
-        //}
+        public Rectangle BoundingRectangle
+        {
+            get
+            {
+                return GetBounds();
+            }
+        }
+
+        public Rectangle ContentRectangle
+        {
+            get
+            {
+                var rect = BoundingRectangle;
+                return new Rectangle(rect.Left + padding.Left, rect.Top + padding.Top, rect.Width - padding.Horizontal, rect.Height - padding.Vertical);
+            }
+        }
 
         public virtual Rectangle GetBounds()
         {
@@ -385,6 +492,20 @@
                 rect.Offset(parentRect.Location);
             }
             return rect;
+        }
+
+        public abstract Size GetContentSize(IGuiSystem context);
+
+        public virtual Size CalculateActualSize(IGuiSystem context)
+        {
+            var desizredSize = GetContentSize(context) + margin.Size + padding.Size;
+            if (desizredSize.Width < minWidth) { desizredSize.Width = minWidth; }
+            if (desizredSize.Height < minHeight) { desizredSize.Height = minHeight; }
+            if (desizredSize.Width > maxWidth) { desizredSize.Width = maxWidth; }
+            if (desizredSize.Height > maxHeight) { desizredSize.Height = maxHeight; }
+            var awidth = width == 0 ? desizredSize.Width : width;
+            var aheight = height == 0 ? desizredSize.Height : height;
+            return new Size(awidth, aheight);
         }
 
         public virtual bool Contains(int x, int y)

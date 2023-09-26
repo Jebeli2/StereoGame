@@ -1,4 +1,5 @@
 ﻿using StereoGame.Framework.Collections;
+using StereoGame.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -10,12 +11,12 @@ namespace StereoGame.Extended.Gui
 {
     public class Skin
     {
-        private static readonly Skin defaultSkin = CreateDefaultSkin();
+        private static readonly Skin defaultSkin = CreateDefaultSkin(null);
         private readonly KeyedCollection<string, ControlStyle> styles = new KeyedCollection<string, ControlStyle>(s => s.Name);
-
-        public Skin()
+        private TextFont? defaultFont;
+        public Skin(TextFont? defaultFont)
         {
-
+            this.defaultFont = defaultFont;
         }
 
         public KeyedCollection<string, ControlStyle> Styles
@@ -32,6 +33,12 @@ namespace StereoGame.Extended.Gui
         }
 
         public static Skin DefaultSkin => defaultSkin;
+
+        public TextFont? DefaultFont
+        {
+            get => defaultFont;
+            set => defaultFont = value;
+        }
 
         public ControlStyle? GetStyle(string name)
         {
@@ -76,23 +83,11 @@ namespace StereoGame.Extended.Gui
         {
             ControlStyle? cs = GetStyle(control);
             cs?.Apply(control);
-            //var types = new List<Type>();
-            //var controlType = control.GetType();
-            //while (controlType != null)
-            //{
-            //    types.Add(controlType);
-            //    controlType = controlType.BaseType;
-            //}
-            //for (int i = types.Count - 1; i >= 0; i--)
-            //{
-            //    var style = GetStyle(types[i]);
-            //    style?.Apply(control);
-            //}
         }
 
-        private static Skin CreateDefaultSkin()
+        private static Skin CreateDefaultSkin(TextFont? font)
         {
-            return new Skin
+            return new Skin(font)
             {
                 Styles =
                 {
@@ -102,6 +97,7 @@ namespace StereoGame.Extended.Gui
                         BorderColor = Color.FromArgb(67,67,70),
                         BorderThickness =1,
                         TextColor = Color.FromArgb(241,241,241),
+                        Padding = new Padding(5),
                         DisabledStyle = new ControlStyle
                         {
                             TextColor = Color.FromArgb(78,78,80)
@@ -111,13 +107,16 @@ namespace StereoGame.Extended.Gui
                     {
                         BackgroundColor = Color.Transparent,
                         BorderColor = Color.Transparent,
-                        BorderThickness = 0
+                        BorderThickness = 0,
+                        Padding = new Padding(0),
+                        Margin = new Padding(0)
                     },
                     new ControlStyle(typeof(Window))
                     {
                         BackgroundColor = Color.FromArgb(128, Color.Black),
                         BorderColor = Color.DarkGray,
-                        BorderThickness = 1
+                        BorderThickness = 1,
+                        Padding = new Padding(8)
                     },
                     new ControlStyle(typeof(Button))
                     {

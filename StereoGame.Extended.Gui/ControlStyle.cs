@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StereoGame.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -38,6 +39,7 @@ namespace StereoGame.Extended.Gui
             BorderColor = other.BorderColor;
             BorderThickness = other.BorderThickness;
             TextColor = other.TextColor;
+            Padding = other.Padding;
         }
 
         public string Name => name;
@@ -46,6 +48,8 @@ namespace StereoGame.Extended.Gui
         public Color? BorderColor { get; set; }
         public int? BorderThickness { get; set; }
         public Color? TextColor { get; set; }
+        public Padding? Padding { get; set; }
+        public Padding? Margin { get; set; }
 
         public ControlStyle Combine(ControlStyle? other)
         {
@@ -55,6 +59,8 @@ namespace StereoGame.Extended.Gui
                 if (other.BorderColor != null) { BorderColor = other.BorderColor; }
                 if (other.BorderThickness != null) { BorderThickness = other.BorderThickness; }
                 if (other.TextColor != null) { TextColor = other.TextColor; }
+                if (other.Padding != null) { Padding = other.Padding; }
+                if (other.Margin != null) { Margin = other.Margin; }
             }
             return this;
         }
@@ -84,7 +90,6 @@ namespace StereoGame.Extended.Gui
         public void Apply(Control control)
         {
             ApplyStyle(control, this);
-            Console.WriteLine($"Apply {this} to {control}");
         }
 
         private static void ApplyStyle(Control control, ControlStyle? style)
@@ -94,6 +99,8 @@ namespace StereoGame.Extended.Gui
             if (style.BorderColor != null) { control.BorderColor = style.BorderColor.Value; }
             if (style.BorderThickness != null) { control.BorderThickness = style.BorderThickness.Value; }
             if (style.TextColor != null) { control.TextColor = style.TextColor.Value; }
+            if (style.Padding != null) { control.Padding = style.Padding.Value; }
+            if (style.Margin != null) { control.Margin = style.Margin.Value; }
         }
 
         public override string ToString()

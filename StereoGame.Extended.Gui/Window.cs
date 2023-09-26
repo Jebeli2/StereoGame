@@ -10,7 +10,7 @@
     public class Window : LayoutControl
     {
         public Window()
-            : base(null)
+            : this(null)
 
         {
 
@@ -18,12 +18,12 @@
         public Window(Screen? screen)
             : base(screen)
         {
-
+            layout = new BoxLayout(Orientation.Vertical, Alignment.Fill, 10, 10);
         }
 
-        protected override void Layout(IGuiSystem gui, Rectangle rect)
+        public override Size GetContentSize(IGuiSystem context)
         {
-            
+            return new Size(Width, Height);
         }
     }
 }

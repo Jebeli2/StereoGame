@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace StereoGame.Framework.Graphics
 {
-    public class TextFont : IDisposable
+    public abstract class TextFont : IDisposable
     {
         private int ySize;
         protected FontStyle fontStyle;
@@ -60,6 +61,8 @@ namespace StereoGame.Framework.Graphics
                 disposed = true;
             }
         }
+
+        public abstract Size MeasureText(string? text);
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

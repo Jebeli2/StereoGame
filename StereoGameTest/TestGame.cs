@@ -38,7 +38,7 @@
         protected override void Initialize()
         {
             base.Initialize();
-            InitGui();
+            InitGui(font);
         }
 
         protected override void LoadContent()
@@ -69,8 +69,9 @@
             GraphicsDevice.DrawText(font, fps.FramesPerSecondText, 10, 10);
         }
 
-        private void InitGui()
+        private void InitGui(TextFont? font)
         {
+            Skin.DefaultSkin.DefaultFont = font;
             mainScreen = new Screen();
             titleWindow = new Window(mainScreen);
             titleWindow.X = 20;
@@ -78,9 +79,9 @@
             titleWindow.Width = 200;
             titleWindow.Height = 200;
 
-            var button1 = new Button(titleWindow) { X = 10, Y = 10, Width = 180, Height = 30 };
-            var button2 = new Button(titleWindow) { X = 10, Y = 50, Width = 180, Height = 30 };
-            var button3 = new Button(titleWindow) { X = 10, Y = 90, Width = 180, Height = 30 };
+            var button1 = new Button(titleWindow, "Test GUI") { X = 10, Y = 10, Width = 180, Height = 30 };
+            var button2 = new Button(titleWindow, "Test MAP") { X = 10, Y = 50, Width = 180, Height = 30 };
+            var button3 = new Button(titleWindow, "Test SOM") { X = 10, Y = 90, Width = 180, Height = 30 };
 
             gui.ActiveScreen = mainScreen;
         }

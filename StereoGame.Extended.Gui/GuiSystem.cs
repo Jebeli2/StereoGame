@@ -23,6 +23,8 @@
             mouseListener.MouseUp += MouseListener_MouseUp;
         }
 
+        public int ScreenWidth => screenWidth;
+        public int ScreenHeight => screenHeight;
 
         public Screen? ActiveScreen
         {
@@ -109,8 +111,11 @@
             screenHeight = Height;
             screen.X = 0;
             screen.Y = 0;
+            screen.FixedWidth = screenWidth;
+            screen.FixedHeight = screenHeight;
             screen.Width = screenWidth;
             screen.Height = screenHeight;
+            screen.PerformLayout(this);
         }
 
         private Control? FindControlAt(int x, int y)
@@ -146,7 +151,7 @@
             }
             preFocusedControl = null;
             var pea = PointerEventArgs.FromMouseEventArgs(e);
-            PropagateDown(hoveredControl,x => x.OnPointerUp(pea));
+            PropagateDown(hoveredControl, x => x.OnPointerUp(pea));
         }
 
         private void MouseListener_MouseMoved(object? sender, MouseEventArgs e)
@@ -165,7 +170,7 @@
             }
             else
             {
-                PropagateDown(hoveredControl,x => x.OnPointerMove(pea));
+                PropagateDown(hoveredControl, x => x.OnPointerMove(pea));
             }
         }
 

@@ -16,9 +16,9 @@
 
         }
 
-        protected override void Layout(IGuiSystem gui, Rectangle rect)
+        public override Size GetContentSize(IGuiSystem context)
         {
-            
+            return new Size(context.ScreenWidth, context.ScreenHeight);
         }
     }
 }

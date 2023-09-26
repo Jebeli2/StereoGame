@@ -26,11 +26,17 @@ namespace StereoGame.Extended.Gui
             base.Update(gui, gameTime);
             if (!isLayoutValid)
             {
-                Layout(gui, new Rectangle(0, 0, Width, Height));
+                
+                //Layout(gui, new Rectangle(0, 0, Width, Height));
                 isLayoutValid = true;
             }
         }
 
-        protected abstract void Layout(IGuiSystem gui, Rectangle rect);
+        //protected abstract void Layout(IGuiSystem gui, Rectangle rect);
+
+        //protected static void PlaceControl(IGuiSystem gui, Control control, float x, float y, float width, float height)
+        //{
+
+        //}
     }
 }

@@ -1,6 +1,7 @@
 ﻿using StereoGame.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -14,7 +15,7 @@ namespace StereoGame.Framework.Platform.SDL
         private readonly IntPtr mem;
 
         public SdlTextFont(IntPtr handle, int ptSize)
-            :this(handle, ptSize, IntPtr.Zero)
+            : this(handle, ptSize, IntPtr.Zero)
         {
 
         }
@@ -41,7 +42,18 @@ namespace StereoGame.Framework.Platform.SDL
         {
             base.Dispose(disposing);
             SDL2TTF.CloseFont(handle);
-            if (mem != IntPtr.Zero) { Marshal.FreeHGlobal(mem); }   
+            if (mem != IntPtr.Zero) { Marshal.FreeHGlobal(mem); }
+        }
+
+        public override Size MeasureText(string? text)
+        {
+            int w = 0;
+            int h = 0;
+            if (!string.IsNullOrEmpty(text))
+            {
+                _ = SDL2TTF.SizeUTF8(handle, text, out w, out h);
+            }
+            return new Size(w, h);
         }
     }
 }
