@@ -35,6 +35,7 @@
         private int borderThickness;
         private Color textColor;
 
+        //private ControlStyle? normalStyle;
         private ControlStyle? hoverStyle;
         private ControlStyle? disabledStyle;
         private ControlStyle? pressedStyle;
@@ -267,6 +268,11 @@
             }
         }
 
+        public bool IsNormal
+        {
+            get { return !hovered && !pressed && enabled; }
+        }
+
         public Color BackgroundColor
         {
             get { return backgroundColor; }
@@ -314,6 +320,20 @@
                 }
             }
         }
+
+        //public ControlStyle? NormalStyle
+        //{
+        //    get { return normalStyle; }
+        //    set
+        //    {
+        //        if (normalStyle != value)
+        //        {
+        //            normalStyle = value;
+        //            normalStyle?.ApplyIf(this, IsNormal);
+        //        }
+        //    }
+        //}
+        
 
         public ControlStyle? HoverStyle
         {
@@ -409,5 +429,9 @@
             return true;
         }
 
+        public override string ToString()
+        {
+            return $"{GetType().Name} #{id}";
+        }
     }
 }
