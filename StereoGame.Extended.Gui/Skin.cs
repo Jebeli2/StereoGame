@@ -44,7 +44,7 @@ namespace StereoGame.Extended.Gui
             return GetStyle(controlType.Name);
         }
 
-        public void Apply(Control control)
+        public ControlStyle? GetStyle(Control control)
         {
             var types = new List<Type>();
             var controlType = control.GetType();
@@ -53,11 +53,41 @@ namespace StereoGame.Extended.Gui
                 types.Add(controlType);
                 controlType = controlType.BaseType;
             }
+            ControlStyle? cs = null;
             for (int i = types.Count - 1; i >= 0; i--)
             {
                 var style = GetStyle(types[i]);
-                style?.Apply(control);
+                if (style != null)
+                {
+                    if (cs == null)
+                    {
+                        cs = new ControlStyle(style);
+                    }
+                    else
+                    {
+                        cs = cs.Combine(control, style);
+                    }
+                }
             }
+            return cs;
+        }
+
+        public void Apply(Control control)
+        {
+            ControlStyle? cs = GetStyle(control);
+            cs?.Apply(control);
+            //var types = new List<Type>();
+            //var controlType = control.GetType();
+            //while (controlType != null)
+            //{
+            //    types.Add(controlType);
+            //    controlType = controlType.BaseType;
+            //}
+            //for (int i = types.Count - 1; i >= 0; i--)
+            //{
+            //    var style = GetStyle(types[i]);
+            //    style?.Apply(control);
+            //}
         }
 
         private static Skin CreateDefaultSkin()
@@ -85,8 +115,8 @@ namespace StereoGame.Extended.Gui
                     },
                     new ControlStyle(typeof(Window))
                     {
-                        BackgroundColor = Color.DarkGray,
-                        BorderColor = Color.LightGray,
+                        BackgroundColor = Color.FromArgb(128, Color.Black),
+                        BorderColor = Color.DarkGray,
                         BorderThickness = 1
                     },
                     new ControlStyle(typeof(Button))

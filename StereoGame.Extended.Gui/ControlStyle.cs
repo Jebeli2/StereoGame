@@ -10,13 +10,13 @@ namespace StereoGame.Extended.Gui
 {
     public class ControlStyle
     {
-        private readonly Dictionary<int, ControlStyle> previousStyles = new();
+        //private readonly Dictionary<int, ControlStyle> previousStyles = new();
         private readonly string name;
         private readonly Type targetType;
 
 
         public ControlStyle()
-            : this("object", typeof(object))
+            : this(typeof(Control))
         {
 
         }
@@ -30,12 +30,44 @@ namespace StereoGame.Extended.Gui
             this.targetType = targetType;
         }
 
+        public ControlStyle(ControlStyle other)
+        {
+            name = other.name;
+            targetType = other.targetType;
+            BackgroundColor = other.BackgroundColor;
+            BorderColor = other.BorderColor;
+            BorderThickness = other.BorderThickness;
+            TextColor = other.TextColor;
+        }
+
         public string Name => name;
         public Type TargetType => targetType;
         public Color? BackgroundColor { get; set; }
         public Color? BorderColor { get; set; }
         public int? BorderThickness { get; set; }
         public Color? TextColor { get; set; }
+
+        public ControlStyle Combine(ControlStyle? other)
+        {
+            if (other != null)
+            {
+                if (other.BackgroundColor != null) { BackgroundColor = other.BackgroundColor; }
+                if (other.BorderColor != null) { BorderColor = other.BorderColor; }
+                if (other.BorderThickness != null) { BorderThickness = other.BorderThickness; }
+                if (other.TextColor != null) { TextColor = other.TextColor; }
+            }
+            return this;
+        }
+
+        public ControlStyle Combine(Control control, ControlStyle other)
+        {
+            ControlStyle combi = new ControlStyle(this);
+            combi.Combine(other);
+            if (!control.Enabled) { combi.Combine(other.DisabledStyle); }
+            if (control.Hovered) { combi.Combine(other.HoverStyle); }
+            if (control.Pressed) { combi.Combine(other.PressedStyle); }
+            return combi;
+        }
 
         public ControlStyle? HoverStyle { get; set; }
         public ControlStyle? DisabledStyle { get; set; }
@@ -47,79 +79,21 @@ namespace StereoGame.Extended.Gui
             {
                 Apply(control);
             }
-            else
-            {
-                Revert(control);
-            }
         }
 
         public void Apply(Control control)
         {
             ApplyStyle(control, this);
-            previousStyles[control.Id] = this;
             Console.WriteLine($"Apply {this} to {control}");
         }
 
-
-        //public ControlStyle Collect(Control control)
-        //{
-        //    ControlStyle style = new ControlStyle(name, targetType);
-        //    //style.BackgroundColor = control.BackgroundColor; 
-        //    //style.BorderColor = control.BorderColor; 
-        //    //style.BorderThickness = control.BorderThickness; 
-        //    //style.TextColor = control.TextColor; 
-        //    //style.HoverStyle = control.HoverStyle; 
-        //    //style.DisabledStyle = control.DisabledStyle;
-        //    //style.PressedStyle = control.PressedStyle;
-
-        //    if (BackgroundColor != null) { style.BackgroundColor = control.BackgroundColor; }
-        //    if (BorderColor != null) { style.BorderColor = control.BorderColor; }
-        //    if (BorderThickness != null) { style.BorderThickness = control.BorderThickness; }
-        //    if (TextColor != null) { style.TextColor = control.TextColor; }
-        //    if (HoverStyle != null) { style.HoverStyle = control.HoverStyle; }
-        //    if (DisabledStyle != null) { style.DisabledStyle = control.DisabledStyle; }
-        //    if (PressedStyle != null) { style.PressedStyle = control.PressedStyle; }
-        //    return style;
-        //}
-
-        private static void SetStyle(Control control, ControlStyle? style, bool predicate)
+        private static void ApplyStyle(Control control, ControlStyle? style)
         {
             if (style == null) return;
-            if (!predicate) return;
             if (style.BackgroundColor != null) { control.BackgroundColor = style.BackgroundColor.Value; }
             if (style.BorderColor != null) { control.BorderColor = style.BorderColor.Value; }
             if (style.BorderThickness != null) { control.BorderThickness = style.BorderThickness.Value; }
             if (style.TextColor != null) { control.TextColor = style.TextColor.Value; }
-            if (style.DisabledStyle != null) { control.DisabledStyle = style.DisabledStyle; }
-            if (style.HoverStyle != null) { control.HoverStyle = style.HoverStyle; }
-            if (style.PressedStyle != null) { control.PressedStyle = style.PressedStyle; }
-        }
-
-
-        public void Revert(Control control)
-        {
-            if (previousStyles.TryGetValue(control.Id, out ControlStyle? style))
-            {
-                ApplyStyle(control, style);
-                previousStyles.Remove(control.Id);
-                //    //    Console.WriteLine($"Revert to {style}");
-            }
-            //    //else
-            //    //{
-            //    //    Console.WriteLine("Would like to revert to default, but there's nothing here...");
-            //    //}
-        }
-
-        private static void ApplyStyle(Control control, ControlStyle style)
-        {
-            SetStyle(control, style, true);
-            SetStyle(control, style.DisabledStyle, !control.Enabled);
-            SetStyle(control, style.HoverStyle, control.Hovered);
-            SetStyle(control, style.PressedStyle, control.Pressed);
-            //if (style.NormalStyle != null) { control.NormalStyle = style.NormalStyle; }
-            //if (style.HoverStyle != null) { control.HoverStyle = style.HoverStyle; }
-            //if (style.DisabledStyle != null) { control.DisabledStyle = style.DisabledStyle; }
-            //if (style.PressedStyle != null) { control.PressedStyle = style.PressedStyle; }
         }
 
         public override string ToString()
@@ -130,9 +104,6 @@ namespace StereoGame.Extended.Gui
             if (BorderColor != null) { sb.Append("Border:"); sb.Append(BorderColor.Value); sb.Append('-'); }
             if (BorderThickness != null) { sb.Append("Thickness:"); sb.Append(BorderThickness.Value); sb.Append('-'); }
             if (TextColor != null) { sb.Append("Text:"); sb.Append(TextColor.Value); sb.Append('-'); }
-            //if (HoverStyle != null) { sb.Append("Hover:"); sb.Append(HoverStyle); sb.Append('-'); }
-            //if (DisabledStyle != null) { sb.Append("Disabled:"); sb.Append(DisabledStyle); sb.Append('-'); }
-            //if (PressedStyle != null) { sb.Append("Pressed:"); sb.Append(PressedStyle); sb.Append('-'); }
             sb.Length -= 1;
             return sb.ToString();
         }

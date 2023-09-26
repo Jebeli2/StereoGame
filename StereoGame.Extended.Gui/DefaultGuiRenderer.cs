@@ -20,22 +20,22 @@
 
         public void DrawControl(Control control, int offsetX = 0, int offsetY = 0)
         {
-            GraphicsDevice? gd = game.GraphicsDevice;
-            if (gd != null)
-            {
-                Rectangle bounds = control.GetBounds();
-                Color fg = Color.LightGray;
-                if (control.Focused)
-                {
-                    fg = Color.White;
-                }
-                else if (control.Hovered)
-                {
-                    fg = Color.Gray;
-                }
-                gd.Color = fg;
-                gd.DrawRect(bounds);
-            }
+            //GraphicsDevice? gd = game.GraphicsDevice;
+            //if (gd != null)
+            //{
+            //    Rectangle bounds = control.GetBounds();
+            //    Color fg = Color.LightGray;
+            //    if (control.Focused)
+            //    {
+            //        fg = Color.White;
+            //    }
+            //    else if (control.Hovered)
+            //    {
+            //        fg = Color.Gray;
+            //    }
+            //    gd.Color = fg;
+            //    gd.DrawRect(bounds);
+            //}
         }
 
         public void FillRectangle(Rectangle rect, Color color, Rectangle? clippingRect = null)

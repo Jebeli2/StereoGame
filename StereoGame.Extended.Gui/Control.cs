@@ -35,10 +35,9 @@
         private int borderThickness;
         private Color textColor;
 
-        //private ControlStyle? normalStyle;
-        private ControlStyle? hoverStyle;
-        private ControlStyle? disabledStyle;
-        private ControlStyle? pressedStyle;
+        //private ControlStyle? hoverStyle;
+        //private ControlStyle? disabledStyle;
+        //private ControlStyle? pressedStyle;
 
         private Skin skin;
 
@@ -213,7 +212,8 @@
                 if (enabled != value)
                 {
                     enabled = value;
-                    disabledStyle?.ApplyIf(this, !enabled);
+                    skin.Apply(this);
+                    //disabledStyle?.ApplyIf(this, !enabled);
                 }
             }
         }
@@ -250,7 +250,8 @@
                 if (hovered != value)
                 {
                     hovered = value;
-                    hoverStyle?.ApplyIf(this, hovered);
+                    skin.Apply(this);
+                    //hoverStyle?.ApplyIf(this, hovered);
                 }
             }
         }
@@ -263,7 +264,8 @@
                 if (pressed != value)
                 {
                     pressed = value;
-                    pressedStyle?.ApplyIf(this, pressed);
+                    skin.Apply(this);
+                    //pressedStyle?.ApplyIf(this, pressed);
                 }
             }
         }
@@ -335,44 +337,44 @@
         //}
         
 
-        public ControlStyle? HoverStyle
-        {
-            get { return hoverStyle; }
-            set
-            {
-                if (hoverStyle != value)
-                {
-                    hoverStyle = value;
-                    hoverStyle?.ApplyIf(this, hovered);
-                }
-            }
-        }
+        //public ControlStyle? HoverStyle
+        //{
+        //    get { return hoverStyle; }
+        //    set
+        //    {
+        //        if (hoverStyle != value)
+        //        {
+        //            hoverStyle = value;
+        //            hoverStyle?.ApplyIf(this, hovered);
+        //        }
+        //    }
+        //}
 
-        public ControlStyle? DisabledStyle
-        {
-            get { return disabledStyle; }
-            set
-            {
-                if (disabledStyle != value)
-                {
-                    disabledStyle = value;
-                    disabledStyle?.ApplyIf(this, !enabled);
-                }
-            }
-        }
+        //public ControlStyle? DisabledStyle
+        //{
+        //    get { return disabledStyle; }
+        //    set
+        //    {
+        //        if (disabledStyle != value)
+        //        {
+        //            disabledStyle = value;
+        //            disabledStyle?.ApplyIf(this, !enabled);
+        //        }
+        //    }
+        //}
 
-        public ControlStyle? PressedStyle
-        {
-            get { return pressedStyle; }
-            set
-            {
-                if (pressedStyle != value)
-                {
-                    pressedStyle = value;
-                    pressedStyle?.ApplyIf(this, pressed);
-                }
-            }
-        }
+        //public ControlStyle? PressedStyle
+        //{
+        //    get { return pressedStyle; }
+        //    set
+        //    {
+        //        if (pressedStyle != value)
+        //        {
+        //            pressedStyle = value;
+        //            pressedStyle?.ApplyIf(this, pressed);
+        //        }
+        //    }
+        //}
 
         public virtual Rectangle GetBounds()
         {
