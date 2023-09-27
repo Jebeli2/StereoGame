@@ -43,6 +43,7 @@
             GraphicsDevice? gd = game.GraphicsDevice;
             if (gd != null && font != null && !string.IsNullOrEmpty(text))
             {
+                gd.BlendMode = BlendMode.Blend;
                 gd.DrawText(font, text, rect, color, horizontalAlignment, verticalAlignment);
             }
         }
@@ -52,6 +53,7 @@
             GraphicsDevice? gd = game.GraphicsDevice;
             if (gd != null)
             {
+                gd.BlendMode = BlendMode.Blend;
                 gd.Color = color;
                 gd.FillRect(rect);
             }
@@ -62,6 +64,7 @@
             GraphicsDevice? gd = game.GraphicsDevice;
             if (gd != null)
             {
+                gd.BlendMode = BlendMode.Blend;
                 gd.Color = color;
                 gd.DrawRect(rect);
             }

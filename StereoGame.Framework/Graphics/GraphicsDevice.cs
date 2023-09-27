@@ -13,12 +13,12 @@ namespace StereoGame.Framework.Graphics
         private bool isDisposed;
         private readonly object resourcesLock = new();
         private readonly List<WeakReference> resources = new();
-        private BlendMode blendMode;
-        private Color color;
-        private byte colorR;
-        private byte colorG;
-        private byte colorB;
-        private byte colorA;
+        protected BlendMode blendMode;
+        protected Color color;
+        protected byte colorR;
+        protected byte colorG;
+        protected byte colorB;
+        protected byte colorA;
         internal GraphicsDevice()
         {
             color = Color.Empty;
@@ -109,6 +109,9 @@ namespace StereoGame.Framework.Graphics
         public abstract Texture? LoadTexture(string path);
         public abstract Texture? LoadTexture(string path, byte[] data);
 
+        public abstract void PushTarget(Texture? texture);
+        public abstract void PopTarget();
+
         public void DrawTexture(Texture? texture)
         {
             if (texture != null)
@@ -137,6 +140,7 @@ namespace StereoGame.Framework.Graphics
                 DrawTexture(texture, ref src, ref dst);
             }
         }
+
         protected abstract void DrawTexture(Texture? texture, ref Rectangle src, ref Rectangle dst);
 
         public abstract void DrawLine(int x1, int y1, int x2, int y2);

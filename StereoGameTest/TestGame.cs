@@ -23,6 +23,9 @@
         private Screen? mainScreen;
         private Window? titleWindow;
 
+        private Screen? guiTestScreen;
+        private Window? guiTestWindow;
+
         public TestGame()
         {
             Content.AddResourceManager(Properties.Resources.ResourceManager);
@@ -78,12 +81,31 @@
             titleWindow.Y = 50;
             titleWindow.Width = 200;
             titleWindow.Height = 200;
+            titleWindow.Title = "Stereo";
 
             var button1 = new Button(titleWindow, "Test GUI") { X = 10, Y = 10, Width = 180, Height = 30 };
+
+            button1.Clicked += (s, e) => { gui.ActiveScreen = guiTestScreen; };
+
             var button2 = new Button(titleWindow, "Test MAP") { X = 10, Y = 50, Width = 180, Height = 30 };
             var button3 = new Button(titleWindow, "Test SOM") { X = 10, Y = 90, Width = 180, Height = 30 };
 
             gui.ActiveScreen = mainScreen;
+
+
+            guiTestScreen = new Screen();
+            guiTestWindow = new Window(guiTestScreen);
+            guiTestWindow.X = 100;
+            guiTestWindow.Y = 100;
+            guiTestWindow.Width = 200;
+            guiTestWindow.Height = 200;
+            guiTestWindow.Title = "GUI Test";
+            var b1 = new Button(guiTestWindow, "Buttons");
+            var b2 = new Button(guiTestWindow, "Whatever");
+            var b3 = new Button(guiTestWindow, "Back");
+
+            b3.Clicked += (s, e) => { gui.ActiveScreen = mainScreen; };
+
         }
 
     }

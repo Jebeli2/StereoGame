@@ -23,6 +23,8 @@
             Text = text;
         }
 
+        public event EventHandler<EventArgs>? Clicked;
+
         public override bool OnPointerDown(PointerEventArgs args)
         {
             if (Enabled)
@@ -39,6 +41,10 @@
             if (Pressed)
             {
                 Pressed = false;
+                if (BoundingRectangle.Contains(args.X,args.Y) && Enabled)
+                {
+                    Click();
+                }
             }
             return base.OnPointerUp(args);
         }
@@ -61,12 +67,14 @@
             return base.OnPointerLeave(args);
         }
 
-        public override void Draw(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime)
+        public override void Draw(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, int offsetX = 0, int offsetY = 0)
         {
-            base.Draw(gui, renderer, gameTime);
+            base.Draw(gui, renderer, gameTime, offsetX, offsetY);
             if (!string.IsNullOrEmpty(Text))
             {
-                renderer.DrawText(Font, Text, GetBounds(), TextColor, HorizontalAlignment.Center, VerticalAlignment.Center);
+                Rectangle bounds = GetBounds();
+                bounds.Offset(offsetX, offsetY);
+                renderer.DrawText(Font, Text, bounds, TextColor, HorizontalAlignment.Center, VerticalAlignment.Center);
             }
         }
 
@@ -80,6 +88,11 @@
         {
             Size ct = GetContentSize(context);
             return ct + Padding.Size;
+        }
+
+        public void Click()
+        {
+            Clicked?.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -18,4 +18,11 @@ namespace StereoGame.Extended.Gui
         Horizontal,
         Vertical,
     }
+
+    public enum HitTestResult
+    {
+        None,
+        Control,
+        DragArea
+    }
 }

@@ -25,9 +25,12 @@ namespace StereoGame.Extended.Gui
 
         public Size GetPreferredSize(IGuiSystem context, Control control)
         {
-            int sizeW = margin * 2;
-            int sizeH = margin * 2;
+            Size size = new Size(margin * 2, margin * 2);
+            int xOffset = control.Padding.Horizontal;
+            int yOffset = control.Padding.Vertical;
             bool first = true;
+            int axis1 = (int)orientation;
+            int axis2 = (((int)orientation) + 1) % 2;
             foreach (Control child in control.Children)
             {
                 if (!child.Visible) continue;
@@ -37,41 +40,39 @@ namespace StereoGame.Extended.Gui
                 }
                 else
                 {
-                    switch (orientation)
-                    {
-                        case Orientation.Horizontal:
-                            sizeW += spacing;
-                            break;
-                        case Orientation.Vertical:
-                            sizeH += spacing;
-                            break;
-                    }
+                    size.AddAxis(axis1, spacing);
                 }
                 Size ps = child.GetPreferredSize(context);
                 Size fs = child.GetFixedSize();
-                int targetW = fs.Width != 0 ? fs.Width : ps.Width;
-                int targetH = fs.Height != 0 ? fs.Height : ps.Height;
-                switch (orientation)
-                {
-                    case Orientation.Horizontal:
-                        sizeW += targetW;
-                        sizeH = Math.Max(sizeH, targetH + 2 * margin);
-                        break;
-                    case Orientation.Vertical:
-                        sizeH += targetH;
-                        sizeW = Math.Max(sizeW, targetW + 2 * margin);
-                        break;
-                }
+                Size targetSize = ps.GetValidSize(ref fs);
+                size.AddAxis(axis1, targetSize.GetAxis(axis1));
+                size.SetAxis(axis2, Math.Max(size.GetAxis(axis2), targetSize.GetAxis(axis2) + 2 * margin));
             }
-            return new Size(sizeW, sizeH);
+            size.Width += xOffset;
+            size.Height += yOffset;
+            return size;
         }
 
         public void PerformLayout(IGuiSystem context, Control control)
         {
             Size fsw = control.GetFixedSize();
-            int cw = fsw.Width != 0 ? fsw.Width : control.Width;
-            int ch = fsw.Height != 0 ? fsw.Height : control.Height;
+            Size cw = new Size(control.Width, control.Height);
+            Size cs = cw.GetValidSize(ref fsw);
+            cs.Width -= control.Padding.Horizontal;
+            cs.Height -= control.Padding.Vertical;
+            int axis1 = (int)orientation;
+            int axis2 = (((int)orientation) + 1) % 2;
             int position = margin;
+            int xOffset = control.Padding.Left;
+            int yOffset = control.Padding.Top;
+            if (orientation == Orientation.Vertical)
+            {
+                position += yOffset;
+            }
+            else
+            {
+                position += xOffset;
+            }
             bool first = true;
             foreach (Control child in control.Children)
             {
@@ -86,65 +87,32 @@ namespace StereoGame.Extended.Gui
                 }
                 Size ps = child.GetPreferredSize(context);
                 Size fs = child.GetFixedSize();
-                int targetW = fs.Width != 0 ? fs.Width : ps.Width;
-                int targetH = fs.Height != 0 ? fs.Height : ps.Height;
-                Point pos = new Point();
-                switch (orientation)
+                Size targetSize = ps.GetValidSize(ref fs);
+                Point pos = new Point(xOffset, yOffset);
+                pos.SetAxis(axis1, position);
+                switch (alignment)
                 {
-                    case Orientation.Horizontal:
-                        pos.X = position;
-                        switch (alignment)
-                        {
-                            case Alignment.Minimum:
-                                pos.Y += margin;
-                                break;
-                            case Alignment.Middle:
-                                pos.Y += (ch - targetH) / 2;
-                                break;
-                            case Alignment.Maximum:
-                                pos.Y += ch - targetH - margin * 2;
-                                break;
-                            case Alignment.Fill:
-                                pos.Y += margin;
-                                targetH = fsw.Height != 0 ? fsw.Height : (ch - margin * 2);
-                                break;
-                        }
-
+                    case Alignment.Minimum:
+                        pos.AddAxis(axis2, margin);
                         break;
-                    case Orientation.Vertical:
-                        pos.Y = position;
-                        switch (alignment)
-                        {
-                            case Alignment.Minimum:
-                                pos.X += margin;
-                                break;
-                            case Alignment.Middle:
-                                pos.X += (cw - targetW) / 2;
-                                break;
-                            case Alignment.Maximum:
-                                pos.X += cw - targetW - margin * 2;
-                                break;
-                            case Alignment.Fill:
-                                pos.X += margin;
-                                targetW = fsw.Width != 0 ? fsw.Width : (cw - margin * 2);
-                                break;
-                        }
+                    case Alignment.Middle:
+                        pos.AddAxis(axis2, (cs.GetAxis(axis2) - targetSize.GetAxis(axis2)) / 2);
+                        break;
+                    case Alignment.Maximum:
+                        pos.AddAxis(axis2, cs.GetAxis(axis2) - targetSize.GetAxis(axis2) - margin * 2);
+                        break;
+                    case Alignment.Fill:
+                        pos.AddAxis(axis2, margin);
+                        targetSize.SetAxis(axis2, fs.GetAxis(axis2) != 0 ? fs.GetAxis(axis2) : (cs.GetAxis(axis2) - margin * 2));
                         break;
                 }
+
                 child.X = pos.X;
                 child.Y = pos.Y;
-                child.Width = targetW;
-                child.Height = targetH;
+                child.Width = targetSize.Width;
+                child.Height = targetSize.Height;
                 child.PerformLayout(context);
-                switch(orientation)
-                {
-                    case Orientation.Horizontal:
-                        position += targetW;
-                        break;
-                    case Orientation.Vertical:
-                        position += targetH;
-                        break;
-                }
+                position += targetSize.GetAxis(axis1);
             }
         }
     }

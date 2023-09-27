@@ -1007,6 +1007,10 @@
             private static extern int SDL_RenderFillRect(IntPtr renderer, ref Rectangle rect);
             [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
             private static extern int SDL_RenderDrawLine(IntPtr renderer, int x1, int y1, int x2, int y2);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr SDL_GetRenderTarget(IntPtr renderer);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_SetRenderTarget(IntPtr renderer, IntPtr texture);
 
 
 
@@ -1063,8 +1067,10 @@
             }
             public static int RenderDrawRect(IntPtr renderer, ref Rectangle rect) => SDL_RenderDrawRect(renderer, ref rect);
             public static int RenderFillRect(IntPtr renderer, ref Rectangle rect) => SDL_RenderFillRect(renderer, ref rect);
-
             public static int RenderDrawLine(IntPtr renderer, int x1, int y1, int x2, int y2) => SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+            public static IntPtr GetRenderTarget(IntPtr renderer) => SDL_GetRenderTarget(renderer);
+            public static int SetRenderTarget(IntPtr renderer, IntPtr texture) => SDL_SetRenderTarget(renderer, texture);
+
             //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             //private delegate IntPtr d_sdl_createrenderer(IntPtr window, int index, SDL_RendererFlags flags);
             //private static readonly d_sdl_createrenderer SDL_CreateRenderer = FuncLoader.LoadFunction<d_sdl_createrenderer>(NativeLibrary, "SDL_CreateRenderer");

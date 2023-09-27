@@ -1,5 +1,6 @@
 ﻿namespace StereoGame.Extended.Gui
 {
+    using StereoGame.Framework.Graphics;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -11,5 +12,6 @@
         int ScreenWidth { get; }
         int ScreenHeight { get; }
 
+        GraphicsDevice GraphicsDevice { get; }
     }
 }

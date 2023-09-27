@@ -32,7 +32,7 @@
             SDL2Image.Init(SDL2Image.IMG_InitFlags.IMG_INIT_PNG);
             SDL2TTF.Init();
             SDL2Mixer.Init(SDL2Mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL2Mixer.MIX_InitFlags.MIX_INIT_OGG | SDL2Mixer.MIX_InitFlags.MIX_INIT_MID);
-            Sdl.SetHint("SDL_HINT_RENDER_DRIVER", "opengl");
+            //Sdl.SetHint("SDL_HINT_RENDER_DRIVER", "opengl");
             Sdl.SetHint("SDL_HINT_RENDER_BATCHING", "1");
             Sdl.SetHint("SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH", "1");
             Sdl.SetHint("SDL_HINT_RENDER_SCALE_QUALITY", "1");

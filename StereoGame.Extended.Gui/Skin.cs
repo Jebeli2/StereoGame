@@ -116,7 +116,7 @@ namespace StereoGame.Extended.Gui
                         BackgroundColor = Color.FromArgb(128, Color.Black),
                         BorderColor = Color.DarkGray,
                         BorderThickness = 1,
-                        Padding = new Padding(8)
+                        Padding = new Padding(8,30,8,8)
                     },
                     new ControlStyle(typeof(Button))
                     {

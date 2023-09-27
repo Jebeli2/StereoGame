@@ -19,6 +19,7 @@
         private readonly List<int> textCacheKeys = new();
         //private readonly List<int> iconCacheKeys = new();
         private int textCacheLimit = 100;
+        private readonly Stack<IntPtr> prevTargets = new();
 
 
         public SdlGraphicsDevice(Game game, SdlGameWindow window, PresentationParameters pp)
@@ -72,7 +73,7 @@
             IntPtr tex = SDL2Image.LoadTexture(handle, path);
             if (tex != IntPtr.Zero)
             {
-                _=Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
+                _ = Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
                 SdlTexture texture = new(this, w, h, tex) { Name = path };
                 OnResourceCreated(texture);
                 return texture;
@@ -88,7 +89,7 @@
                 IntPtr tex = SDL2Image.LoadTexture_RW(handle, rw, 1);
                 if (tex != IntPtr.Zero)
                 {
-                    _=Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
+                    _ = Sdl.Renderer.QueryTexture(tex, out _, out _, out int w, out int h);
                     SdlTexture texture = new(this, w, h, tex) { Name = path };
                     OnResourceCreated(texture);
                     return texture;
@@ -97,28 +98,50 @@
             return null;
         }
 
+        public override void PushTarget(Texture? texture)
+        {
+            if (CheckTexture(texture, out IntPtr target))
+            {
+                IntPtr oldTarget = Sdl.Renderer.GetRenderTarget(handle);
+                prevTargets.Push(oldTarget);
+                _ = Sdl.Renderer.SetRenderTarget(handle, target);
+                _ = Sdl.Renderer.SetRenderDrawBlendMode(handle, (int)blendMode);
+                _ = Sdl.Renderer.SetRenderDrawColor(handle, colorR, colorG, colorB, colorA);
+            }
+        }
+        public override void PopTarget()
+        {
+            if (prevTargets.Count > 0)
+            {
+                IntPtr oldTarget = prevTargets.Pop();
+                _ = Sdl.Renderer.SetRenderTarget(handle, oldTarget);
+                _ = Sdl.Renderer.SetRenderDrawBlendMode(handle, (int)blendMode);
+                _ = Sdl.Renderer.SetRenderDrawColor(handle, colorR, colorG, colorB, colorA);
+            }
+        }
+
         protected override void DrawTexture(Texture? texture, ref Rectangle src, ref Rectangle dst)
         {
             if (CheckTexture(texture, out IntPtr tex))
             {
-                _=Sdl.Renderer.RenderCopy(handle, tex, ref src, ref dst);
+                _ = Sdl.Renderer.RenderCopy(handle, tex, ref src, ref dst);
             }
         }
 
         public override void DrawLine(int x1, int y1, int x2, int y2)
         {
-            _=Sdl.Renderer.RenderDrawLine(handle, x1, y1, x2, y2);
+            _ = Sdl.Renderer.RenderDrawLine(handle, x1, y1, x2, y2);
         }
 
         protected override void FillRect(ref Rectangle rect)
         {
-            _=Sdl.Renderer.RenderFillRect(handle, ref rect);
+            _ = Sdl.Renderer.RenderFillRect(handle, ref rect);
         }
 
 
         protected override void DrawRect(ref Rectangle rect)
         {
-            _=Sdl.Renderer.RenderDrawRect(handle, ref rect);
+            _ = Sdl.Renderer.RenderDrawRect(handle, ref rect);
         }
 
         protected override void DrawText(TextFont? font, ReadOnlySpan<char> text, float x, float y, float width, float height, Color color, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment, float offsetX, float offsetY)

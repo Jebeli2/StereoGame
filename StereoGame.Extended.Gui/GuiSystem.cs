@@ -2,6 +2,9 @@
 {
     using StereoGame.Framework;
     using StereoGame.Framework.Input;
+    using System;
+    using System.Drawing;
+    using System.Security.Cryptography;
 
     public class GuiSystem : DrawableGameComponent, IGuiSystem
     {
@@ -13,6 +16,9 @@
         private Control? preFocusedControl;
         private Control? focusedControl;
         private Control? hoveredControl;
+        private Control? preDragControl;
+        private int dragStartX;
+        private int dragStartY;
         public GuiSystem(Game game) : base(game)
         {
             DrawOrder = 1000;
@@ -85,14 +91,34 @@
             }
         }
 
-        private void DrawControl(Control control, GameTime gameTime)
+        private void DrawControl(Control control, GameTime gameTime, int offsetX = 0, int offsetY = 0)
         {
             if (control.Visible)
             {
-                control.Draw(this, renderer, gameTime);
-                foreach (Control child in control.Children)
+                Rectangle bounds = control.GetBounds();
+                if (control.SuperBitmap)
                 {
-                    DrawControl(child, gameTime);
+                    if (control.NeedsNewBitmap)
+                    {
+                        control.PushBitmap(this);
+                        offsetX -= bounds.Left;
+                        offsetY -= bounds.Top;
+                        control.Draw(this, renderer, gameTime, offsetX, offsetY);
+                        foreach (Control child in control.Children)
+                        {
+                            DrawControl(child, gameTime, offsetX, offsetY);
+                        }
+                        control.PopBitmap(this);
+                    }
+                    GraphicsDevice.DrawTexture(control.Bitmap, 0, 0, bounds.Width, bounds.Height, bounds.X, bounds.Y);
+                }
+                else
+                {
+                    control.Draw(this, renderer, gameTime, offsetX, offsetY);
+                    foreach (Control child in control.Children)
+                    {
+                        DrawControl(child, gameTime, offsetX, offsetY);
+                    }
                 }
             }
         }
@@ -134,12 +160,46 @@
             return null;
         }
 
+        private bool CheckDragStart(PointerEventArgs pea)
+        {
+            if (preFocusedControl != null && pea.Button == MouseButton.Left)
+            {
+                HitTestResult hitTest = preFocusedControl.GetHitTestResult(pea.X, pea.Y);
+                if (hitTest == HitTestResult.DragArea)
+                {
+                    preDragControl = preFocusedControl;
+                    dragStartX = pea.X;
+                    dragStartY = pea.Y;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool CheckDragging(PointerEventArgs pea)
+        {
+            if (preDragControl != null && (pea.X != dragStartX || pea.Y != dragStartY))
+            {
+                int dX = pea.X - dragStartX;
+                int dY = pea.Y - dragStartY;
+                preDragControl.X += dX;
+                preDragControl.Y += dY;
+                dragStartX = pea.X;
+                dragStartY = pea.Y;
+                return true;
+            }
+            return false;
+        }
+
         private void MouseListener_MouseDown(object? sender, MouseEventArgs e)
         {
             if (activeScreen == null || !activeScreen.Visible) return;
             preFocusedControl = FindControlAt(e.X, e.Y);
             var pea = PointerEventArgs.FromMouseEventArgs(e);
-            PropagateDown(hoveredControl, x => x.OnPointerDown(pea));
+            if (!CheckDragStart(pea))
+            {
+                PropagateDown(hoveredControl, x => x.OnPointerDown(pea));
+            }
         }
         private void MouseListener_MouseUp(object? sender, MouseEventArgs e)
         {
@@ -150,6 +210,7 @@
                 SetFocus(postFocusedControl);
             }
             preFocusedControl = null;
+            preDragControl = null;
             var pea = PointerEventArgs.FromMouseEventArgs(e);
             PropagateDown(hoveredControl, x => x.OnPointerUp(pea));
         }
@@ -159,36 +220,24 @@
             if (activeScreen == null || !activeScreen.Visible) return;
             var hc = FindControlAt(e.X, e.Y);
             var pea = PointerEventArgs.FromMouseEventArgs(e);
-            if (hc != hoveredControl)
+            if (!CheckDragging(pea))
             {
-                if (hoveredControl != null && (hc == null || !hc.HasParent(hoveredControl)))
+                if (hc != hoveredControl)
                 {
-                    PropagateDown(hoveredControl, x => x.OnPointerLeave(pea));
+                    if (hoveredControl != null && (hc == null || !hc.HasParent(hoveredControl)))
+                    {
+                        PropagateDown(hoveredControl, x => x.OnPointerLeave(pea));
+                    }
+                    hoveredControl = hc;
+                    PropagateDown(hoveredControl, x => x.OnPointerEnter(pea));
                 }
-                hoveredControl = hc;
-                PropagateDown(hoveredControl, x => x.OnPointerEnter(pea));
-            }
-            else
-            {
-                PropagateDown(hoveredControl, x => x.OnPointerMove(pea));
+                else
+                {
+                    PropagateDown(hoveredControl, x => x.OnPointerMove(pea));
+                }
             }
         }
 
-        //private void SetHovered(Control? control)
-        //{
-        //    if (hoveredControl != control)
-        //    {
-        //        if (hoveredControl != null)
-        //        {
-        //            hoveredControl.Hovered = false;
-        //        }
-        //        hoveredControl = control;
-        //        if (hoveredControl != null)
-        //        {
-        //            hoveredControl.Hovered = true;
-        //        }
-        //    }
-        //}
 
         private static void PropagateDown(Control? control, Func<Control, bool> predicate)
         {

@@ -22,8 +22,6 @@
         private int height;
         private int fixedWidth;
         private int fixedHeight;
-        //private int actualWidth;
-        //private int actualHeight;
         private int minWidth;
         private int minHeight;
         private int maxWidth;
@@ -37,6 +35,10 @@
         private bool focused;
         private bool hovered;
         private bool pressed;
+
+        protected bool valid;
+        protected bool superBitmap;
+        private Texture? bitmap;
 
         protected ILayout? layout;
         private TextFont? font;
@@ -143,9 +145,16 @@
                     child.PerformLayout(context);
                 }
             }
+            valid = false;
         }
 
-        public virtual void InvalidateLayout() { }
+        public virtual void Invalidate()
+        {
+            valid = false;
+            parent?.Invalidate();
+        }
+
+        //public virtual void InvalidateLayout() { }
 
 
         public int X
@@ -269,18 +278,6 @@
             }
         }
 
-        //public int ActualWidth
-        //{
-        //    get { return actualWidth; }
-        //    internal set { actualWidth = value; }
-        //}
-
-        //public int ActualHeight
-        //{
-        //    get { return actualHeight; }
-        //    internal set { actualHeight = value; }
-        //}
-
         public Padding Margin
         {
             get { return margin; }
@@ -300,6 +297,7 @@
                 if (horizontalAlignment != value)
                 {
                     horizontalAlignment = value;
+                    Invalidate();
                 }
             }
         }
@@ -312,6 +310,7 @@
                 if (verticalAlignment != value)
                 {
                     verticalAlignment = value;
+                    Invalidate();
                 }
             }
         }
@@ -325,7 +324,6 @@
                 {
                     enabled = value;
                     skin.Apply(this);
-                    //disabledStyle?.ApplyIf(this, !enabled);
                 }
             }
         }
@@ -338,6 +336,7 @@
                 if (visible != value)
                 {
                     visible = value;
+                    Invalidate();
                 }
             }
         }
@@ -350,6 +349,7 @@
                 if (focused != value)
                 {
                     focused = value;
+                    Invalidate();
                 }
             }
         }
@@ -363,7 +363,6 @@
                 {
                     hovered = value;
                     skin.Apply(this);
-                    //hoverStyle?.ApplyIf(this, hovered);
                 }
             }
         }
@@ -377,7 +376,6 @@
                 {
                     pressed = value;
                     skin.Apply(this);
-                    //pressedStyle?.ApplyIf(this, pressed);
                 }
             }
         }
@@ -395,6 +393,7 @@
                 if (backgroundColor != value)
                 {
                     backgroundColor = value;
+                    Invalidate();
                 }
             }
         }
@@ -407,6 +406,7 @@
                 if (borderColor != value)
                 {
                     borderColor = value;
+                    Invalidate();
                 }
             }
         }
@@ -419,6 +419,7 @@
                 if (borderThickness != value)
                 {
                     borderThickness = value;
+                    Invalidate();
                 }
             }
         }
@@ -431,6 +432,7 @@
                 if (textColor != value)
                 {
                     textColor = value;
+                    Invalidate();
                 }
             }
         }
@@ -449,6 +451,7 @@
                 if (font != value)
                 {
                     font = value;
+                    Invalidate();
                 }
             }
         }
@@ -461,10 +464,13 @@
                 if (text != value)
                 {
                     text = value;
+                    Invalidate();
                 }
             }
         }
 
+        public bool SuperBitmap => superBitmap;
+        public Texture? Bitmap => bitmap;
 
         public Rectangle BoundingRectangle
         {
@@ -508,6 +514,15 @@
             return new Size(awidth, aheight);
         }
 
+        public virtual HitTestResult GetHitTestResult(int x, int y)
+        {
+            if (Contains(x, y))
+            {
+                return HitTestResult.Control;
+            }
+            return HitTestResult.None;
+        }
+
         public virtual bool Contains(int x, int y)
         {
             return GetBounds().Contains(x, y);
@@ -519,9 +534,10 @@
         }
         public virtual void Update(IGuiSystem gui, GameTime gameTime) { }
 
-        public virtual void Draw(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime)
+        public virtual void Draw(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, int offsetX = 0, int offsetY = 0)
         {
             Rectangle rect = GetBounds();
+            rect.Offset(offsetX, offsetY);
             if (!backgroundColor.IsEmpty && backgroundColor != Color.Transparent)
             {
                 renderer.FillRectangle(rect, backgroundColor);
@@ -530,6 +546,67 @@
             {
                 renderer.DrawRectangle(rect, borderColor, borderThickness);
             }
+
+            //if (superBitmap)
+            //{
+            //    Rectangle dst = GetBounds();
+            //    if (!valid || bitmap == null)
+            //    {
+            //        CheckBitmap(gui);
+            //        gui.GraphicsDevice.PushTarget(bitmap);
+            //        gui.GraphicsDevice.Color = Color.FromArgb(0, 0, 0, 0);
+            //        DrawControl(gui, renderer, gameTime, -dst.Left, -dst.Top);
+            //        gui.GraphicsDevice.Clear();
+            //        gui.GraphicsDevice.PopTarget();
+            //        valid = true;
+
+            //    }
+            //    if (valid && bitmap != null)
+            //    {
+            //        gui.GraphicsDevice.DrawTexture(bitmap, 0, 0, dst.Width, dst.Height, dst.X, dst.Y);
+            //    }
+            //}
+            //else
+            //{
+            //    DrawControl(gui, renderer, gameTime, 0, 0);
+            //}
+        }
+
+        internal bool NeedsNewBitmap
+        {
+            get
+            {
+                return superBitmap && (!valid || bitmap == null);
+            }
+        }
+
+
+        internal void PushBitmap(IGuiSystem gui)
+        {
+            CheckBitmap(gui);
+            gui.GraphicsDevice.PushTarget(bitmap);
+            gui.GraphicsDevice.Color = Color.FromArgb(0, 0, 0, 0);
+            gui.GraphicsDevice.Clear();
+        }
+
+        internal void PopBitmap(IGuiSystem gui)
+        {
+            gui.GraphicsDevice.PopTarget();
+            valid = true;
+        }
+
+        private void CheckBitmap(IGuiSystem gui)
+        {
+            if (bitmap == null || bitmap.Width < width || bitmap.Height < height)
+            {
+                InitBitmap(gui);
+            }
+        }
+
+        private void InitBitmap(IGuiSystem gui)
+        {
+            bitmap?.Dispose();
+            bitmap = gui.GraphicsDevice.CreateTexture(width, height);
         }
 
         public virtual bool OnPointerDown(PointerEventArgs args) { return true; }
