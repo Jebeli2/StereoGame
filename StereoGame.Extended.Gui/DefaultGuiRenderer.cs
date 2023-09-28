@@ -18,26 +18,6 @@
             this.game = game;
         }
 
-        public void DrawControl(Control control, int offsetX = 0, int offsetY = 0)
-        {
-            //GraphicsDevice? gd = game.GraphicsDevice;
-            //if (gd != null)
-            //{
-            //    Rectangle bounds = control.GetBounds();
-            //    Color fg = Color.LightGray;
-            //    if (control.Focused)
-            //    {
-            //        fg = Color.White;
-            //    }
-            //    else if (control.Hovered)
-            //    {
-            //        fg = Color.Gray;
-            //    }
-            //    gd.Color = fg;
-            //    gd.DrawRect(bounds);
-            //}
-        }
-
         public void DrawRegion(TextureRegion? region, Rectangle dest)
         {
             GraphicsDevice? gd = game.GraphicsDevice;
@@ -79,6 +59,28 @@
                 gd.DrawRect(rect);
             }
         }
+
+        public void DrawHorizontalLine(int x1, int x2, int y, Color color, float thickness = 1.0f, Rectangle? clippingRect = null)
+        {
+            GraphicsDevice? gd = game.GraphicsDevice;
+            if (gd != null)
+            {
+                gd.BlendMode = BlendMode.Blend;
+                gd.Color = color;
+                gd.DrawLine(x1, y, x2, y);
+            }
+        }
+        public void DrawVerticalLine(int x, int y1, int y2, Color color, float thickness = 1.0f, Rectangle? clippingRect = null)
+        {
+            GraphicsDevice? gd = game.GraphicsDevice;
+            if (gd != null)
+            {
+                gd.BlendMode = BlendMode.Blend;
+                gd.Color = color;
+                gd.DrawLine(x, y1, x, y2);
+            }
+        }
+
 
     }
 }

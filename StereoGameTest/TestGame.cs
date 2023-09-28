@@ -76,13 +76,13 @@
         private void InitGui(TextFont? font)
         {
             Skin.DefaultSkin.DefaultFont = font;
-            var buttonStyle = Skin.DefaultSkin.GetStyle(typeof(Button));
-            if (button != null && buttonStyle != null)
-            {
-                NinePatchRegion npr = new NinePatchRegion(button, new Padding(2));
-                buttonStyle.BackgroundRegion = npr;
-                buttonStyle.BorderThickness = 0;
-            }
+            //var buttonStyle = Skin.DefaultSkin.GetStyle(typeof(Button));
+            //if (button != null && buttonStyle != null)
+            //{
+            //    NinePatchRegion npr = new NinePatchRegion(button, new Padding(2));
+            //    buttonStyle.BackgroundRegion = npr;
+            //    buttonStyle.BorderThickness = 0;
+            //}
             mainScreen = new Screen();
             titleWindow = new Window(mainScreen);
             titleWindow.X = 20;

@@ -182,11 +182,12 @@
             {
                 int dX = pea.X - dragStartX;
                 int dY = pea.Y - dragStartY;
-                preDragControl.X += dX;
-                preDragControl.Y += dY;
-                dragStartX = pea.X;
-                dragStartY = pea.Y;
-                return true;
+                if (preDragControl.Move(dX, dY))
+                {
+                    dragStartX = pea.X;
+                    dragStartY = pea.Y;
+                    return true;
+                }
             }
             return false;
         }

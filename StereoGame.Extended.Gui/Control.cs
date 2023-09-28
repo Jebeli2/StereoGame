@@ -514,6 +514,28 @@
             return rect;
         }
 
+        public bool Move(int dx, int dy)
+        {
+            int newX = x + dx;
+            int newY = y + dy;
+            if (newX < 0) { newX = 0; }
+            if (newY < 0) { newY = 0; }
+            if (parent != null)
+            {
+                int maxX = parent.Width - width;
+                int maxY = parent.Height - height;
+                if (newX > maxX) { newX = maxX; }
+                if (newY > maxY) { newY = maxY; }
+            }
+            if (newX != x || newY != y)
+            {
+                x = newX;
+                y = newY;
+                return true;
+            }
+            return false;
+        }
+
         public abstract Size GetContentSize(IGuiSystem context);
 
         public virtual Size CalculateActualSize(IGuiSystem context)
@@ -554,7 +576,7 @@
             rect.Offset(offsetX, offsetY);
             if (backgroundRegion != null)
             {
-                renderer.DrawRegion(backgroundRegion,rect);
+                renderer.DrawRegion(backgroundRegion, rect);
             }
             else if (!backgroundColor.IsEmpty && backgroundColor != Color.Transparent)
             {

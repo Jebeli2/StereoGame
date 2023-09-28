@@ -57,6 +57,7 @@
                 bounds.Offset(offsetX, offsetY);
                 bounds.Height = Padding.Top;
                 renderer.DrawText(Font, Title, bounds, TextColor);
+                renderer.DrawHorizontalLine(bounds.Left + Padding.Left, bounds.Right - Padding.Right, bounds.Top + Padding.Top, BorderColor);
             }
         }
     }
