@@ -60,6 +60,23 @@
             }
         }
 
+        public void DrawBorder(Rectangle rect, Color shine, Color shadow, float thickness = 1.0f, Rectangle? clippingRect = null)
+        {
+            GraphicsDevice? gd = game.GraphicsDevice;
+            if (gd != null)
+            {
+                gd.BlendMode = BlendMode.Blend;
+                gd.Color = shine;
+                gd.DrawLine(rect.Left, rect.Top + 1, rect.Left, rect.Bottom - 1);
+                gd.DrawLine(rect.Left, rect.Top, rect.Right - 1, rect.Top);
+                gd.Color = shadow;
+                gd.DrawLine(rect.Right - 1, rect.Top + 1, rect.Right - 1, rect.Bottom - 2);
+                gd.DrawLine(rect.Left, rect.Bottom - 1, rect.Right - 1, rect.Bottom - 1);
+
+            }
+        }
+
+
         public void DrawHorizontalLine(int x1, int x2, int y, Color color, float thickness = 1.0f, Rectangle? clippingRect = null)
         {
             GraphicsDevice? gd = game.GraphicsDevice;

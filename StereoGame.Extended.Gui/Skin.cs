@@ -93,10 +93,12 @@ namespace StereoGame.Extended.Gui
                 {
                     new ControlStyle(typeof(Control))
                     {
-                        BackgroundColor = Color.FromArgb(51,51,55),
-                        BorderColor = Color.FromArgb(67,67,70),
+                        BackgroundColor = Color.FromArgb(52,52,52),
+                        //BorderColor = Color.FromArgb(67,67,70),
+                        BorderColor = Color.FromArgb(128,200, 200, 200),
+                        BorderShadowColor = Color.FromArgb(128,10, 10, 10),
                         BorderThickness =1,
-                        TextColor = Color.FromArgb(241,241,241),
+                        TextColor = Color.FromArgb(240,240,240),
                         Padding = new Padding(5),
                         DisabledStyle = new ControlStyle
                         {
@@ -107,14 +109,16 @@ namespace StereoGame.Extended.Gui
                     {
                         BackgroundColor = Color.Transparent,
                         BorderColor = Color.Transparent,
+                        BorderShadowColor= Color.Transparent,
                         BorderThickness = 0,
                         Padding = new Padding(0),
                         Margin = new Padding(0)
                     },
                     new ControlStyle(typeof(Window))
                     {
-                        BackgroundColor = Color.FromArgb(128, Color.Black),
-                        BorderColor = Color.DarkGray,
+                        BackgroundColor = Color.FromArgb(128,100,100,100),
+                        BorderColor = Color.FromArgb(200,200, 200, 200),
+                        BorderShadowColor = Color.FromArgb(200,10, 10, 10),
                         BorderThickness = 1,
                         Padding = new Padding(8,30,8,8)
                     },
@@ -122,12 +126,17 @@ namespace StereoGame.Extended.Gui
                     {
                         HoverStyle = new ControlStyle
                         {
-                            BackgroundColor = Color.FromArgb(62,62,64),
-                            BorderColor = Color.WhiteSmoke
+                            BackgroundColor = Color.FromArgb(100,100,100),
+                            BorderColor = Color.FromArgb(128,200, 200, 200),
+                            BorderShadowColor = Color.FromArgb(128,10, 10, 10),
+                            BorderThickness =1,
                         },
                         PressedStyle = new ControlStyle
                         {
-                            BackgroundColor = Color.FromArgb(0,122,204)
+                            BackgroundColor = Color.FromArgb(80,80,80),
+                            BorderColor = Color.FromArgb(128,10, 10, 10),
+                            BorderShadowColor = Color.FromArgb(128,200, 200, 200),
+                            BorderThickness =1,
                         }
                     }
 

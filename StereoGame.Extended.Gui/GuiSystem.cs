@@ -110,6 +110,7 @@
                         }
                         control.PopBitmap(this);
                     }
+                    GraphicsDevice.BlendMode = Framework.Graphics.BlendMode.Blend;
                     GraphicsDevice.DrawTexture(control.Bitmap, 0, 0, bounds.Width, bounds.Height, bounds.X, bounds.Y);
                 }
                 else

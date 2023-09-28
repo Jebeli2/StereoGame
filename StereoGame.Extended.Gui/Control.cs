@@ -45,6 +45,7 @@
         private TextureRegion? backgroundRegion;
         private Color backgroundColor;
         private Color borderColor;
+        private Color borderShadowColor;
         private int borderThickness;
         private Color textColor;
 
@@ -424,6 +425,18 @@
                 }
             }
         }
+        public Color BorderShadowColor
+        {
+            get { return borderShadowColor; }
+            set
+            {
+                if (borderShadowColor != value)
+                {
+                    borderShadowColor = value;
+                    Invalidate();
+                }
+            }
+        }
 
         public int BorderThickness
         {
@@ -584,32 +597,8 @@
             }
             if (borderThickness != 0)
             {
-                renderer.DrawRectangle(rect, borderColor, borderThickness);
+                renderer.DrawBorder(rect, borderColor, borderShadowColor, borderThickness);
             }
-
-            //if (superBitmap)
-            //{
-            //    Rectangle dst = GetBounds();
-            //    if (!valid || bitmap == null)
-            //    {
-            //        CheckBitmap(gui);
-            //        gui.GraphicsDevice.PushTarget(bitmap);
-            //        gui.GraphicsDevice.Color = Color.FromArgb(0, 0, 0, 0);
-            //        DrawControl(gui, renderer, gameTime, -dst.Left, -dst.Top);
-            //        gui.GraphicsDevice.Clear();
-            //        gui.GraphicsDevice.PopTarget();
-            //        valid = true;
-
-            //    }
-            //    if (valid && bitmap != null)
-            //    {
-            //        gui.GraphicsDevice.DrawTexture(bitmap, 0, 0, dst.Width, dst.Height, dst.X, dst.Y);
-            //    }
-            //}
-            //else
-            //{
-            //    DrawControl(gui, renderer, gameTime, 0, 0);
-            //}
         }
 
         internal bool NeedsNewBitmap
@@ -647,6 +636,10 @@
         {
             bitmap?.Dispose();
             bitmap = gui.GraphicsDevice.CreateTexture(width, height);
+            if (bitmap != null)
+            {
+                bitmap.BlendMode = BlendMode.Blend;
+            }
         }
 
         public virtual bool OnPointerDown(PointerEventArgs args) { return true; }
