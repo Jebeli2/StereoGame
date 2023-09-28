@@ -83,6 +83,16 @@ namespace StereoGameTest.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Button {
+            get {
+                object obj = ResourceManager.GetObject("Button", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] fire_temple {
             get {
                 object obj = ResourceManager.GetObject("fire_temple", resourceCulture);
@@ -116,6 +126,16 @@ namespace StereoGameTest.Properties {
         internal static byte[] LiberationSans_Regular {
             get {
                 object obj = ResourceManager.GetObject("LiberationSans-Regular", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Roboto_Regular {
+            get {
+                object obj = ResourceManager.GetObject("Roboto-Regular", resourceCulture);
                 return ((byte[])(obj));
             }
         }

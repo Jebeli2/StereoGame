@@ -129,6 +129,7 @@
         public static void ClearHints() => SDL_ClearHints();
         public static string? GetHint(string name) => InteropHelpers.Utf8ToString(SDL_GetHint(name));
         public static bool SetHint(string name, string value) => SDL_SetHint(name, value);
+        public static bool SetHint(string name, int value) => SDL_SetHint(name, value.ToString());
         public static bool SetHintWithPriority(string name, string value, SDL_HintPriority priority) => SDL_SetHintWithPriority(name, value, priority);
         public static bool GetHintBoolean(string name, bool default_value) => SDL_GetHintBoolean(name, default_value);
         public static void ClearError() => SDL_ClearError();
@@ -653,6 +654,24 @@
             public const int SDL_TEXTUREACCESS_STREAMING = 1;
             public const int SDL_TEXTUREACCESS_TARGET = 2;
 
+            public enum SDL_ScaleMode
+            {
+                SDL_ScaleModeNearest,
+                SDL_ScaleModeLinear,
+                SDL_ScaleModeBest
+            }
+
+
+            [Flags]
+            public enum SDL_BlendMode
+            {
+                SDL_BLENDMODE_NONE = 0x00000000,
+                SDL_BLENDMODE_BLEND = 0x00000001,
+                SDL_BLENDMODE_ADD = 0x00000002,
+                SDL_BLENDMODE_MOD = 0x00000004,
+                SDL_BLENDMODE_MUL = 0x00000008, /* >= 2.0.11 */
+                SDL_BLENDMODE_INVALID = 0x7FFFFFFF
+            }
             public enum SDL_PixelType
             {
                 SDL_PIXELTYPE_UNKNOWN,
@@ -980,6 +999,8 @@
             [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
             private static extern int SDL_SetTextureAlphaMod(IntPtr texture, byte alpha);
             [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_GetTextureAlphaMod(IntPtr texture, out byte alpha);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
             private static extern int SDL_SetRenderDrawBlendMode(IntPtr renderer, int blendMode);
 
             [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
@@ -1011,8 +1032,19 @@
             private static extern IntPtr SDL_GetRenderTarget(IntPtr renderer);
             [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
             private static extern int SDL_SetRenderTarget(IntPtr renderer, IntPtr texture);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_GetTextureScaleMode(IntPtr texture, out SDL_ScaleMode scaleMode);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_SetTextureScaleMode(IntPtr texture, SDL_ScaleMode scaleMode);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_GetTextureColorMod(IntPtr texture, out byte r, out byte g, out byte b);
 
-
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_SetTextureColorMod(IntPtr texture, byte r, byte g, byte b);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_GetTextureBlendMode(IntPtr texture, out SDL_BlendMode blendMode);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_SetTextureBlendMode(IntPtr texture, SDL_BlendMode blendMode);
 
             public static IntPtr CreateRenderer(IntPtr window, int index, SDL_RendererFlags flags) => SDL_CreateRenderer(window, index, flags);
             public static void DestroyRenderer(IntPtr renderer) => SDL_DestroyRenderer(renderer);
@@ -1023,8 +1055,20 @@
             public static void DestroyTexture(IntPtr texture) => SDL_DestroyTexture(texture);
             public static int QueryTexture(IntPtr texture, out uint format, out int access, out int w, out int h) => SDL_QueryTexture(texture, out format, out access, out w, out h);
             public static int SetTextureAlphaMod(IntPtr texture, byte alpha) => SDL_SetTextureAlphaMod(texture, alpha);
+            public static int GetTextureAlphaMod(IntPtr texture, out byte alpha) => SDL_GetTextureAlphaMod(texture, out alpha);
             public static int SetRenderDrawBlendMode(IntPtr renderer, int blendMode) => SDL_SetRenderDrawBlendMode(renderer, blendMode);
             public static int SetRenderDrawColor(IntPtr renderer, byte r, byte g, byte b, byte a) => SDL_SetRenderDrawColor(renderer, r, g, b, a);
+
+            public static int RenderCopy(IntPtr renderer, IntPtr texture)
+            {
+                return SDL_RenderCopy(renderer, texture, IntPtr.Zero, IntPtr.Zero);
+            }
+
+            public static int RenderCopy(IntPtr renderer, IntPtr texture, Rectangle src, int x, int y)
+            {
+                Rectangle dst = new Rectangle(x, y, src.Width, src.Height);
+                return SDL_RenderCopy(renderer, texture, ref src, ref dst);
+            }
 
             public static int RenderCopy(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref Rectangle dstrect)
             {
@@ -1044,6 +1088,21 @@
                 {
                     return SDL_RenderCopy(renderer, texture, ref srcrect, ref dstrect);
                 }
+            }
+
+            public static int RenderCopyF(IntPtr renderer, IntPtr texture)
+            {
+                return SDL_RenderCopyF(renderer, texture, IntPtr.Zero, IntPtr.Zero);
+            }
+            public static int RenderCopyF(IntPtr renderer, IntPtr texture, Rectangle src, float x, float y)
+            {
+                RectangleF dst = new RectangleF(x, y, src.Width, src.Height);
+                return SDL_RenderCopyF(renderer, texture, ref src, ref dst);
+            }
+            public static int RenderCopyF(IntPtr renderer, IntPtr texture, float x, float y, float w, float h)
+            {
+                RectangleF dst = new RectangleF(x, y, w, h);
+                return SDL_RenderCopyF(renderer, texture, IntPtr.Zero, ref dst);
             }
 
             public static int RenderCopyF(IntPtr renderer, IntPtr texture, ref Rectangle srcrect, ref RectangleF dstrect)
@@ -1070,6 +1129,16 @@
             public static int RenderDrawLine(IntPtr renderer, int x1, int y1, int x2, int y2) => SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
             public static IntPtr GetRenderTarget(IntPtr renderer) => SDL_GetRenderTarget(renderer);
             public static int SetRenderTarget(IntPtr renderer, IntPtr texture) => SDL_SetRenderTarget(renderer, texture);
+
+            public static int GetTextureScaleMode(IntPtr texture, out SDL_ScaleMode scaleMode) => SDL_GetTextureScaleMode(texture, out scaleMode);
+            public static int SetTextureScaleMode(IntPtr texture, SDL_ScaleMode scaleMode) => SDL_SetTextureScaleMode(texture, scaleMode);
+            public static int GetTextureColorMod(IntPtr texture, out byte r, out byte g, out byte b) => SDL_GetTextureColorMod(texture, out r, out g, out b);
+            public static int SetTextureColorMod(IntPtr texture, byte r, byte g, byte b) => SDL_SetTextureColorMod(texture, r, g, b);
+            public static int GetTextureBlendMode(IntPtr texture, out SDL_BlendMode blendMode) => SDL_GetTextureBlendMode(texture, out blendMode);
+            public static int SetTextureBlendMode(IntPtr texture, SDL_BlendMode blendMode) => SDL_SetTextureBlendMode(texture, blendMode);
+
+
+
 
             //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             //private delegate IntPtr d_sdl_createrenderer(IntPtr window, int index, SDL_RendererFlags flags);

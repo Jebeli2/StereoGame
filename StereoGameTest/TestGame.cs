@@ -7,6 +7,7 @@
     using StereoGame.Framework.Graphics;
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Drawing;
     using System.Linq;
     using System.Text;
@@ -15,7 +16,9 @@
     internal class TestGame : Game
     {
         private Texture? bg;
+        private Texture? button;
         private TextFont? font;
+        private TextFont? guiFont;
         private Music? music;
         private readonly FramesPerSecondCounterComponent fps;
 
@@ -41,16 +44,18 @@
         protected override void Initialize()
         {
             base.Initialize();
-            InitGui(font);
+            InitGui(guiFont);
         }
 
         protected override void LoadContent()
         {
             //bg = Content.Load<Texture>(@"c:\Local\mods\fantasycore\images\menus\backgrounds\badlands.png");
-            bg = Content.Load<Texture>(@"badlands");
+            bg = Content.Load<Texture>(nameof(Properties.Resources.badlands));
+            button = Content.Load<Texture>(nameof(Properties.Resources.Button));
             //font = Content.Load<TextFont>(@"c:\Local\mods\fantasycore\fonts\LiberationSans-Regular.ttf", 16);
-            font = Content.Load<TextFont>(@"LiberationSans-Regular", 16);
-            music = Content.Load<Music>(@"JesuJoy");
+            font = Content.Load<TextFont>(nameof(Properties.Resources.LiberationSans_Regular), 16);
+            guiFont = Content.Load<TextFont>(nameof(Properties.Resources.Roboto_Regular), 16);
+            music = Content.Load<Music>(nameof(Properties.Resources.box));
 
             AudioDevice.PlayMusic(music);
 
@@ -64,10 +69,6 @@
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.DrawTexture(bg);
-            //GraphicsDevice.Color = Color.BlanchedAlmond;
-            //GraphicsDevice.BlendMode = BlendMode.Blend;
-            //GraphicsDevice.DrawRect(10, 10, 100, 100);
-            //GraphicsDevice.DrawLine(10, 109, 109, 10);
             base.Draw(gameTime);
             GraphicsDevice.DrawText(font, fps.FramesPerSecondText, 10, 10);
         }
@@ -75,6 +76,13 @@
         private void InitGui(TextFont? font)
         {
             Skin.DefaultSkin.DefaultFont = font;
+            var buttonStyle = Skin.DefaultSkin.GetStyle(typeof(Button));
+            if (button != null && buttonStyle != null)
+            {
+                NinePatchRegion npr = new NinePatchRegion(button, new Padding(2));
+                buttonStyle.BackgroundRegion = npr;
+                buttonStyle.BorderThickness = 0;
+            }
             mainScreen = new Screen();
             titleWindow = new Window(mainScreen);
             titleWindow.X = 20;

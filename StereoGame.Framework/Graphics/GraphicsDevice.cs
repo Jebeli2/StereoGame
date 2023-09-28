@@ -19,9 +19,11 @@ namespace StereoGame.Framework.Graphics
         protected byte colorG;
         protected byte colorB;
         protected byte colorA;
+        protected TextureFilter textureFilter;
         internal GraphicsDevice()
         {
             color = Color.Empty;
+            textureFilter = TextureFilter.Nearest;
         }
         ~GraphicsDevice()
         {
@@ -131,6 +133,15 @@ namespace StereoGame.Framework.Graphics
                 DrawTexture(texture, ref src, ref dst);
             }
         }
+
+        public void DrawTexture(Texture? texture, Rectangle src, Rectangle dst)
+        {
+            if (texture != null)
+            {
+                DrawTexture(texture, ref src, ref dst);
+            }
+        }
+
         public void DrawTexture(Texture? texture, int srcX, int srcY, int srcW, int srcH, int dstX, int dstY)
         {
             if (texture != null)

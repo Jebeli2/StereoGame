@@ -254,4 +254,11 @@ namespace StereoGame.Framework.Graphics
         Center,
         Stretch
     }
+
+    public enum TextureFilter
+    {
+        Linear,
+        Nearest,
+        Best
+    }
 }

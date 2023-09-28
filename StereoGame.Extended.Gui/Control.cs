@@ -42,6 +42,7 @@
 
         protected ILayout? layout;
         private TextFont? font;
+        private TextureRegion? backgroundRegion;
         private Color backgroundColor;
         private Color borderColor;
         private int borderThickness;
@@ -385,6 +386,19 @@
         //    get { return !hovered && !pressed && enabled; }
         //}
 
+        public TextureRegion? BackgroundRegion
+        {
+            get { return backgroundRegion; }
+            set
+            {
+                if (backgroundRegion != value)
+                {
+                    backgroundRegion = value;
+                    Invalidate();
+                }
+            }
+        }
+
         public Color BackgroundColor
         {
             get { return backgroundColor; }
@@ -538,7 +552,11 @@
         {
             Rectangle rect = GetBounds();
             rect.Offset(offsetX, offsetY);
-            if (!backgroundColor.IsEmpty && backgroundColor != Color.Transparent)
+            if (backgroundRegion != null)
+            {
+                renderer.DrawRegion(backgroundRegion,rect);
+            }
+            else if (!backgroundColor.IsEmpty && backgroundColor != Color.Transparent)
             {
                 renderer.FillRectangle(rect, backgroundColor);
             }

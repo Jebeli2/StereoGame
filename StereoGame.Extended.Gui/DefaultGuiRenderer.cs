@@ -38,6 +38,16 @@
             //}
         }
 
+        public void DrawRegion(TextureRegion? region, Rectangle dest)
+        {
+            GraphicsDevice? gd = game.GraphicsDevice;
+            if (gd != null && region != null)
+            {
+                gd.BlendMode = BlendMode.Blend;
+                gd.DrawTextureRegion(region, dest);
+            }
+        }
+
         public void DrawText(TextFont? font, string? text, Rectangle rect, Color color, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, VerticalAlignment verticalAlignment = VerticalAlignment.Center, Rectangle? clippingRect = null)
         {
             GraphicsDevice? gd = game.GraphicsDevice;

@@ -59,6 +59,7 @@
         }
         public override Texture? CreateTexture(int width, int height)
         {
+            Sdl.SetHint("SDL_RENDER_SCALE_QUALITY", (int)textureFilter);
             IntPtr tex = Sdl.Renderer.CreateTexture(handle, Sdl.Renderer.SDL_PIXELFORMAT_ARGB8888, Sdl.Renderer.SDL_TEXTUREACCESS_TARGET, width, height);
             if (tex != IntPtr.Zero)
             {
@@ -70,6 +71,7 @@
         }
         public override Texture? LoadTexture(string path)
         {
+            Sdl.SetHint("SDL_RENDER_SCALE_QUALITY", (int)textureFilter);
             IntPtr tex = SDL2Image.LoadTexture(handle, path);
             if (tex != IntPtr.Zero)
             {
@@ -86,6 +88,7 @@
             IntPtr rw = Sdl.RWFromMem(data, data.Length);
             if (rw != IntPtr.Zero)
             {
+                Sdl.SetHint("SDL_RENDER_SCALE_QUALITY", (int)textureFilter);
                 IntPtr tex = SDL2Image.LoadTexture_RW(handle, rw, 1);
                 if (tex != IntPtr.Zero)
                 {
@@ -247,10 +250,8 @@
                     y = y + height / 2 - h / 2;
                     break;
             }
-            Rectangle srcRect = new Rectangle(0, 0, w, h);
-            RectangleF dstRect = new RectangleF(x + offsetX, y + offsetY, w, h);
             SetBlendMode(BlendMode.Blend);
-            Sdl.Renderer.RenderCopyF(handle, textCache.Texture, ref srcRect, ref dstRect);
+            Sdl.Renderer.RenderCopyF(handle, textCache.Texture, x + offsetX, y + offsetY, w, h);
         }
 
         private TextCache? GetTextCache(IntPtr font, ReadOnlySpan<char> text, Color color)
@@ -288,7 +289,9 @@
                     if (texHandle != IntPtr.Zero)
                     {
                         _ = Sdl.Renderer.QueryTexture(texHandle, out _, out _, out int w, out int h);
+                        _ = Sdl.Renderer.SetTextureBlendMode(texHandle, Sdl.Renderer.SDL_BlendMode.SDL_BLENDMODE_BLEND);
                         _ = Sdl.Renderer.SetTextureAlphaMod(texHandle, color.A);
+                        _ = Sdl.Renderer.SetTextureScaleMode(texHandle, Sdl.Renderer.SDL_ScaleMode.SDL_ScaleModeBest);
                         textCache = new TextCache(font, hash, color, w, h, texHandle);
                     }
                     Sdl.FreeSurface(surface);

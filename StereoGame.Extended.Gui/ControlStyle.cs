@@ -35,6 +35,7 @@ namespace StereoGame.Extended.Gui
         {
             name = other.name;
             targetType = other.targetType;
+            BackgroundRegion = other.BackgroundRegion;
             BackgroundColor = other.BackgroundColor;
             BorderColor = other.BorderColor;
             BorderThickness = other.BorderThickness;
@@ -44,6 +45,7 @@ namespace StereoGame.Extended.Gui
 
         public string Name => name;
         public Type TargetType => targetType;
+        public TextureRegion? BackgroundRegion { get; set; }
         public Color? BackgroundColor { get; set; }
         public Color? BorderColor { get; set; }
         public int? BorderThickness { get; set; }
@@ -55,6 +57,7 @@ namespace StereoGame.Extended.Gui
         {
             if (other != null)
             {
+                if (other.BackgroundRegion != null) { BackgroundRegion = other.BackgroundRegion; }
                 if (other.BackgroundColor != null) { BackgroundColor = other.BackgroundColor; }
                 if (other.BorderColor != null) { BorderColor = other.BorderColor; }
                 if (other.BorderThickness != null) { BorderThickness = other.BorderThickness; }
@@ -95,6 +98,7 @@ namespace StereoGame.Extended.Gui
         private static void ApplyStyle(Control control, ControlStyle? style)
         {
             if (style == null) return;
+            if (style.BackgroundRegion != null) { control.BackgroundRegion = style.BackgroundRegion; }  
             if (style.BackgroundColor != null) { control.BackgroundColor = style.BackgroundColor.Value; }
             if (style.BorderColor != null) { control.BorderColor = style.BorderColor.Value; }
             if (style.BorderThickness != null) { control.BorderThickness = style.BorderThickness.Value; }
