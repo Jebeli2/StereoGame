@@ -13,12 +13,15 @@
         private int screenWidth;
         private int screenHeight;
         private readonly MouseListener mouseListener;
+        private Window? activeWindow;
         private Control? preFocusedControl;
         private Control? focusedControl;
         private Control? hoveredControl;
         private Control? preDragControl;
         private int dragStartX;
         private int dragStartY;
+        private bool moveWindowToFrontOnActivate = true;
+        private readonly Queue<Window> activationWindows = new();
         public GuiSystem(Game game) : base(game)
         {
             DrawOrder = 1000;
@@ -39,6 +42,8 @@
             {
                 if (activeScreen != value)
                 {
+                    activationWindows.Clear();
+                    activeWindow = null;
                     activeScreen = value;
                     if (activeScreen != null) { InitScreen(activeScreen); }
                 }
@@ -51,6 +56,7 @@
             {
                 CheckScreenSize();
                 mouseListener.Update(gameTime);
+                CheckWindowActivationQueue();
                 UpdateControl(activeScreen, gameTime);
             }
         }
@@ -61,6 +67,11 @@
             {
                 DrawControl(activeScreen, gameTime);
             }
+        }
+
+        public void ActivateWindow(Window? window)
+        {
+            if (window != null) { activationWindows.Enqueue(window); }
         }
 
         public void SetFocus(Control? control)
@@ -166,9 +177,11 @@
 
         private bool CheckWindowFocus(PointerEventArgs pea)
         {
-            if (preFocusedControl is Window window)
+            Window? window = preFocusedControl?.Window;
+            if (window != null)
             {
-                activeScreen?.WindowToFront(window);
+                SetActiveWindow(window);
+                //activeScreen?.WindowToFront(window);
             }
             return false;
         }
@@ -262,6 +275,27 @@
             }
         }
 
-
+        private void CheckWindowActivationQueue()
+        {
+            if (activationWindows.Count > 0)
+            {
+                Window win = activationWindows.Dequeue();
+                SetActiveWindow(win);
+            }
+        }
+        private void SetActiveWindow(Window? window)
+        {
+            if (activeWindow != window)
+            {
+                if (activeWindow != null) activeWindow.Active = false;
+                activeWindow = window;
+                if (activeWindow != null)
+                {
+                    activeWindow.Active = true;
+                    if (moveWindowToFrontOnActivate) { activeScreen?.WindowToFront(activeWindow); }
+                }
+                //if (moveWindowToFrontOnActivate && activeWindow != null) { activeWindow.ToFront(); }
+            }
+        }
     }
 }

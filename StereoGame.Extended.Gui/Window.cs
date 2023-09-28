@@ -29,6 +29,8 @@
             set => Text = value;
         }
 
+    
+
         public override Size GetContentSize(IGuiSystem context)
         {
             return new Size(Width, Height);
@@ -60,7 +62,7 @@
                 Rectangle textRect = bounds;
                 textRect.X += 20;
                 textRect.Width -= 20;
-                renderer.FillRectangle(bounds, BackgroundColor);
+                renderer.FillRectangle(bounds, BorderColor);
                 renderer.DrawText(Font, Title, textRect, TextColor, Framework.Graphics.HorizontalAlignment.Left);
                 renderer.DrawHorizontalLine(bounds.Left, bounds.Right - 1, bounds.Bottom, BorderShadowColor);
             }

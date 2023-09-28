@@ -49,6 +49,7 @@ namespace StereoGame.Extended.Gui
         public TextureRegion? BackgroundRegion { get; set; }
         public Color? BackgroundColor { get; set; }
         public Color? BorderColor { get; set; }
+        public Color? BorderShineColor { get; set; }
         public Color? BorderShadowColor { get; set; }
         public int? BorderThickness { get; set; }
         public Color? TextColor { get; set; }
@@ -62,6 +63,7 @@ namespace StereoGame.Extended.Gui
                 if (other.BackgroundRegion != null) { BackgroundRegion = other.BackgroundRegion; }
                 if (other.BackgroundColor != null) { BackgroundColor = other.BackgroundColor; }
                 if (other.BorderColor != null) { BorderColor = other.BorderColor; }
+                if (other.BorderShineColor != null) { BorderShineColor = other.BorderShineColor; }
                 if (other.BorderShadowColor != null) { BorderShadowColor = other.BorderShadowColor; }
                 if (other.BorderThickness != null) { BorderThickness = other.BorderThickness; }
                 if (other.TextColor != null) { TextColor = other.TextColor; }
@@ -80,9 +82,11 @@ namespace StereoGame.Extended.Gui
             else if (control.Hovered) { combi.Combine(other.HoverStyle); }
             else if (control.Checked) { combi.Combine(other.CheckedStyle); }
             if (control.Pressed) { combi.Combine(other.PressedStyle); }
+            if (control.Active) { combi.Combine(other.ActiveStyle); }
             return combi;
         }
 
+        public ControlStyle? ActiveStyle { get; set; }
         public ControlStyle? HoverStyle { get; set; }
         public ControlStyle? DisabledStyle { get; set; }
         public ControlStyle? PressedStyle { get; set; }
@@ -108,6 +112,7 @@ namespace StereoGame.Extended.Gui
             if (style.BackgroundRegion != null) { control.BackgroundRegion = style.BackgroundRegion; }
             if (style.BackgroundColor != null) { control.BackgroundColor = style.BackgroundColor.Value; }
             if (style.BorderColor != null) { control.BorderColor = style.BorderColor.Value; }
+            if (style.BorderShineColor != null) { control.BorderShineColor = style.BorderShineColor.Value; }
             if (style.BorderShadowColor != null) { control.BorderShadowColor = style.BorderShadowColor.Value; }
             if (style.BorderThickness != null) { control.BorderThickness = style.BorderThickness.Value; }
             if (style.TextColor != null) { control.TextColor = style.TextColor.Value; }

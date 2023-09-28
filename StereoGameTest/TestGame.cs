@@ -65,7 +65,7 @@
             //font = Content.Load<TextFont>(@"c:\Local\mods\fantasycore\fonts\LiberationSans-Regular.ttf", 16);
             font = Content.Load<TextFont>(nameof(Properties.Resources.LiberationSans_Regular), 16);
             guiFont = Content.Load<TextFont>(nameof(Properties.Resources.Roboto_Regular), 16);
-            music = Content.Load<Music>(nameof(Properties.Resources.box));
+            music = Content.Load<Music>(nameof(Properties.Resources.JesuJoy));
 
             AudioDevice.PlayMusic(music);
 
@@ -128,12 +128,13 @@
 
             var button1 = new Button(titleWindow, "Test GUI") { X = 10, Y = 10, Width = 180, Height = 30 };
 
-            button1.Clicked += (s, e) => { gui.ActiveScreen = guiTestScreen; };
+            button1.Clicked += (s, e) => { gui.ActiveScreen = guiTestScreen; gui.ActivateWindow(guiTestWindow); };
 
             var button2 = new Button(titleWindow, "Test MAP") { X = 10, Y = 50, Width = 180, Height = 30 };
             var button3 = new Button(titleWindow, "Test SOM") { X = 10, Y = 90, Width = 180, Height = 30 };
 
             gui.ActiveScreen = mainScreen;
+            gui.ActivateWindow(titleWindow);
 
 
             guiTestScreen = new Screen();
@@ -148,7 +149,7 @@
             var b3 = new Button(guiTestWindow, "Back");
 
             b1.Clicked += (s, e) => { if (buttonDemo != null) { buttonDemo.Visible ^= true; } };
-            b3.Clicked += (s, e) => { gui.ActiveScreen = mainScreen; };
+            b3.Clicked += (s, e) => { gui.ActiveScreen = mainScreen; gui.ActivateWindow(titleWindow); };
 
 
             buttonDemo = new Window(guiTestScreen);
@@ -175,6 +176,8 @@
             t2.CheckedStateChanged += (s, e) => { ToggleBoxes(); };
             _ = new ToggleButton(p1) { Icon = Icons.CIRCLE_WITH_PLUS };
             _ = new ToggleButton(p1) { Icon = Icons.DRIVE };
+
+
         }
 
     }

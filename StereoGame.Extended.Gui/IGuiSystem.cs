@@ -11,7 +11,7 @@
     {
         int ScreenWidth { get; }
         int ScreenHeight { get; }
-
         GraphicsDevice GraphicsDevice { get; }
+
     }
 }

@@ -38,6 +38,7 @@
         private bool hovered;
         private bool pressed;
         private bool _checked;
+        private bool active;
 
         protected bool valid;
         protected bool superBitmap;
@@ -48,6 +49,7 @@
         private TextureRegion? backgroundRegion;
         private Color backgroundColor;
         private Color borderColor;
+        private Color borderShineColor;
         private Color borderShadowColor;
         private int borderThickness;
         private Color textColor;
@@ -94,6 +96,33 @@
         public Control? Parent
         {
             get { return parent; }
+        }
+
+        public Window? Window
+        {
+            get
+            {
+                Control? c = this;
+                while (c != null)
+                {
+                    if (c is Window window) return window;
+                    c = c.Parent;
+                }
+                return null;
+            }
+        }
+        public Screen? Screen
+        {
+            get
+            {
+                Control? c = this;
+                while (c != null)
+                {
+                    if (c is Screen screen) return screen;
+                    c = c.Parent;
+                }
+                return null;
+            }
         }
 
         public IEnumerable<Control> Children
@@ -400,6 +429,18 @@
             }
         }
 
+        public bool Active
+        {
+            get { return active; }
+            set
+            {
+                if (active != value)
+                {
+                    active = value;
+                    skin.Apply(this);
+                }
+            }
+        }
         public bool Hovered
         {
             get { return hovered; }
@@ -478,6 +519,21 @@
                 }
             }
         }
+
+        public Color BorderShineColor
+        {
+            get { return borderShineColor; }
+            set
+            {
+                if (borderShineColor != value)
+                {
+                    borderShineColor = value;
+                    Invalidate();
+                }
+            }
+        }
+
+
         public Color BorderShadowColor
         {
             get { return borderShadowColor; }
@@ -663,7 +719,7 @@
             }
             if (borderThickness != 0)
             {
-                renderer.DrawBorder(rect, borderColor, borderShadowColor, borderThickness);
+                renderer.DrawBorder(rect, borderShineColor, borderShadowColor, borderThickness);
             }
         }
 
