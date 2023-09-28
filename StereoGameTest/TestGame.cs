@@ -28,6 +28,7 @@
 
         private Screen? guiTestScreen;
         private Window? guiTestWindow;
+        private Window? buttonDemo;
 
         public TestGame()
         {
@@ -112,7 +113,23 @@
             var b2 = new Button(guiTestWindow, "Whatever");
             var b3 = new Button(guiTestWindow, "Back");
 
+            b1.Clicked += (s, e) => { if (buttonDemo != null) { buttonDemo.Visible ^= true; } };
             b3.Clicked += (s, e) => { gui.ActiveScreen = mainScreen; };
+
+
+            buttonDemo = new Window(guiTestScreen);
+            buttonDemo.X = 200;
+            buttonDemo.Y = 100;
+            buttonDemo.Width = 200;
+            buttonDemo.Height = 200;
+            buttonDemo.Title = "Button Demo";
+            buttonDemo.Visible = false;
+            _ = new Label(buttonDemo, "Push buttons");
+            _ = new Button(buttonDemo, "Plain button");
+            _ = new Button(buttonDemo, "Styled");
+            _ = new Label(buttonDemo, "Toggle buttons");
+            _ = new ToggleButton(buttonDemo, "Toggle me");
+            _ = new Label(buttonDemo, "Radio buttons");
 
         }
 

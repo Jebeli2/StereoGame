@@ -56,8 +56,9 @@
                 Rectangle bounds = GetBounds();
                 bounds.Offset(offsetX, offsetY);
                 bounds.Height = Padding.Top;
+                renderer.FillRectangle(bounds, BackgroundColor);
                 renderer.DrawText(Font, Title, bounds, TextColor);
-                renderer.DrawHorizontalLine(bounds.Left + Padding.Left, bounds.Right - Padding.Right, bounds.Top + Padding.Top, BorderColor);
+                renderer.DrawHorizontalLine(bounds.Left + 1, bounds.Right - 1, bounds.Bottom, BorderColor);
             }
         }
     }

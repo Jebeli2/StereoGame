@@ -30,11 +30,14 @@
         private Padding margin;
         private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Stretch;
         private VerticalAlignment verticalAlignment = VerticalAlignment.Stretch;
+        private HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.Center;
+        private VerticalAlignment verticalTextAlignment = VerticalAlignment.Center;
         private bool enabled;
         private bool visible;
         private bool focused;
         private bool hovered;
         private bool pressed;
+        private bool _checked;
 
         protected bool valid;
         protected bool superBitmap;
@@ -331,6 +334,32 @@
             }
         }
 
+        public HorizontalAlignment HorizontalTextAlignment
+        {
+            get { return horizontalTextAlignment; }
+            set
+            {
+                if (horizontalTextAlignment != value)
+                {
+                    horizontalTextAlignment = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        public VerticalAlignment VerticalTextAlignment
+        {
+            get { return verticalTextAlignment; }
+            set
+            {
+                if (verticalTextAlignment != value)
+                {
+                    verticalTextAlignment = value;
+                    Invalidate();
+                }
+            }
+        }
+
         public bool Enabled
         {
             get { return enabled; }
@@ -396,10 +425,19 @@
             }
         }
 
-        //public bool IsNormal
-        //{
-        //    get { return !hovered && !pressed && enabled; }
-        //}
+        public bool Checked
+        {
+            get { return _checked; }
+            set
+            {
+                if (_checked != value)
+                {
+                    _checked = value;
+                    skin.Apply(this);
+                }
+
+            }
+        }
 
         public TextureRegion? BackgroundRegion
         {
@@ -674,6 +712,34 @@
                 Hovered = false;
             }
             return true;
+        }
+
+        protected void ToBack(Control control)
+        {
+            if (children.Count > 1)
+            {
+                int index = children.IndexOf(control);
+                if (index >= 0)
+                {
+                    children.RemoveAt(index);
+                    children.Insert(0, control);
+                    Invalidate();
+                }
+            }
+        }
+
+        protected void ToFront(Control control)
+        {
+            if (children.Count > 1)
+            {
+                int index = children.IndexOf(control);
+                if (index >= 0)
+                {
+                    children.RemoveAt(index);
+                    children.Add(control);
+                    Invalidate();
+                }
+            }
         }
 
         public override string ToString()

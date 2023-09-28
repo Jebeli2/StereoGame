@@ -41,7 +41,7 @@
             if (Pressed)
             {
                 Pressed = false;
-                if (BoundingRectangle.Contains(args.X,args.Y) && Enabled)
+                if (BoundingRectangle.Contains(args.X, args.Y) && Enabled)
                 {
                     Click();
                 }
@@ -74,7 +74,7 @@
             {
                 Rectangle bounds = GetBounds();
                 bounds.Offset(offsetX, offsetY);
-                renderer.DrawText(Font, Text, bounds, TextColor, HorizontalAlignment.Center, VerticalAlignment.Center);
+                renderer.DrawText(Font, Text, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
             }
         }
 

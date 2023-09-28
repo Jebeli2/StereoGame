@@ -38,6 +38,7 @@ namespace StereoGame.Extended.Gui
             BackgroundRegion = other.BackgroundRegion;
             BackgroundColor = other.BackgroundColor;
             BorderColor = other.BorderColor;
+            BorderShadowColor = other.BorderShadowColor;
             BorderThickness = other.BorderThickness;
             TextColor = other.TextColor;
             Padding = other.Padding;
@@ -61,7 +62,7 @@ namespace StereoGame.Extended.Gui
                 if (other.BackgroundRegion != null) { BackgroundRegion = other.BackgroundRegion; }
                 if (other.BackgroundColor != null) { BackgroundColor = other.BackgroundColor; }
                 if (other.BorderColor != null) { BorderColor = other.BorderColor; }
-                if (other.BorderShadowColor != null) { BorderShadowColor = other.BorderShadowColor; }   
+                if (other.BorderShadowColor != null) { BorderShadowColor = other.BorderShadowColor; }
                 if (other.BorderThickness != null) { BorderThickness = other.BorderThickness; }
                 if (other.TextColor != null) { TextColor = other.TextColor; }
                 if (other.Padding != null) { Padding = other.Padding; }
@@ -75,7 +76,9 @@ namespace StereoGame.Extended.Gui
             ControlStyle combi = new ControlStyle(this);
             combi.Combine(other);
             if (!control.Enabled) { combi.Combine(other.DisabledStyle); }
-            if (control.Hovered) { combi.Combine(other.HoverStyle); }
+            if (control.Hovered && control.Checked) { combi.Combine(other.CheckedHoverStyle); }
+            else if (control.Hovered) { combi.Combine(other.HoverStyle); }
+            else if (control.Checked) { combi.Combine(other.CheckedStyle); }
             if (control.Pressed) { combi.Combine(other.PressedStyle); }
             return combi;
         }
@@ -83,6 +86,8 @@ namespace StereoGame.Extended.Gui
         public ControlStyle? HoverStyle { get; set; }
         public ControlStyle? DisabledStyle { get; set; }
         public ControlStyle? PressedStyle { get; set; }
+        public ControlStyle? CheckedStyle { get; set; }
+        public ControlStyle? CheckedHoverStyle { get; set; }
 
         public void ApplyIf(Control control, bool prediacte)
         {
@@ -100,7 +105,7 @@ namespace StereoGame.Extended.Gui
         private static void ApplyStyle(Control control, ControlStyle? style)
         {
             if (style == null) return;
-            if (style.BackgroundRegion != null) { control.BackgroundRegion = style.BackgroundRegion; }  
+            if (style.BackgroundRegion != null) { control.BackgroundRegion = style.BackgroundRegion; }
             if (style.BackgroundColor != null) { control.BackgroundColor = style.BackgroundColor.Value; }
             if (style.BorderColor != null) { control.BorderColor = style.BorderColor.Value; }
             if (style.BorderShadowColor != null) { control.BorderShadowColor = style.BorderShadowColor.Value; }

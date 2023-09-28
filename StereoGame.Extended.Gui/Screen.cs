@@ -20,5 +20,15 @@
         {
             return new Size(context.ScreenWidth, context.ScreenHeight);
         }
+
+        public void WindowToFront(Window window)
+        {
+            ToFront(window);
+        }
+
+        public void WindowToBack(Window window)
+        {
+            ToBack(window);
+        }
     }
 }

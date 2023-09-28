@@ -164,6 +164,15 @@
             return null;
         }
 
+        private bool CheckWindowFocus(PointerEventArgs pea)
+        {
+            if (preFocusedControl is Window window)
+            {
+                activeScreen?.WindowToFront(window);
+            }
+            return false;
+        }
+
         private bool CheckDragStart(PointerEventArgs pea)
         {
             if (preFocusedControl != null && pea.Button == MouseButton.Left)
@@ -201,6 +210,7 @@
             if (activeScreen == null || !activeScreen.Visible) return;
             preFocusedControl = FindControlAt(e.X, e.Y);
             var pea = PointerEventArgs.FromMouseEventArgs(e);
+            CheckWindowFocus(pea);
             if (!CheckDragStart(pea))
             {
                 PropagateDown(hoveredControl, x => x.OnPointerDown(pea));
