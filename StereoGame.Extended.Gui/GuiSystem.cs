@@ -84,10 +84,11 @@
             if (control.Visible)
             {
                 control.Update(this, gameTime);
-                foreach (Control child in control.Children)
-                {
-                    UpdateControl(child, gameTime);
-                }
+                control.ForEachChild(UpdateControl, gameTime);
+                //foreach (Control child in control.Children)
+                //{
+                //    UpdateControl(child, gameTime);
+                //}
             }
         }
 
@@ -104,10 +105,11 @@
                         offsetX -= bounds.Left;
                         offsetY -= bounds.Top;
                         control.Draw(this, renderer, gameTime, offsetX, offsetY);
-                        foreach (Control child in control.Children)
-                        {
-                            DrawControl(child, gameTime, offsetX, offsetY);
-                        }
+                        control.ForEachChild(DrawControl, gameTime, offsetX, offsetY);
+                        //foreach (Control child in control.Children)
+                        //{
+                        //    DrawControl(child, gameTime, offsetX, offsetY);
+                        //}
                         control.PopBitmap(this);
                     }
                     GraphicsDevice.BlendMode = Framework.Graphics.BlendMode.Blend;
@@ -116,10 +118,11 @@
                 else
                 {
                     control.Draw(this, renderer, gameTime, offsetX, offsetY);
-                    foreach (Control child in control.Children)
-                    {
-                        DrawControl(child, gameTime, offsetX, offsetY);
-                    }
+                    control.ForEachChild(DrawControl, gameTime, offsetX, offsetY);
+                    //foreach (Control child in control.Children)
+                    //{
+                    //    DrawControl(child, gameTime, offsetX, offsetY);
+                    //}
                 }
             }
         }

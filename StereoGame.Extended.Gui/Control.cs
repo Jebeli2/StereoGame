@@ -118,6 +118,20 @@
             return false;
         }
 
+        public void ForEachChild(Action<Control, GameTime> action, GameTime gameTime)
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+                action(children[i], gameTime);
+            }
+        }
+        public void ForEachChild(Action<Control, GameTime, int, int> action, GameTime gameTime, int x, int y)
+        {
+            for (int i = 0; i < children.Count; i++)
+            {
+                action(children[i], gameTime, x, y);
+            }
+        }
         public Size GetFixedSize()
         {
             return new Size(fixedWidth, fixedHeight);
