@@ -8,6 +8,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using static System.Net.Mime.MediaTypeNames;
 
     internal class DefaultGuiRenderer : IGuiRenderer
     {
@@ -35,6 +36,15 @@
             {
                 gd.BlendMode = BlendMode.Blend;
                 gd.DrawText(font, text, rect, color, horizontalAlignment, verticalAlignment);
+            }
+        }
+        public void DrawIcon(Icons icon, Rectangle rect, Color color, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, VerticalAlignment verticalAlignment = VerticalAlignment.Center, Rectangle? clippingRect = null)
+        {
+            GraphicsDevice? gd = game.GraphicsDevice;
+            if (gd != null && icon != Icons.NONE)
+            {
+                gd.BlendMode = BlendMode.Blend;
+                gd.DrawIcon(icon, rect, color, horizontalAlignment, verticalAlignment);
             }
         }
 

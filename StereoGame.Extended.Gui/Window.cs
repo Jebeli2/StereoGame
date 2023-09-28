@@ -56,9 +56,13 @@
                 Rectangle bounds = GetBounds();
                 bounds.Offset(offsetX, offsetY);
                 bounds.Height = Padding.Top;
+                bounds.Inflate(-1, -1);
+                Rectangle textRect = bounds;
+                textRect.X += 20;
+                textRect.Width -= 20;
                 renderer.FillRectangle(bounds, BackgroundColor);
-                renderer.DrawText(Font, Title, bounds, TextColor);
-                renderer.DrawHorizontalLine(bounds.Left + 1, bounds.Right - 1, bounds.Bottom, BorderColor);
+                renderer.DrawText(Font, Title, textRect, TextColor, Framework.Graphics.HorizontalAlignment.Left);
+                renderer.DrawHorizontalLine(bounds.Left, bounds.Right - 1, bounds.Bottom, BorderShadowColor);
             }
         }
     }

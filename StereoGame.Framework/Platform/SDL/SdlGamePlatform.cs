@@ -140,7 +140,7 @@
         public override GraphicsDevice CreateGraphicsDevice(PresentationParameters pp)
         {
             view.Size = new System.Drawing.Size(pp.BackBufferWidth, pp.BackBufferHeight);
-            renderer = new SdlGraphicsDevice(Game, view, pp);
+            renderer = new SdlGraphicsDevice(Game, this, view, pp);
             return renderer;
         }
 

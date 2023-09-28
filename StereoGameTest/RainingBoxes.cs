@@ -32,6 +32,12 @@
             swish = Game.Content.Load<Sound>(nameof(Properties.Resources.swish_11));
         }
 
+        public void Clear()
+        {
+            squares.Clear();
+            mousePressed = false;
+        }
+
         public override void Update(GameTime gameTime)
         {
             double time = gameTime.TotalGameTime.TotalMilliseconds / 1000;

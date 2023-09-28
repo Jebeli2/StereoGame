@@ -11,21 +11,28 @@
     internal class SdlGraphicsDevice : GraphicsDevice
     {
         private readonly Game game;
+        private readonly SdlGamePlatform platform;
         private readonly SdlGameWindow window;
         private IntPtr handle;
         private readonly StringBuilder stringBuffer = new(512);
         private readonly Dictionary<int, TextCache> textCache = new();
-        //private readonly Dictionary<int, IconCache> iconCache = new();
+        private readonly Dictionary<int, IconCache> iconCache = new();
         private readonly List<int> textCacheKeys = new();
-        //private readonly List<int> iconCacheKeys = new();
+        private readonly List<int> iconCacheKeys = new();
         private int textCacheLimit = 100;
+        private int iconCacheLimit = 100;
         private readonly Stack<IntPtr> prevTargets = new();
+        private readonly TextFont? defaultFont;
+        private readonly TextFont? iconFont;
 
 
-        public SdlGraphicsDevice(Game game, SdlGameWindow window, PresentationParameters pp)
+        public SdlGraphicsDevice(Game game, SdlGamePlatform platform, SdlGameWindow window, PresentationParameters pp)
         {
             this.game = game;
+            this.platform = platform;
             this.window = window;
+            defaultFont = platform.LoadFont("default", Properties.Resources.Roboto_Regular, 16);
+            iconFont = platform.LoadFont("icon", Properties.Resources.entypo, 16);
             var flags = Sdl.Renderer.SDL_RendererFlags.SDL_RENDERER_ACCELERATED;
             switch (pp.PresentInterval)
             {
@@ -52,6 +59,9 @@
             if (disposing)
             {
                 ClearTextCache();
+                ClearIconCache();
+                defaultFont?.Dispose();
+                iconFont?.Dispose();
                 Sdl.Renderer.DestroyRenderer(handle);
                 handle = IntPtr.Zero;
             }
@@ -151,11 +161,23 @@
         {
             if (text == null) return;
             if (text.Length == 0) return;
+            if (font == null) { font = defaultFont; }
             if (CheckTextFont(font, out IntPtr fnt))
             {
                 DrawTextCache(GetTextCache(fnt, text, color), x, y, width, height, horizontalAlignment, verticalAlignment, offsetX, offsetY);
             }
         }
+
+        protected override void DrawIcon(Icons icon, float x, float y, float width, float height, Color color, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment, float offsetX, float offsetY)
+        {
+            if (icon == Icons.NONE) return;
+            TextFont? font = iconFont;
+            if (CheckTextFont(font, out IntPtr fnt))
+            {
+                DrawIconCache(GetIconCache(fnt, icon, color), x, y, width, height, horizontalAlignment, verticalAlignment, offsetX, offsetY);
+            }
+        }
+
 
         protected override void SetDrawColor(byte r, byte g, byte b, byte a)
         {
@@ -194,8 +216,20 @@
                 int len = textCacheKeys.Count / 2;
                 var halfKeys = textCacheKeys.GetRange(0, len);
                 textCacheKeys.RemoveRange(0, len);
-                //SDLLog.Verbose(LogCategory.RENDER, $"Text cache limit {textCacheLimit} reached. Cleaning up...");
+                Log($"Text cache limit {textCacheLimit} reached. Cleaning up...");
                 ClearTextCache(halfKeys);
+            }
+        }
+
+        private void CheckIconCache()
+        {
+            if (iconCache.Count > iconCacheLimit)
+            {
+                int len = iconCacheKeys.Count / 2;
+                var halfKeys = iconCacheKeys.GetRange(0, len);
+                iconCacheKeys.RemoveRange(0, len);
+                Log($"Icon cache limit {iconCacheLimit} reached. Cleaning up...");
+                ClearIconCache(halfKeys);
             }
         }
         private void ClearTextCache()
@@ -221,9 +255,34 @@
                 }
             }
         }
+
+        private void ClearIconCache()
+        {
+            foreach (var kvp in iconCache)
+            {
+                IconCache tc = kvp.Value;
+                Sdl.Renderer.DestroyTexture(tc.Texture);
+            }
+            iconCache.Clear();
+        }
+
+        private void ClearIconCache(IEnumerable<int> keys)
+        {
+            foreach (var key in keys)
+            {
+                if (iconCache.TryGetValue(key, out var tc))
+                {
+                    if (iconCache.Remove(key))
+                    {
+                        Sdl.Renderer.DestroyTexture(tc.Texture);
+                    }
+                }
+            }
+        }
         private void DrawTextCache(TextCache? textCache, float x, float y, float width, float height, HorizontalAlignment hAlign, VerticalAlignment vAlign, float offsetX, float offsetY)
         {
             if (textCache == null) return;
+            if (textCache.Texture == IntPtr.Zero) return;
             int w = textCache.Width;
             int h = textCache.Height;
             switch (hAlign)
@@ -254,10 +313,47 @@
             Sdl.Renderer.RenderCopyF(handle, textCache.Texture, x + offsetX, y + offsetY, w, h);
         }
 
+        private void DrawIconCache(IconCache? iconCache, float x, float y, float width, float height, HorizontalAlignment hAlign, VerticalAlignment vAlign, float offsetX, float offsetY)
+        {
+            if (iconCache == null) return;
+            if (iconCache.Texture == IntPtr.Zero) return;
+            int w = iconCache.Width;
+            int h = iconCache.Height;
+            switch (hAlign)
+            {
+                case HorizontalAlignment.Left:
+                    //nop
+                    break;
+                case HorizontalAlignment.Right:
+                    x = x + width - w;
+                    break;
+                case HorizontalAlignment.Center:
+                    x = x + width / 2 - w / 2;
+                    break;
+            }
+            switch (vAlign)
+            {
+                case VerticalAlignment.Top:
+                    // nop
+                    break;
+                case VerticalAlignment.Bottom:
+                    y = y + height - h;
+                    break;
+                case VerticalAlignment.Center:
+                    y = y + height / 2 - h / 2;
+                    break;
+            }
+            //RectangleF dstRect = new RectangleF(x + offsetX, y + offsetY, w, h);
+            SetBlendMode(BlendMode.Blend);
+            Sdl.Renderer.RenderCopyF(handle, iconCache.Texture, x + offsetX, y + offsetY, w, h);
+        }
+
+
         private TextCache? GetTextCache(IntPtr font, ReadOnlySpan<char> text, Color color)
         {
             int hash = string.GetHashCode(text);
             int key = HashCode.Combine(font, hash, color);
+            CheckTextCache();
             if (textCache.TryGetValue(key, out var tc))
             {
                 if (tc.Matches(font, hash, color))
@@ -272,6 +368,23 @@
                 textCacheKeys.Add(key);
             }
             return tc;
+        }
+
+        private IconCache? GetIconCache(IntPtr font, Icons icon, Color color)
+        {
+            int key = HashCode.Combine(icon, color);
+            CheckIconCache();
+            if (iconCache.TryGetValue(key, out var ic))
+            {
+                if (ic.Matches(icon, color)) { return ic; }
+            }
+            ic = CreateIconCache(font, icon, color);
+            if (ic != null)
+            {
+                iconCache[key] = ic;
+                iconCacheKeys.Add(key);
+            }
+            return ic;
         }
 
         private TextCache? CreateTextCache(IntPtr font, ReadOnlySpan<char> text, Color color)
@@ -300,6 +413,32 @@
             return textCache;
         }
 
+        private IconCache? CreateIconCache(IntPtr font, Icons icon, Color color)
+        {
+            IconCache? iconCache = null;
+            if (font != IntPtr.Zero)
+            {
+                IntPtr surface = SDL2TTF.RenderGlyph32_Blended(font, (uint)icon, ToSDLColor(color));
+                if (surface != IntPtr.Zero)
+                {
+                    IntPtr texHandle = Sdl.Renderer.CreateTextureFromSurface(handle, surface);
+                    if (texHandle != IntPtr.Zero)
+                    {
+                        if (texHandle != IntPtr.Zero)
+                        {
+                            _ = Sdl.Renderer.QueryTexture(texHandle, out _, out _, out int w, out int h);
+                            _ = Sdl.Renderer.SetTextureBlendMode(texHandle, Sdl.Renderer.SDL_BlendMode.SDL_BLENDMODE_BLEND);
+                            _ = Sdl.Renderer.SetTextureAlphaMod(texHandle, color.A);
+                            _ = Sdl.Renderer.SetTextureScaleMode(texHandle, Sdl.Renderer.SDL_ScaleMode.SDL_ScaleModeBest);
+                            iconCache = new IconCache(icon, color, w, h, texHandle);
+                        }
+                    }
+                    Sdl.FreeSurface(surface);
+                }
+            }
+            return iconCache;
+        }
+
         private class TextCache
         {
             internal TextCache(IntPtr font, int textHash, Color color, int width, int height, IntPtr texture)
@@ -324,6 +463,29 @@
             }
         }
 
+        private class IconCache
+        {
+
+            internal IconCache(Icons icon, Color color, int width, int height, IntPtr texture)
+            {
+                Icon = icon;
+                Color = color;
+                Width = width;
+                Height = height;
+                Texture = texture;
+            }
+
+            public Icons Icon;
+            public Color Color;
+            public int Width;
+            public int Height;
+            public IntPtr Texture;
+
+            public bool Matches(Icons icon, Color color)
+            {
+                return (icon == Icon) && (color == Color);
+            }
+        }
         private static int ToSDLColor(Color c)
         {
             int i = c.A;

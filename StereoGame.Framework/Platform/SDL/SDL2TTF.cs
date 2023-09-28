@@ -56,6 +56,8 @@ namespace StereoGame.Framework.Platform.SDL
         private static extern int TTF_SizeUTF8(IntPtr font, StringBuilder text, out int w, out int h);
         [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int TTF_SizeUTF8(IntPtr font, string text, out int w, out int h);
+        [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr TTF_RenderGlyph32_Blended(IntPtr font, uint ch, int fg);
 
         public static int Init() => TTF_Init();
         public static void Quit() => TTF_Quit();
@@ -83,6 +85,7 @@ namespace StereoGame.Framework.Platform.SDL
 
         public static int SizeUTF8(IntPtr font, StringBuilder text, out int w, out int h) => TTF_SizeUTF8(font, text, out w, out h);
         public static int SizeUTF8(IntPtr font, string text, out int w, out int h) => TTF_SizeUTF8(font, text, out w, out h);
+        public static IntPtr RenderGlyph32_Blended(IntPtr font, uint ch, int fg) => TTF_RenderGlyph32_Blended(font, ch, fg);
 
 
         //public static IntPtr NativeLibrary = GetNativeLibrary();

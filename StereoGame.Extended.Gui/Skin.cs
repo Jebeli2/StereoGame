@@ -95,8 +95,8 @@ namespace StereoGame.Extended.Gui
                     {
                         BackgroundColor = Color.FromArgb(52,52,52),
                         //BorderColor = Color.FromArgb(67,67,70),
-                        BorderColor = Color.FromArgb(128,200, 200, 200),
-                        BorderShadowColor = Color.FromArgb(128,10, 10, 10),
+                        BorderColor = Color.FromArgb(188,200, 200, 200),
+                        BorderShadowColor = Color.FromArgb(188,10, 10, 10),
                         BorderThickness =1,
                         TextColor = Color.FromArgb(240,240,240),
                         Padding = new Padding(5),
@@ -116,7 +116,7 @@ namespace StereoGame.Extended.Gui
                     },
                     new ControlStyle(typeof(Window))
                     {
-                        BackgroundColor = Color.FromArgb(128,100,100,100),
+                        BackgroundColor = Color.FromArgb(188,100,100,100),
                         BorderColor = Color.FromArgb(200,200, 200, 200),
                         BorderShadowColor = Color.FromArgb(200,10, 10, 10),
                         BorderThickness = 1,
@@ -136,15 +136,15 @@ namespace StereoGame.Extended.Gui
                         HoverStyle = new ControlStyle
                         {
                             BackgroundColor = Color.FromArgb(64,64,64),
-                            BorderColor = Color.FromArgb(128,200, 200, 200),
-                            BorderShadowColor = Color.FromArgb(128,10, 10, 10),
+                            BorderColor = Color.FromArgb(188,200, 200, 200),
+                            BorderShadowColor = Color.FromArgb(188,10, 10, 10),
                             BorderThickness =1,
                         },
                         PressedStyle = new ControlStyle
                         {
                             BackgroundColor = Color.FromArgb(80,80,80),
-                            BorderColor = Color.FromArgb(128,10, 10, 10),
-                            BorderShadowColor = Color.FromArgb(128,200, 200, 200),
+                            BorderColor = Color.FromArgb(188,10, 10, 10),
+                            BorderShadowColor = Color.FromArgb(188,200, 200, 200),
                             BorderThickness =1,
                         }
                     },
@@ -153,15 +153,15 @@ namespace StereoGame.Extended.Gui
                         CheckedStyle = new ControlStyle
                         {
                             BackgroundColor = Color.FromArgb(20,20,20),
-                            BorderColor = Color.FromArgb(128,10, 10, 10),
-                            BorderShadowColor = Color.FromArgb(128,200, 200, 200),
+                            BorderColor = Color.FromArgb(188,10, 10, 10),
+                            BorderShadowColor = Color.FromArgb(188,200, 200, 200),
                             BorderThickness =1,
                         },
                         CheckedHoverStyle = new ControlStyle
                         {
                             BackgroundColor = Color.FromArgb(34,34,34),
-                            BorderColor = Color.FromArgb(128,10, 10, 10),
-                            BorderShadowColor = Color.FromArgb(128,200, 200, 200),
+                            BorderColor = Color.FromArgb(188,10, 10, 10),
+                            BorderShadowColor = Color.FromArgb(188,200, 200, 200),
                             BorderThickness =1,
 
                         }

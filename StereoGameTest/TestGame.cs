@@ -30,16 +30,25 @@
         private Window? guiTestWindow;
         private Window? buttonDemo;
 
+        private Lines lines;
+        private RainingBoxes boxes;
+
         public TestGame()
         {
             Content.AddResourceManager(Properties.Resources.ResourceManager);
-
             TargetFPS = 120;
             fps = new FramesPerSecondCounterComponent(this);
             Components.Add(fps);
             gui = new GuiSystem(this);
             Components.Add(gui);
+            lines = new Lines(this);
+            Components.Add(lines);
+            boxes = new RainingBoxes(this);
+            Components.Add(boxes);
         }
+
+        public Lines Lines => lines;
+        public RainingBoxes Boxes => boxes;
 
 
         protected override void Initialize()
@@ -74,6 +83,31 @@
             GraphicsDevice.DrawText(font, fps.FramesPerSecondText, 10, 10);
         }
 
+        private void ToggleBoxes()
+        {
+            if (Components.Contains(boxes))
+            {
+                boxes.Clear();
+                Components.Remove(boxes);
+            }
+            else
+            {
+                boxes.Clear();
+                Components.Add(boxes);
+            }
+        }
+
+        private void ToggleLines()
+        {
+            if (Components.Contains(lines))
+            {
+                Components.Remove(lines);
+            }
+            else
+            {
+                Components.Add(lines);
+            }
+        }
         private void InitGui(TextFont? font)
         {
             Skin.DefaultSkin.DefaultFont = font;
@@ -126,11 +160,21 @@
             buttonDemo.Visible = false;
             _ = new Label(buttonDemo, "Push buttons");
             _ = new Button(buttonDemo, "Plain button");
-            _ = new Button(buttonDemo, "Styled");
+            var sb = new Button(buttonDemo, "Styled");
+            sb.Icon = Icons.ROCKET;
             _ = new Label(buttonDemo, "Toggle buttons");
             _ = new ToggleButton(buttonDemo, "Toggle me");
             _ = new Label(buttonDemo, "Radio buttons");
-
+            _ = new Button(buttonDemo, "Radio button 1");
+            _ = new Button(buttonDemo, "Radio button 2");
+            _ = new Label(buttonDemo, "A tool palette");
+            var p1 = new Panel(buttonDemo);
+            var t1 = new ToggleButton(p1) { Icon = Icons.LINE_GRAPH, Checked = true };
+            t1.CheckedStateChanged += (s, e) => { ToggleLines(); };
+            var t2 = new ToggleButton(p1) { Icon = Icons.BOX, Checked = true };
+            t2.CheckedStateChanged += (s, e) => { ToggleBoxes(); };
+            _ = new ToggleButton(p1) { Icon = Icons.CIRCLE_WITH_PLUS };
+            _ = new ToggleButton(p1) { Icon = Icons.DRIVE };
         }
 
     }

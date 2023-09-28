@@ -12,6 +12,7 @@
     {
         void DrawRegion(TextureRegion? region, Rectangle dest);
         void DrawText(TextFont? font, string? text, Rectangle rect, Color color, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, VerticalAlignment verticalAlignment = VerticalAlignment.Center, Rectangle? clippingRect = null);
+        void DrawIcon(Icons icon, Rectangle rect, Color color, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, VerticalAlignment verticalAlignment = VerticalAlignment.Center, Rectangle? clippingRect = null);
         void FillRectangle(Rectangle rect, Color color, Rectangle? clippingRect = null);
         void DrawRectangle(Rectangle rect, Color color, float thickness = 1.0f, Rectangle? clippingRect = null);        
         void DrawBorder(Rectangle rect, Color shine, Color shadow, float thickness = 1.0f, Rectangle? clippingRect = null);

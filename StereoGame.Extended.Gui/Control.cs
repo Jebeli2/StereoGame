@@ -56,6 +56,7 @@
         private Skin skin;
 
         private string? text;
+        private Icons icon;
 
 
         protected Control()
@@ -543,6 +544,19 @@
                 if (text != value)
                 {
                     text = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        public Icons Icon
+        {
+            get => icon;
+            set
+            {
+                if (icon != value)
+                {
+                    icon = value;
                     Invalidate();
                 }
             }
