@@ -12,7 +12,7 @@
         private IGuiRenderer renderer;
         private int screenWidth;
         private int screenHeight;
-        private MouseListener mouseListener;
+        private readonly MouseListener mouseListener;
         private Control? preFocusedControl;
         private Control? focusedControl;
         private Control? hoveredControl;

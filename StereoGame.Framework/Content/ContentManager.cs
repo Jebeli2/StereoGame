@@ -240,14 +240,22 @@
             ResourceSet? rs = rm.GetResourceSet(System.Globalization.CultureInfo.InvariantCulture, true, false);
             if (rs != null)
             {
-                foreach (System.Collections.DictionaryEntry e in rs)
+                var enumerator = rs.GetEnumerator();
+                while (enumerator.MoveNext())
                 {
-                    string? s = e.Key?.ToString();
-                    if (!string.IsNullOrEmpty(s))
+                    if (enumerator.Key is string s)
                     {
                         yield return s;
                     }
                 }
+                //foreach (System.Collections.DictionaryEntry e in rs)
+                //{
+                //    string? s = e.Key?.ToString();
+                //    if (!string.IsNullOrEmpty(s))
+                //    {
+                //        yield return s;
+                //    }
+                //}
             }
         }
     }
