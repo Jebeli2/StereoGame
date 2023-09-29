@@ -649,48 +649,65 @@
             return rect;
         }
 
-        public bool Resize(IGuiSystem gui, int dx, int dy, HitTestResult hitTestResult)
+        public bool Resize(Rectangle startRect, int dx, int dy, HitTestResult hitTestResult)
         {
-            int newX = x;
-            int newY = y;
-            int newWidth = width;
-            int newHeight = height;
+            Rectangle newRect = startRect;
             switch (hitTestResult)
             {
                 case HitTestResult.SizeLeft:
-                    newX += dx;
-                    newWidth -= dx;
+                    newRect.X += dx;
+                    newRect.Width -= dx;
                     break;
                 case HitTestResult.SizeRight:
-                    newWidth += dx;
+                    newRect.Width += dx;
                     break;
                 case HitTestResult.SizeTop:
-                    newY += dy;
-                    newHeight -= dy;
+                    newRect.Y += dy;
+                    newRect.Height -= dy;
                     break;
                 case HitTestResult.SizeBottom:
-                    newHeight += dy;
+                    newRect.Height += dy;
+                    break;
+                case HitTestResult.SizeBottomLeft:
+                    newRect.X += dx;
+                    newRect.Width -= dx;
+                    newRect.Height += dy;
+                    break;
+                case HitTestResult.SizeBottomRight:
+                    newRect.Width += dx;
+                    newRect.Height += dy;
+                    break;
+                case HitTestResult.SizeTopLeft:
+                    newRect.X += dx;
+                    newRect.Width -= dx;
+                    newRect.Y += dy;
+                    newRect.Height -= dy;
+                    break;
+                case HitTestResult.SizeTopRight:
+                    newRect.Width += dx;
+                    newRect.Y += dy;
+                    newRect.Height -= dy;
                     break;
             }
-            if (newX < 0) { newX = 0; }
-            if (newY < 0) { newY = 0; }
+            if (newRect.X < 0) { newRect.X = 0; }
+            if (newRect.Y < 0) { newRect.Y = 0; }
             if (parent != null)
             {
-                int maxX = parent.Width- newWidth;
-                int maxY = parent.Height - newHeight;
-                if (newX > maxX) { newX = maxX; }
-                if (newY > maxY) { newY = maxY; }
+                //int maxX = parent.Width- newWidth;
+                //int maxY = parent.Height - newHeight;
+                //if (newX > maxX) { newX = maxX; }
+                //if (newY > maxY) { newY = maxY; }
             }
-            if (newX != x || newY != y || newWidth != width || newHeight != height)
+            if (newRect != startRect)
             {
-                x = newX;
-                y = newY;
-                width = newWidth;
-                height = newHeight;
+                x = newRect.X;
+                y = newRect.Y;
+                width = newRect.Width;
+                height = newRect.Height;
                 fixedWidth = width;
                 fixedHeight = height;
-                PerformLayout(gui);
-                //Invalidate();
+                //PerformLayout(gui);
+                Invalidate();
                 return true;
             }
             return false;

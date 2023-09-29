@@ -20,6 +20,7 @@
         private Control? preDragControl;
         private Control? preSizeControl;
         private HitTestResult dragSizeHitTest;
+        private Rectangle sizeStartRect;
         private int dragSizeStartX;
         private int dragSizeStartY;
         private bool moveWindowToFrontOnActivate = true;
@@ -203,6 +204,14 @@
                     case HitTestResult.SizeRight:
                         Mouse.SetSystemCursor(SystemCursor.SizeWE);
                         return true;
+                    case HitTestResult.SizeBottomLeft:
+                    case HitTestResult.SizeTopRight:
+                        Mouse.SetSystemCursor(SystemCursor.SizeNESW);
+                        return true;
+                    case HitTestResult.SizeBottomRight:
+                    case HitTestResult.SizeTopLeft:
+                        Mouse.SetSystemCursor(SystemCursor.SizeNWSE);
+                        return true;
                 }
             }
             return false;
@@ -220,21 +229,18 @@
                     dragSizeStartY = pea.Y;
                     return true;
                 }
-                else if (hitTest == HitTestResult.SizeBottom || hitTest == HitTestResult.SizeTop || hitTest == HitTestResult.SizeLeft || hitTest == HitTestResult.SizeRight)
+                else if (hitTest == HitTestResult.SizeBottom ||
+                        hitTest == HitTestResult.SizeTop ||
+                        hitTest == HitTestResult.SizeLeft ||
+                        hitTest == HitTestResult.SizeRight ||
+                        hitTest == HitTestResult.SizeBottomRight ||
+                        hitTest == HitTestResult.SizeBottomLeft ||
+                        hitTest == HitTestResult.SizeTopRight ||
+                        hitTest == HitTestResult.SizeTopLeft)
                 {
-                    //switch (hitTest)
-                    //{
-                    //    case HitTestResult.SizeBottom:
-                    //    case HitTestResult.SizeTop:
-                    //        Mouse.SetSystemCursor(SystemCursor.SizeNS);
-                    //        break;
-                    //    case HitTestResult.SizeLeft:
-                    //    case HitTestResult.SizeRight:
-                    //        Mouse.SetSystemCursor(SystemCursor.SizeWE);
-                    //        break;
-                    //}
                     preSizeControl = preFocusedControl;
                     dragSizeHitTest = hitTest;
+                    sizeStartRect = preSizeControl.BoundingRectangle;
                     dragSizeStartX = pea.X;
                     dragSizeStartY = pea.Y;
                     return true;
@@ -265,14 +271,24 @@
             {
                 int dX = pea.X - dragSizeStartX;
                 int dY = pea.Y - dragSizeStartY;
-                dragSizeStartX = pea.X;
-                dragSizeStartY = pea.Y;
-                if (preSizeControl.Resize(this, dX, dY, dragSizeHitTest))
+                //dragSizeStartX = pea.X;
+                //dragSizeStartY = pea.Y;
+                if (preSizeControl.Resize(sizeStartRect, dX, dY, dragSizeHitTest))
                 {
                     return true;
                 }
             }
             return preSizeControl != null;
+        }
+
+        private bool CheckEndSizing(PointerEventArgs pea)
+        {
+            if (preSizeControl != null)
+            {
+                preSizeControl.PerformLayout(this);
+                return true;
+            }
+            return false;
         }
 
         private void MouseListener_MouseDown(object? sender, MouseEventArgs e)
@@ -290,6 +306,12 @@
         {
             if (activeScreen == null || !activeScreen.Visible) return;
             var postFocusedControl = FindControlAt(e.X, e.Y);
+            var pea = PointerEventArgs.FromMouseEventArgs(e);
+            if (CheckEndSizing(pea))
+            {
+
+                Mouse.ClearSystemCursor();
+            }
             if (preFocusedControl == postFocusedControl)
             {
                 SetFocus(postFocusedControl);
@@ -297,8 +319,6 @@
             preFocusedControl = null;
             preDragControl = null;
             preSizeControl = null;
-            Mouse.ClearSystemCursor();
-            var pea = PointerEventArgs.FromMouseEventArgs(e);
             PropagateDown(hoveredControl, x => x.OnPointerUp(pea));
         }
 

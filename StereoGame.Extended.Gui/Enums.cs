@@ -28,5 +28,9 @@ namespace StereoGame.Extended.Gui
         SizeLeft,
         SizeTop,
         SizeBottom,       
+        SizeBottomLeft,
+        SizeBottomRight,
+        SizeTopLeft,
+        SizeTopRight,
     }
 }

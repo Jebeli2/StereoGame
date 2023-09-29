@@ -41,17 +41,29 @@
             Rectangle bounds = GetBounds();
             if (bounds.Contains(x, y))
             {
-                if (y > bounds.Top + 2 && y < bounds.Top + Padding.Top)
+                if (y >= bounds.Bottom - Padding.Bottom && x <= bounds.Left + Padding.Left)
                 {
-                    return HitTestResult.DragArea;
+                    return HitTestResult.SizeBottomLeft;
                 }
-                else if (y <= bounds.Top + Padding.Bottom)
+                else if (y >= bounds.Bottom - Padding.Bottom && x >= bounds.Right - Padding.Right)
                 {
-                    return HitTestResult.SizeTop;
+                    return HitTestResult.SizeBottomRight;
+                }
+                else if (x <= bounds.Left + Padding.Left && y <= bounds.Top + Padding.Bottom)
+                {
+                    return HitTestResult.SizeTopLeft;
+                }
+                else if (x >= bounds.Right - Padding.Right && y <= bounds.Top + Padding.Bottom)
+                {
+                    return HitTestResult.SizeTopRight;
                 }
                 else if (y >= bounds.Bottom - Padding.Bottom)
                 {
                     return HitTestResult.SizeBottom;
+                }
+                else if (y <= bounds.Top + Padding.Bottom)
+                {
+                    return HitTestResult.SizeTop;
                 }
                 else if (x <= bounds.Left + Padding.Left)
                 {
@@ -60,6 +72,10 @@
                 else if (x >= bounds.Right - Padding.Right)
                 {
                     return HitTestResult.SizeRight;
+                }
+                else if (y > bounds.Top + 2 && y < bounds.Top + Padding.Top)
+                {
+                    return HitTestResult.DragArea;
                 }
                 return HitTestResult.Control;
             }
