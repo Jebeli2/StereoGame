@@ -1481,6 +1481,17 @@
                 public uint Direction;
             }
 
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_SetCursor(IntPtr cursor);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr SDL_CreateSystemCursor(SystemCursor cursor);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_FreeCursor(IntPtr cursor);
+
+            public static void SetCursor(IntPtr cursor) => SDL_SetCursor(cursor);
+            public static IntPtr CreateSystemCursor(SystemCursor cursor) => SDL_CreateSystemCursor(cursor);
+            public static void FreeCursor(IntPtr cursor) => SDL_FreeCursor(cursor);
+
             //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             //private delegate IntPtr d_sdl_createcolorcursor(IntPtr surface, int x, int y);
             //private static readonly d_sdl_createcolorcursor SDL_CreateColorCursor = FuncLoader.LoadFunction<d_sdl_createcolorcursor>(NativeLibrary, "SDL_CreateColorCursor");

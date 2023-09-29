@@ -27,5 +27,15 @@ namespace StereoGame.Framework.Input
             if (primaryWindow != null) return GetState(primaryWindow);
             return defaultState;
         }
+
+        public static void SetSystemCursor(SystemCursor cursor)
+        {
+            primaryWindow?.SetSystemCursor(cursor);
+        }
+
+        public static void ClearSystemCursor()
+        {
+            primaryWindow?.ClearSystemCursor();
+        }
     }
 }

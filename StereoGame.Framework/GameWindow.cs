@@ -52,6 +52,9 @@ namespace StereoGame.Framework
 
         internal MouseState MouseState;
 
+        internal protected abstract void SetSystemCursor(SystemCursor cursor);
+        internal protected abstract void ClearSystemCursor();
+
         protected GameWindow()
         {
         }

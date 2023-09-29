@@ -1,5 +1,6 @@
 ﻿namespace StereoGame.Framework.Platform.SDL
 {
+    using StereoGame.Framework.Input;
     using StereoGame.Framework.Utilities;
     using System;
     using System.Collections.Generic;
@@ -26,6 +27,7 @@
         private bool isFullScreen;
         private bool disposed;
         private uint id;
+        private IntPtr cursor;
 
         public SdlGameWindow(Game game)
         {
@@ -96,6 +98,25 @@
         {
             mouseVisible = visible;
             //Sdl.Mouse.ShowCursor(visible ? 1 : 0);
+        }
+
+        protected internal override void SetSystemCursor(SystemCursor cursor)
+        {
+            ClearSystemCursor();
+            this.cursor = Sdl.Mouse.CreateSystemCursor((Sdl.Mouse.SystemCursor)cursor);
+            if (this.cursor != IntPtr.Zero)
+            {
+                Sdl.Mouse.SetCursor(this.cursor);
+            }
+        }
+
+        protected internal override void ClearSystemCursor()
+        {
+            if (cursor != IntPtr.Zero)
+            {
+                Sdl.Mouse.FreeCursor(cursor);
+                cursor = IntPtr.Zero;
+            }
         }
         public override DisplayOrientation CurrentOrientation => DisplayOrientation.Default;
 

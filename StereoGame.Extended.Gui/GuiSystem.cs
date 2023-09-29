@@ -18,8 +18,10 @@
         private Control? focusedControl;
         private Control? hoveredControl;
         private Control? preDragControl;
-        private int dragStartX;
-        private int dragStartY;
+        private Control? preSizeControl;
+        private HitTestResult dragSizeHitTest;
+        private int dragSizeStartX;
+        private int dragSizeStartY;
         private bool moveWindowToFrontOnActivate = true;
         private readonly Queue<Window> activationWindows = new();
         public GuiSystem(Game game) : base(game)
@@ -186,16 +188,55 @@
             return false;
         }
 
-        private bool CheckDragStart(PointerEventArgs pea)
+        private bool CheckSizeMouse(Control? hc, PointerEventArgs pea)
+        {
+            if (hc != null && preSizeControl == null)
+            {
+                HitTestResult hitTest = hc.GetHitTestResult(pea.X, pea.Y);
+                switch (hitTest)
+                {
+                    case HitTestResult.SizeBottom:
+                    case HitTestResult.SizeTop:
+                        Mouse.SetSystemCursor(SystemCursor.SizeNS);
+                        return true;
+                    case HitTestResult.SizeLeft:
+                    case HitTestResult.SizeRight:
+                        Mouse.SetSystemCursor(SystemCursor.SizeWE);
+                        return true;
+                }
+            }
+            return false;
+        }
+        private bool CheckDragOrSizeStart(PointerEventArgs pea)
         {
             if (preFocusedControl != null && pea.Button == MouseButton.Left)
             {
                 HitTestResult hitTest = preFocusedControl.GetHitTestResult(pea.X, pea.Y);
                 if (hitTest == HitTestResult.DragArea)
                 {
+                    Mouse.ClearSystemCursor();
                     preDragControl = preFocusedControl;
-                    dragStartX = pea.X;
-                    dragStartY = pea.Y;
+                    dragSizeStartX = pea.X;
+                    dragSizeStartY = pea.Y;
+                    return true;
+                }
+                else if (hitTest == HitTestResult.SizeBottom || hitTest == HitTestResult.SizeTop || hitTest == HitTestResult.SizeLeft || hitTest == HitTestResult.SizeRight)
+                {
+                    //switch (hitTest)
+                    //{
+                    //    case HitTestResult.SizeBottom:
+                    //    case HitTestResult.SizeTop:
+                    //        Mouse.SetSystemCursor(SystemCursor.SizeNS);
+                    //        break;
+                    //    case HitTestResult.SizeLeft:
+                    //    case HitTestResult.SizeRight:
+                    //        Mouse.SetSystemCursor(SystemCursor.SizeWE);
+                    //        break;
+                    //}
+                    preSizeControl = preFocusedControl;
+                    dragSizeHitTest = hitTest;
+                    dragSizeStartX = pea.X;
+                    dragSizeStartY = pea.Y;
                     return true;
                 }
             }
@@ -204,18 +245,34 @@
 
         private bool CheckDragging(PointerEventArgs pea)
         {
-            if (preDragControl != null && (pea.X != dragStartX || pea.Y != dragStartY))
+            if (preDragControl != null && (pea.X != dragSizeStartX || pea.Y != dragSizeStartY))
             {
-                int dX = pea.X - dragStartX;
-                int dY = pea.Y - dragStartY;
+                int dX = pea.X - dragSizeStartX;
+                int dY = pea.Y - dragSizeStartY;
                 if (preDragControl.Move(dX, dY))
                 {
-                    dragStartX = pea.X;
-                    dragStartY = pea.Y;
+                    dragSizeStartX = pea.X;
+                    dragSizeStartY = pea.Y;
                     return true;
                 }
             }
             return false;
+        }
+
+        private bool CheckSizing(PointerEventArgs pea)
+        {
+            if (preSizeControl != null && (pea.X != dragSizeStartX && pea.Y != dragSizeStartY))
+            {
+                int dX = pea.X - dragSizeStartX;
+                int dY = pea.Y - dragSizeStartY;
+                dragSizeStartX = pea.X;
+                dragSizeStartY = pea.Y;
+                if (preSizeControl.Resize(this, dX, dY, dragSizeHitTest))
+                {
+                    return true;
+                }
+            }
+            return preSizeControl != null;
         }
 
         private void MouseListener_MouseDown(object? sender, MouseEventArgs e)
@@ -224,7 +281,7 @@
             preFocusedControl = FindControlAt(e.X, e.Y);
             var pea = PointerEventArgs.FromMouseEventArgs(e);
             CheckWindowFocus(pea);
-            if (!CheckDragStart(pea))
+            if (!CheckDragOrSizeStart(pea))
             {
                 PropagateDown(hoveredControl, x => x.OnPointerDown(pea));
             }
@@ -239,6 +296,8 @@
             }
             preFocusedControl = null;
             preDragControl = null;
+            preSizeControl = null;
+            Mouse.ClearSystemCursor();
             var pea = PointerEventArgs.FromMouseEventArgs(e);
             PropagateDown(hoveredControl, x => x.OnPointerUp(pea));
         }
@@ -248,8 +307,9 @@
             if (activeScreen == null || !activeScreen.Visible) return;
             var hc = FindControlAt(e.X, e.Y);
             var pea = PointerEventArgs.FromMouseEventArgs(e);
-            if (!CheckDragging(pea))
+            if (!CheckDragging(pea) && !CheckSizing(pea))
             {
+                if (!CheckSizeMouse(hc, pea)) { Mouse.ClearSystemCursor(); }
                 if (hc != hoveredControl)
                 {
                     if (hoveredControl != null && (hc == null || !hc.HasParent(hoveredControl)))

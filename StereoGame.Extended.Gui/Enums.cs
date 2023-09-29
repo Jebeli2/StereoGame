@@ -23,6 +23,10 @@ namespace StereoGame.Extended.Gui
     {
         None,
         Control,
-        DragArea
+        DragArea,
+        SizeRight,
+        SizeLeft,
+        SizeTop,
+        SizeBottom,       
     }
 }

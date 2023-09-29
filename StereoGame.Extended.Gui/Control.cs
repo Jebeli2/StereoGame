@@ -649,6 +649,53 @@
             return rect;
         }
 
+        public bool Resize(IGuiSystem gui, int dx, int dy, HitTestResult hitTestResult)
+        {
+            int newX = x;
+            int newY = y;
+            int newWidth = width;
+            int newHeight = height;
+            switch (hitTestResult)
+            {
+                case HitTestResult.SizeLeft:
+                    newX += dx;
+                    newWidth -= dx;
+                    break;
+                case HitTestResult.SizeRight:
+                    newWidth += dx;
+                    break;
+                case HitTestResult.SizeTop:
+                    newY += dy;
+                    newHeight -= dy;
+                    break;
+                case HitTestResult.SizeBottom:
+                    newHeight += dy;
+                    break;
+            }
+            if (newX < 0) { newX = 0; }
+            if (newY < 0) { newY = 0; }
+            if (parent != null)
+            {
+                int maxX = parent.Width- newWidth;
+                int maxY = parent.Height - newHeight;
+                if (newX > maxX) { newX = maxX; }
+                if (newY > maxY) { newY = maxY; }
+            }
+            if (newX != x || newY != y || newWidth != width || newHeight != height)
+            {
+                x = newX;
+                y = newY;
+                width = newWidth;
+                height = newHeight;
+                fixedWidth = width;
+                fixedHeight = height;
+                PerformLayout(gui);
+                //Invalidate();
+                return true;
+            }
+            return false;
+        }
+
         public bool Move(int dx, int dy)
         {
             int newX = x + dx;
@@ -673,17 +720,17 @@
 
         public abstract Size GetContentSize(IGuiSystem context);
 
-        public virtual Size CalculateActualSize(IGuiSystem context)
-        {
-            var desizredSize = GetContentSize(context) + margin.Size + padding.Size;
-            if (desizredSize.Width < minWidth) { desizredSize.Width = minWidth; }
-            if (desizredSize.Height < minHeight) { desizredSize.Height = minHeight; }
-            if (desizredSize.Width > maxWidth) { desizredSize.Width = maxWidth; }
-            if (desizredSize.Height > maxHeight) { desizredSize.Height = maxHeight; }
-            var awidth = width == 0 ? desizredSize.Width : width;
-            var aheight = height == 0 ? desizredSize.Height : height;
-            return new Size(awidth, aheight);
-        }
+        //public virtual Size CalculateActualSize(IGuiSystem context)
+        //{
+        //    var desizredSize = GetContentSize(context) + margin.Size + padding.Size;
+        //    if (desizredSize.Width < minWidth) { desizredSize.Width = minWidth; }
+        //    if (desizredSize.Height < minHeight) { desizredSize.Height = minHeight; }
+        //    if (desizredSize.Width > maxWidth) { desizredSize.Width = maxWidth; }
+        //    if (desizredSize.Height > maxHeight) { desizredSize.Height = maxHeight; }
+        //    var awidth = width == 0 ? desizredSize.Width : width;
+        //    var aheight = height == 0 ? desizredSize.Height : height;
+        //    return new Size(awidth, aheight);
+        //}
 
         public virtual HitTestResult GetHitTestResult(int x, int y)
         {

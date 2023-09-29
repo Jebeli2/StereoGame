@@ -29,7 +29,7 @@
             set => Text = value;
         }
 
-    
+
 
         public override Size GetContentSize(IGuiSystem context)
         {
@@ -41,9 +41,25 @@
             Rectangle bounds = GetBounds();
             if (bounds.Contains(x, y))
             {
-                if (y > bounds.Top && y < bounds.Top + Padding.Top)
+                if (y > bounds.Top + 2 && y < bounds.Top + Padding.Top)
                 {
                     return HitTestResult.DragArea;
+                }
+                else if (y <= bounds.Top + Padding.Bottom)
+                {
+                    return HitTestResult.SizeTop;
+                }
+                else if (y >= bounds.Bottom - Padding.Bottom)
+                {
+                    return HitTestResult.SizeBottom;
+                }
+                else if (x <= bounds.Left + Padding.Left)
+                {
+                    return HitTestResult.SizeLeft;
+                }
+                else if (x >= bounds.Right - Padding.Right)
+                {
+                    return HitTestResult.SizeRight;
                 }
                 return HitTestResult.Control;
             }
