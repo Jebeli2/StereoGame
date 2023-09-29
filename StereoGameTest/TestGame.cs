@@ -125,16 +125,16 @@
             titleWindow.Width = 200;
             titleWindow.Height = 200;
             titleWindow.Title = "Stereo";
+            titleWindow.WindowClosed += (s, e) => { Exit(); };
 
             var button1 = new Button(titleWindow, "Test GUI") { X = 10, Y = 10, Width = 180, Height = 30 };
 
-            button1.Clicked += (s, e) => { gui.ActiveScreen = guiTestScreen; gui.ActivateWindow(guiTestWindow); };
+            button1.Clicked += (s, e) => { gui.ActivateScreenAndWindow(guiTestScreen, guiTestWindow); };
 
             var button2 = new Button(titleWindow, "Test MAP") { X = 10, Y = 50, Width = 180, Height = 30 };
             var button3 = new Button(titleWindow, "Test SOM") { X = 10, Y = 90, Width = 180, Height = 30 };
 
-            gui.ActiveScreen = mainScreen;
-            gui.ActivateWindow(titleWindow);
+            gui.ActivateScreenAndWindow(mainScreen, titleWindow);
 
 
             guiTestScreen = new Screen();
@@ -144,12 +144,14 @@
             guiTestWindow.Width = 200;
             guiTestWindow.Height = 200;
             guiTestWindow.Title = "GUI Test";
+            guiTestWindow.WindowClosed += (s, e) => { gui.ActivateScreenAndWindow(mainScreen, titleWindow); };
+
             var b1 = new Button(guiTestWindow, "Buttons");
             var b2 = new Button(guiTestWindow, "Whatever");
             var b3 = new Button(guiTestWindow, "Back");
 
             b1.Clicked += (s, e) => { if (buttonDemo != null) { buttonDemo.Visible ^= true; } };
-            b3.Clicked += (s, e) => { gui.ActiveScreen = mainScreen; gui.ActivateWindow(titleWindow); };
+            b3.Clicked += (s, e) => { gui.ActivateScreenAndWindow(mainScreen, titleWindow); };
 
 
             buttonDemo = new Window(guiTestScreen);
@@ -159,6 +161,7 @@
             buttonDemo.Height = 200;
             buttonDemo.Title = "Button Demo";
             buttonDemo.Visible = false;
+            buttonDemo.DefaultWindowCloseAction = WindowCloseAction.Hide;
             _ = new Label(buttonDemo, "Push buttons");
             _ = new Button(buttonDemo, "Plain button");
             var sb = new Button(buttonDemo, "Styled");
@@ -176,6 +179,8 @@
             t2.CheckedStateChanged += (s, e) => { ToggleBoxes(); };
             _ = new ToggleButton(p1) { Icon = Icons.CIRCLE_WITH_PLUS };
             _ = new ToggleButton(p1) { Icon = Icons.DRIVE };
+
+            //buttonDemo.WindowClosed += (s, e) => { };
 
 
         }

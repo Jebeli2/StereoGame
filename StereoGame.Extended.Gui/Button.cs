@@ -19,10 +19,21 @@
         {
 
         }
-        public Button(Control? parent, string? text = null)
+        public Button(Icons icon)
+            : this(null, null, icon)
+        {
+
+        }
+        public Button(Control? parent, Icons icon = Icons.NONE)
+            : this(parent, null, icon)
+        {
+        }
+
+        public Button(Control? parent, string? text = null, Icons icon = Icons.NONE)
             : base(parent)
         {
             Text = text;
+            Icon = icon;
         }
 
         public event EventHandler<EventArgs>? Clicked;
@@ -79,8 +90,8 @@
                 Rectangle textBounds = bounds;
                 Rectangle iconBounds = bounds;
                 iconBounds.Width = 2 * ICONWIDTH;
-                textBounds.X += 2 * ICONWIDTH;
-                textBounds.Width -= 2 * ICONWIDTH;
+                //textBounds.X += 2 * ICONWIDTH;
+                //textBounds.Width -= 2 * ICONWIDTH;
                 renderer.DrawText(Font, Text, textBounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
                 renderer.DrawIcon(Icon, iconBounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
             }

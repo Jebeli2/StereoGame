@@ -67,13 +67,13 @@
             }
             base.Dispose(disposing);
         }
-        public override Texture? CreateTexture(int width, int height)
+        public override Texture? CreateTexture(string? name, int width, int height)
         {
             Sdl.SetHint("SDL_RENDER_SCALE_QUALITY", (int)textureFilter);
             IntPtr tex = Sdl.Renderer.CreateTexture(handle, Sdl.Renderer.SDL_PIXELFORMAT_ARGB8888, Sdl.Renderer.SDL_TEXTUREACCESS_TARGET, width, height);
             if (tex != IntPtr.Zero)
             {
-                SdlTexture texture = new(this, width, height, tex) { Name = $"Texture {width}x{height}" };
+                SdlTexture texture = new(this, width, height, tex) { Name = $"Texture <{name ?? "noname"}> {width}x{height}" };
                 OnResourceCreated(texture);
                 return texture;
             }

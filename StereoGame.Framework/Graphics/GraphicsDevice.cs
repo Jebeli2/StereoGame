@@ -107,7 +107,7 @@ namespace StereoGame.Framework.Graphics
             }
         }
 
-        public abstract Texture? CreateTexture(int width, int height);
+        public abstract Texture? CreateTexture(string? name, int width, int height);
         public abstract Texture? LoadTexture(string path);
         public abstract Texture? LoadTexture(string path, byte[] data);
 

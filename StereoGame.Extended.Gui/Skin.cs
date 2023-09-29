@@ -121,7 +121,7 @@ namespace StereoGame.Extended.Gui
                         BorderColor = Color.FromArgb(188,100,100,100),
                         BorderShineColor = Color.FromArgb(200,200, 200, 200),
                         BorderShadowColor = Color.FromArgb(200,10, 10, 10),
-                        BorderThickness = 1,
+                        BorderThickness = 0,
                         Padding = new Padding(8,30,8,8),
                         ActiveStyle = new ControlStyle
                         {
@@ -153,6 +153,24 @@ namespace StereoGame.Extended.Gui
                             BorderShineColor = Color.FromArgb(188,10, 10, 10),
                             BorderShadowColor = Color.FromArgb(188,200, 200, 200),
                             BorderThickness =1,
+                        }
+                    },
+                    new ControlStyle(typeof(SysButton))
+                    {
+                        BackgroundColor = Color.Transparent,
+                        BorderColor = Color.Transparent,
+                        BorderShineColor  = Color.Transparent,
+                        BorderShadowColor= Color.Transparent,
+                        BorderThickness = 0,
+                        Padding = new Padding(0),
+                        Margin = new Padding(0),
+                        HoverStyle = new ControlStyle
+                        {
+                            BackgroundColor = Color.FromArgb(46,200,200,200),
+                        },
+                        PressedStyle = new ControlStyle
+                        {
+                            BackgroundColor = Color.FromArgb(46,10,10,10),
                         }
                     },
                     new ControlStyle(typeof(ToggleButton))

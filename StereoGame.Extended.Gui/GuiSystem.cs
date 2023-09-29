@@ -4,7 +4,6 @@
     using StereoGame.Framework.Input;
     using System;
     using System.Drawing;
-    using System.Security.Cryptography;
 
     public class GuiSystem : DrawableGameComponent, IGuiSystem
     {
@@ -21,6 +20,8 @@
         private Control? preSizeControl;
         private HitTestResult dragSizeHitTest;
         private Rectangle sizeStartRect;
+        private int sizingMod = 3;
+        private int sizingCounter;
         private int dragSizeStartX;
         private int dragSizeStartY;
         private bool moveWindowToFrontOnActivate = true;
@@ -72,6 +73,12 @@
             }
         }
 
+        public void ActivateScreenAndWindow(Screen? screen, Window? window)
+        {
+            ActiveScreen = screen;
+            ActivateWindow(window);
+        }
+
         public void ActivateWindow(Window? window)
         {
             if (window != null) { activationWindows.Enqueue(window); }
@@ -99,10 +106,6 @@
             {
                 control.Update(this, gameTime);
                 control.ForEachChild(UpdateControl, gameTime);
-                //foreach (Control child in control.Children)
-                //{
-                //    UpdateControl(child, gameTime);
-                //}
             }
         }
 
@@ -120,10 +123,6 @@
                         offsetY -= bounds.Top;
                         control.Draw(this, renderer, gameTime, offsetX, offsetY);
                         control.ForEachChild(DrawControl, gameTime, offsetX, offsetY);
-                        //foreach (Control child in control.Children)
-                        //{
-                        //    DrawControl(child, gameTime, offsetX, offsetY);
-                        //}
                         control.PopBitmap(this);
                     }
                     GraphicsDevice.BlendMode = Framework.Graphics.BlendMode.Blend;
@@ -133,10 +132,6 @@
                 {
                     control.Draw(this, renderer, gameTime, offsetX, offsetY);
                     control.ForEachChild(DrawControl, gameTime, offsetX, offsetY);
-                    //foreach (Control child in control.Children)
-                    //{
-                    //    DrawControl(child, gameTime, offsetX, offsetY);
-                    //}
                 }
             }
         }
@@ -184,7 +179,6 @@
             if (window != null)
             {
                 SetActiveWindow(window);
-                //activeScreen?.WindowToFront(window);
             }
             return false;
         }
@@ -240,6 +234,7 @@
                 {
                     preSizeControl = preFocusedControl;
                     dragSizeHitTest = hitTest;
+                    sizingCounter = 0;
                     sizeStartRect = preSizeControl.BoundingRectangle;
                     dragSizeStartX = pea.X;
                     dragSizeStartY = pea.Y;
@@ -271,10 +266,14 @@
             {
                 int dX = pea.X - dragSizeStartX;
                 int dY = pea.Y - dragSizeStartY;
-                //dragSizeStartX = pea.X;
-                //dragSizeStartY = pea.Y;
                 if (preSizeControl.Resize(sizeStartRect, dX, dY, dragSizeHitTest))
                 {
+                    sizingCounter++;
+                    if (sizingCounter > sizingMod)
+                    {
+                        sizingCounter = 0;
+                        CheckSizingLayout();
+                    }
                     return true;
                 }
             }
@@ -283,10 +282,18 @@
 
         private bool CheckEndSizing(PointerEventArgs pea)
         {
+            return CheckSizingLayout();
+        }
+
+        private bool CheckSizingLayout()
+        {
             if (preSizeControl != null)
             {
-                preSizeControl.PerformLayout(this);
-                return true;
+                if (sizeStartRect != preSizeControl.BoundingRectangle)
+                {
+                    preSizeControl.PerformLayout(this);
+                    return true;
+                }
             }
             return false;
         }
@@ -374,7 +381,6 @@
                     activeWindow.Active = true;
                     if (moveWindowToFrontOnActivate) { activeScreen?.WindowToFront(activeWindow); }
                 }
-                //if (moveWindowToFrontOnActivate && activeWindow != null) { activeWindow.ToFront(); }
             }
         }
     }

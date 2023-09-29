@@ -34,6 +34,7 @@ namespace StereoGame.Extended.Gui
             foreach (Control child in control.Children)
             {
                 if (!child.Visible) continue;
+                if (child.ExcludeFromLayout) continue;
                 if (first)
                 {
                     first = false;
@@ -77,6 +78,7 @@ namespace StereoGame.Extended.Gui
             foreach (Control child in control.Children)
             {
                 if (!child.Visible) continue;
+                if (child.ExcludeFromLayout) continue;
                 if (first)
                 {
                     first = false;

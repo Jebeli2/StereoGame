@@ -13,7 +13,7 @@
     {
         private static int nextId;
 
-        private readonly int id;
+        private readonly int controlId;
         private Control? parent;
         private readonly List<Control> children = new();
         private int x;
@@ -32,6 +32,7 @@
         private VerticalAlignment verticalAlignment = VerticalAlignment.Stretch;
         private HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.Center;
         private VerticalAlignment verticalTextAlignment = VerticalAlignment.Center;
+        private bool excludeFromLayout;
         private bool enabled;
         private bool visible;
         private bool focused;
@@ -52,6 +53,7 @@
         private Color borderShineColor;
         private Color borderShadowColor;
         private int borderThickness;
+        private int additionalSizeIncrease;
         private Color textColor;
 
 
@@ -68,7 +70,7 @@
 
         protected Control(Control? parent)
         {
-            id = ++nextId;
+            controlId = ++nextId;
             enabled = true;
             visible = true;
             maxWidth = int.MaxValue;
@@ -91,7 +93,7 @@
             }
         }
 
-        public int Id => id;
+        public int ControlId => controlId;
 
         public Control? Parent
         {
@@ -194,6 +196,7 @@
                     child.PerformLayout(context);
                 }
             }
+            additionalSizeIncrease = 0;
             valid = false;
         }
 
@@ -202,9 +205,6 @@
             valid = false;
             parent?.Invalidate();
         }
-
-        //public virtual void InvalidateLayout() { }
-
 
         public int X
         {
@@ -323,6 +323,18 @@
                 if (maxHeight != value)
                 {
                     maxHeight = value;
+                }
+            }
+        }
+
+        public bool ExcludeFromLayout
+        {
+            get { return excludeFromLayout; }
+            set
+            {
+                if (excludeFromLayout != value)
+                {
+                    excludeFromLayout = value;
                 }
             }
         }
@@ -702,11 +714,18 @@
             {
                 x = newRect.X;
                 y = newRect.Y;
+                if (newRect.Width > width)
+                {
+                    additionalSizeIncrease = Math.Max(additionalSizeIncrease, newRect.Width - width);
+                }
+                if (newRect.Height > height)
+                {
+                    additionalSizeIncrease = Math.Max(additionalSizeIncrease, newRect.Height - height);
+                }
                 width = newRect.Width;
                 height = newRect.Height;
                 fixedWidth = width;
                 fixedHeight = height;
-                //PerformLayout(gui);
                 Invalidate();
                 return true;
             }
@@ -736,18 +755,6 @@
         }
 
         public abstract Size GetContentSize(IGuiSystem context);
-
-        //public virtual Size CalculateActualSize(IGuiSystem context)
-        //{
-        //    var desizredSize = GetContentSize(context) + margin.Size + padding.Size;
-        //    if (desizredSize.Width < minWidth) { desizredSize.Width = minWidth; }
-        //    if (desizredSize.Height < minHeight) { desizredSize.Height = minHeight; }
-        //    if (desizredSize.Width > maxWidth) { desizredSize.Width = maxWidth; }
-        //    if (desizredSize.Height > maxHeight) { desizredSize.Height = maxHeight; }
-        //    var awidth = width == 0 ? desizredSize.Width : width;
-        //    var aheight = height == 0 ? desizredSize.Height : height;
-        //    return new Size(awidth, aheight);
-        //}
 
         public virtual HitTestResult GetHitTestResult(int x, int y)
         {
@@ -821,7 +828,7 @@
         private void InitBitmap(IGuiSystem gui)
         {
             bitmap?.Dispose();
-            bitmap = gui.GraphicsDevice.CreateTexture(width, height);
+            bitmap = gui.GraphicsDevice.CreateTexture(ToString(), width + additionalSizeIncrease * 2, height + additionalSizeIncrease * 2);
             if (bitmap != null)
             {
                 bitmap.BlendMode = BlendMode.Blend;
@@ -878,7 +885,7 @@
 
         public override string ToString()
         {
-            return $"{GetType().Name} #{id}";
+            return $"{GetType().Name} #{controlId}";
         }
     }
 }

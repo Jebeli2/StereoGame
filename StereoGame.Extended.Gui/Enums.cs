@@ -33,4 +33,12 @@ namespace StereoGame.Extended.Gui
         SizeTopLeft,
         SizeTopRight,
     }
+
+    public enum WindowCloseAction
+    {
+        None,
+        Hide,
+        Remove,
+        Dispose
+    }
 }

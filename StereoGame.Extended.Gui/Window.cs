@@ -1,6 +1,7 @@
 ﻿namespace StereoGame.Extended.Gui
 {
     using StereoGame.Framework;
+    using StereoGame.Framework.Graphics;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
@@ -10,6 +11,10 @@
 
     public class Window : LayoutControl
     {
+        private static int nextWindowId;
+        private readonly SysButton closeButton;
+        private WindowCloseAction defaultCloseAction;
+        private readonly int windowId;
         public Window()
             : this(null)
 
@@ -19,8 +24,20 @@
         public Window(Screen? screen)
             : base(screen)
         {
+            windowId = ++nextWindowId;
+            defaultCloseAction = WindowCloseAction.None;
             superBitmap = true;
             layout = new BoxLayout(Orientation.Vertical, Alignment.Fill, 10, 10);
+            closeButton = MakeCloseButton();
+        }
+
+        public event EventHandler<WindowClosingEventArgs>? WindowClosing;
+        public event EventHandler<EventArgs>? WindowClosed;
+
+        public WindowCloseAction DefaultWindowCloseAction
+        {
+            get { return defaultCloseAction; }
+            set { defaultCloseAction = value; }
         }
 
         public string? Title
@@ -29,7 +46,55 @@
             set => Text = value;
         }
 
+        private SysButton MakeCloseButton()
+        {
+            SysButton cb = new SysButton(this, Icons.CROSS);
+            cb.ExcludeFromLayout = true;
+            cb.X = 2;
+            cb.Y = 2;
+            cb.FixedWidth = 28;
+            cb.FixedHeight = 28;
+            cb.Width = 28;
+            cb.Height = 28;
+            cb.Clicked += Cb_Clicked;
+            return cb;
+        }
 
+        private void Cb_Clicked(object? sender, EventArgs e)
+        {
+            WindowCloseAction action = OnWindowClosing(defaultCloseAction);
+            switch (action)
+            {
+                case WindowCloseAction.None:
+                    WindowClosed?.Invoke(this, EventArgs.Empty);
+                    break;
+                case WindowCloseAction.Hide:
+                    Visible = false;
+                    WindowClosed?.Invoke(this, EventArgs.Empty);
+                    break;
+                case WindowCloseAction.Remove:
+                    Visible = false;
+                    Parent?.Remove(this);
+                    WindowClosed?.Invoke(this, EventArgs.Empty);
+                    break;
+                case WindowCloseAction.Dispose:
+                    Visible = false;
+                    Parent?.Remove(this);
+                    WindowClosed?.Invoke(this, EventArgs.Empty);
+                    break;
+            }
+        }
+
+        protected virtual WindowCloseAction OnWindowClosing(WindowCloseAction defaultAction)
+        {
+            if (WindowClosing != null)
+            {
+                WindowClosingEventArgs args = new WindowClosingEventArgs(this, defaultAction);
+                WindowClosing(this, args);
+                defaultAction = args.WindowCloseAction;
+            }
+            return defaultAction;
+        }
 
         public override Size GetContentSize(IGuiSystem context)
         {
@@ -89,15 +154,21 @@
             {
                 Rectangle bounds = GetBounds();
                 bounds.Offset(offsetX, offsetY);
+                renderer.DrawWindowBorder(bounds, BorderColor, BorderShineColor, BorderShadowColor, Padding);
                 bounds.Height = Padding.Top;
                 bounds.Inflate(-1, -1);
                 Rectangle textRect = bounds;
-                textRect.X += 20;
-                textRect.Width -= 20;
-                renderer.FillRectangle(bounds, BorderColor);
+                textRect.X += 32;
+                textRect.Width -= 32;
+                //renderer.FillRectangle(bounds, BorderColor);
                 renderer.DrawText(Font, Title, textRect, TextColor, Framework.Graphics.HorizontalAlignment.Left);
-                renderer.DrawHorizontalLine(bounds.Left, bounds.Right - 1, bounds.Bottom, BorderShadowColor);
+                //renderer.DrawHorizontalLine(bounds.Left, bounds.Right - 1, bounds.Bottom, BorderShadowColor);
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{GetType().Name} #{windowId}";
         }
     }
 }

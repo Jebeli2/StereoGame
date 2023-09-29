@@ -260,6 +260,12 @@
             }
         }
 
+        public void Exit()
+        {
+            shouldExit = true;
+            suppressDraw = true;
+        }
+
         public void Tick()
         {
             RetryTick:
