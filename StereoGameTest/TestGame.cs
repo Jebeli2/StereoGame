@@ -29,6 +29,7 @@
         private Screen? guiTestScreen;
         private Window? guiTestWindow;
         private Window? buttonDemo;
+        private Window? propDemo;
 
         private Lines lines;
         private RainingBoxes boxes;
@@ -69,7 +70,7 @@
 
             AudioDevice.PlayMusic(music);
 
-
+            ToggleBoxes();
         }
 
         protected override void UnloadContent()
@@ -143,10 +144,11 @@
             guiTestWindow.WindowClosed += (s, e) => { gui.ActivateScreenAndWindow(mainScreen, titleWindow); };
 
             var b1 = new Button(guiTestWindow, "Buttons");
-            var b2 = new Button(guiTestWindow, "Whatever");
+            var b2 = new Button(guiTestWindow, "Props");
             var b3 = new Button(guiTestWindow, "Back");
 
             b1.Clicked += (s, e) => { if (buttonDemo != null) { buttonDemo.Visible ^= true; } };
+            b2.Clicked += (s, e) => { if (propDemo != null) { propDemo.Visible ^= true; } };
             b3.Clicked += (s, e) => { gui.ActivateScreenAndWindow(mainScreen, titleWindow); };
 
 
@@ -176,8 +178,17 @@
             _ = new Label(buttonDemo, "Check boxes");
             _ = new CheckBox(buttonDemo, "Check Box");
 
-            //buttonDemo.WindowClosed += (s, e) => { };
-
+            propDemo = new Window(guiTestScreen);
+            propDemo.MinWidth = 200;
+            propDemo.MinHeight = 500;
+            propDemo.Title = "Prop Demo";
+            propDemo.Visible = false;
+            propDemo.DefaultWindowCloseAction = WindowCloseAction.Hide;
+            _ = new Label(propDemo, "Proportional Controls");
+            var prop1 = new PropControl(propDemo);
+            prop1.ModifyProp(true, false, 0x2222, 0, 0x5555, 0);
+            var prop2 = new PropControl(propDemo);
+            prop2.ModifyProp(true, false, 0x0, 0, 0x555, 0);
 
         }
 

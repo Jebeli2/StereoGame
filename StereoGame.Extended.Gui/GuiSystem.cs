@@ -276,23 +276,6 @@
             return preSizeControl != null;
         }
 
-        //private bool CheckEndSizing(PointerEventArgs pea)
-        //{
-        //    return CheckSizingLayout();
-        //}
-
-        //private bool CheckSizingLayout()
-        //{
-        //    if (preSizeControl != null)
-        //    {
-        //        if (sizeStartRect != preSizeControl.BoundingRectangle)
-        //        {
-        //            preSizeControl.PerformLayout(this);
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
 
         private void MouseListener_MouseDown(object? sender, MouseEventArgs e)
         {
@@ -319,10 +302,15 @@
             {
                 SetFocus(postFocusedControl);
             }
+            Control? prevPreFocusedControl = preFocusedControl;
             preFocusedControl = null;
             preDragControl = null;
             preSizeControl = null;
             PropagateDown(hoveredControl, x => x.OnPointerUp(pea));
+            if (prevPreFocusedControl != null && prevPreFocusedControl != hoveredControl)
+            {
+                PropagateDown(prevPreFocusedControl, x => x.OnPointerUp(pea));
+            }
         }
 
         private void MouseListener_MouseMoved(object? sender, MouseEventArgs e)
@@ -345,6 +333,10 @@
                 else
                 {
                     PropagateDown(hoveredControl, x => x.OnPointerMove(pea));
+                }
+                if (preFocusedControl != null && preFocusedControl != hoveredControl)
+                {
+                    PropagateDown(preFocusedControl, x => x.OnPointerMove(pea));
                 }
             }
         }

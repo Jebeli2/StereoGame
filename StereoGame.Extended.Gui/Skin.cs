@@ -215,20 +215,21 @@ namespace StereoGame.Extended.Gui
                             BorderShadowColor = Color.FromArgb(188,10, 10, 10),
                             BorderThickness =1,
                         },
-                        //CheckedStyle = new ControlStyle
-                        //{
-                        //    BackgroundColor = Color.Transparent,
-                        //    BorderShineColor = Color.FromArgb(188,200, 200, 200),
-                        //    BorderShadowColor = Color.FromArgb(188,10, 10, 10),
-                        //    BorderThickness = 0,
-                        //},
-                        //CheckedHoverStyle = new ControlStyle
-                        //{
-                        //    BackgroundColor = Color.Transparent,
-                        //    BorderShineColor = Color.FromArgb(188,200, 200, 200),
-                        //    BorderShadowColor = Color.FromArgb(188,10, 10, 10),
-                        //    BorderThickness = 0,
-                        //}
+                    },
+                    new ControlStyle(typeof(PropControl))
+                    {
+                        BackgroundColor = Color.FromArgb(52,52,52),
+                        KnobColor = Color.FromArgb(100,100,100),
+                        BorderColor = Color.Transparent,
+                        BorderShineColor  = Color.Transparent,
+                        BorderShadowColor= Color.Transparent,
+                        BorderThickness = 0,
+                        HoverStyle = new ControlStyle
+                        {
+                            BackgroundColor = Color.FromArgb(64,64,64),
+                            KnobColor = Color.FromArgb(120,120,120),
+                        },
+
                     }
 
                 }

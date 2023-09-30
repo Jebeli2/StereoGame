@@ -59,6 +59,7 @@
         private Color borderColor;
         private Color borderShineColor;
         private Color borderShadowColor;
+        private Color knobColor;
         private int borderThickness;
         private int additionalSizeIncrease;
         private Color textColor;
@@ -185,7 +186,7 @@
             return layout?.GetPreferredSize(context, this) ?? new Size(width, height);
         }
 
-        public void PerformLayout(IGuiSystem context)
+        public virtual void PerformLayout(IGuiSystem context)
         {
             if (layout != null)
             {
@@ -634,6 +635,19 @@
                 if (borderShadowColor != value)
                 {
                     borderShadowColor = value;
+                    Invalidate();
+                }
+            }
+        }
+
+        public Color KnobColor
+        {
+            get { return knobColor; }
+            set
+            {
+                if (knobColor != value)
+                {
+                    knobColor = value;
                     Invalidate();
                 }
             }
