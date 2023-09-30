@@ -13,8 +13,14 @@
     {
         private static int nextWindowId;
         private readonly SysButton closeButton;
+        private readonly SysButton minmaxButton;
         private WindowCloseAction defaultCloseAction;
         private readonly int windowId;
+        private bool maximized;
+        private int oldX;
+        private int oldY;
+        private int oldWidth;
+        private int oldHeight;
         public Window()
             : this(null)
 
@@ -27,8 +33,10 @@
             windowId = ++nextWindowId;
             defaultCloseAction = WindowCloseAction.None;
             superBitmap = true;
+            textIsTitle = true;
             layout = new BoxLayout(Orientation.Vertical, Alignment.Fill, 10, 10);
             closeButton = MakeCloseButton();
+            minmaxButton = MakeMinMaxButton();
         }
 
         public event EventHandler<WindowClosingEventArgs>? WindowClosing;
@@ -46,6 +54,62 @@
             set => Text = value;
         }
 
+        public void Maximize()
+        {
+            Screen? screen = Screen;
+            if (screen != null)
+            {
+                if (!maximized)
+                {
+                    oldX = X;
+                    oldY = Y;
+                    oldWidth = Width;
+                    oldHeight = Height;
+                    maximized = true;
+                    X = 0;
+                    Y = 0;
+                    Width = screen.Width;
+                    Height = screen.Height;
+                    Invalidate();
+                }
+            }
+        }
+
+        public void Restore()
+        {
+            if (maximized)
+            {
+                Width = oldWidth;
+                Height = oldHeight;
+                X = oldX;
+                Y = oldY;
+                maximized = false;
+                Invalidate();
+            }
+        }
+
+        public override void Invalidate()
+        {
+            base.Invalidate();
+            AdjustSysButtons();
+        }
+
+        private void AdjustSysButtons()
+        {
+            if (minmaxButton != null)
+            {
+                minmaxButton.X = Width - 30;
+                if (maximized)
+                {
+                    minmaxButton.Icon = Icons.RESIZE_100_PERCENT;
+                }
+                else
+                {
+                    minmaxButton.Icon = Icons.RESIZE_FULL_SCREEN;
+                }
+            }
+        }
+
         private SysButton MakeCloseButton()
         {
             SysButton cb = new SysButton(this, Icons.CROSS);
@@ -58,6 +122,32 @@
             cb.Height = 28;
             cb.Clicked += Cb_Clicked;
             return cb;
+        }
+
+        private SysButton MakeMinMaxButton()
+        {
+            SysButton mmb = new SysButton(this, Icons.RESIZE_FULL_SCREEN);
+            mmb.ExcludeFromLayout = true;
+            mmb.X = Width - 30;
+            mmb.Y = 2;
+            mmb.FixedWidth = 28;
+            mmb.FixedHeight = 28;
+            mmb.Width = 28;
+            mmb.Height = 28;
+            mmb.Clicked += Mmb_Clicked;
+            return mmb;
+        }
+
+        private void Mmb_Clicked(object? sender, EventArgs e)
+        {
+            if (maximized)
+            {
+                Restore();
+            }
+            else
+            {
+                Maximize();
+            }
         }
 
         private void Cb_Clicked(object? sender, EventArgs e)
@@ -147,23 +237,17 @@
             return HitTestResult.None;
         }
 
-        public override void Draw(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, int offsetX = 0, int offsetY = 0)
+
+        protected override void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
         {
-            base.Draw(gui, renderer, gameTime, offsetX, offsetY);
-            if (!string.IsNullOrEmpty(Title))
-            {
-                Rectangle bounds = GetBounds();
-                bounds.Offset(offsetX, offsetY);
-                renderer.DrawWindowBorder(bounds, BorderColor, BorderShineColor, BorderShadowColor, Padding);
-                bounds.Height = Padding.Top;
-                bounds.Inflate(-1, -1);
-                Rectangle textRect = bounds;
-                textRect.X += 32;
-                textRect.Width -= 32;
-                //renderer.FillRectangle(bounds, BorderColor);
-                renderer.DrawText(Font, Title, textRect, TextColor, Framework.Graphics.HorizontalAlignment.Left);
-                //renderer.DrawHorizontalLine(bounds.Left, bounds.Right - 1, bounds.Bottom, BorderShadowColor);
-            }
+            base.DrawControl(gui, renderer, gameTime, ref bounds);
+            renderer.DrawWindowBorder(bounds, BorderColor, BorderShineColor, BorderShadowColor, Padding);
+            Rectangle titleRect = bounds;
+            titleRect.Height = Padding.Top;
+            titleRect.Inflate(-1, -1);
+            titleRect.X += 32;
+            titleRect.Width -= 32;
+            renderer.DrawText(Font, Title, titleRect, TextColor, HorizontalAlignment.Left);
         }
 
         public override string ToString()

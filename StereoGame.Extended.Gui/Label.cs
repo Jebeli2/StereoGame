@@ -27,8 +27,19 @@ namespace StereoGame.Extended.Gui
 
         public override Size GetContentSize(IGuiSystem context)
         {
-            Size? size = Font?.MeasureText(Text);
-            return size ?? Size.Empty;
+            Size size = Size.Empty;
+            Size? textSize = Font?.MeasureText(Text);
+            if (textSize != null)
+            {
+                size.Width += textSize.Value.Width;
+                size.Height += textSize.Value.Height;
+            }
+            if (Icon != Icons.NONE || alwaysUseIconSpace)
+            {
+                size.Width += (ICONWIDTH * 3) / 2;
+                size.Height = Math.Max(size.Height, ICONHEIGHT);
+            }
+            return size;
         }
 
         public override Size GetPreferredSize(IGuiSystem context)
@@ -37,16 +48,6 @@ namespace StereoGame.Extended.Gui
             return ct + Padding.Size;
         }
 
-        public override void Draw(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, int offsetX = 0, int offsetY = 0)
-        {
-            base.Draw(gui, renderer, gameTime, offsetX, offsetY);
-            if (!string.IsNullOrEmpty(Text))
-            {
-                Rectangle bounds = GetBounds();
-                bounds.Offset(offsetX, offsetY);
-                renderer.DrawText(Font, Text, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
-            }
-        }
 
     }
 }

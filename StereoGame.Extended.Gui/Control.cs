@@ -11,6 +11,9 @@
 
     public abstract class Control
     {
+        public const int ICONWIDTH = 20;
+        public const int ICONHEIGHT = 20;
+
         private static int nextId;
 
         private readonly int controlId;
@@ -46,6 +49,8 @@
         private Texture? bitmap;
 
         protected ILayout? layout;
+        protected bool alwaysUseIconSpace;
+        protected bool textIsTitle;
         private TextFont? font;
         private TextureRegion? backgroundRegion;
         private Color backgroundColor;
@@ -93,6 +98,19 @@
             }
         }
 
+        public ILayout? Layout
+        {
+            get { return layout; }
+            set
+            {
+                if (layout != value)
+                {
+                    layout = value;
+
+                }
+            }
+        }
+
         public int ControlId => controlId;
 
         public Control? Parent
@@ -127,7 +145,7 @@
             }
         }
 
-        public IEnumerable<Control> Children
+        public virtual IEnumerable<Control> Children
         {
             get { return children; }
         }
@@ -153,20 +171,6 @@
             return false;
         }
 
-        public void ForEachChild(Action<Control, GameTime> action, GameTime gameTime)
-        {
-            for (int i = 0; i < children.Count; i++)
-            {
-                action(children[i], gameTime);
-            }
-        }
-        public void ForEachChild(Action<Control, GameTime, int, int> action, GameTime gameTime, int x, int y)
-        {
-            for (int i = 0; i < children.Count; i++)
-            {
-                action(children[i], gameTime, x, y);
-            }
-        }
         public Size GetFixedSize()
         {
             return new Size(fixedWidth, fixedHeight);
@@ -780,19 +784,67 @@
         {
             Rectangle rect = GetBounds();
             rect.Offset(offsetX, offsetY);
+            DrawControl(gui, renderer, gameTime, ref rect);
+        }
+
+        protected virtual void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
+        {
+            DrawControlBorder(gui, renderer, gameTime, ref bounds);
+            DrawControlText(gui, renderer, gameTime, ref bounds);
+        }
+
+        protected virtual Rectangle AdjustBorderBounds(ref Rectangle bounds)
+        {
+            return bounds;
+        }
+
+        protected void DrawControlBorder(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle rect)
+        {
+            Rectangle bounds = AdjustBorderBounds(ref rect);
             if (backgroundRegion != null)
             {
-                renderer.DrawRegion(backgroundRegion, rect);
+                renderer.DrawRegion(backgroundRegion, bounds);
             }
             else if (!backgroundColor.IsEmpty && backgroundColor != Color.Transparent)
             {
-                renderer.FillRectangle(rect, backgroundColor);
+                renderer.FillRectangle(bounds, backgroundColor);
             }
             if (borderThickness != 0)
             {
-                renderer.DrawBorder(rect, borderShineColor, borderShadowColor, borderThickness);
+                renderer.DrawBorder(bounds, borderShineColor, borderShadowColor, borderThickness);
             }
         }
+
+        protected void DrawControlText(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
+        {
+            if (textIsTitle) return;
+            if (!string.IsNullOrEmpty(Text) && (Icon != Icons.NONE || alwaysUseIconSpace))
+            {
+                Rectangle textBounds = bounds;
+                Rectangle iconBounds = bounds;
+                iconBounds.Width = (ICONWIDTH * 3) / 2;
+                switch (HorizontalTextAlignment)
+                {
+                    case HorizontalAlignment.Left:
+                        textBounds.X += ICONWIDTH * 2;
+                        textBounds.Width -= ICONWIDTH * 2;
+                        break;
+                    case HorizontalAlignment.Right:
+                        break;
+                }
+                renderer.DrawText(Font, Text, textBounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
+                renderer.DrawIcon(Icon, iconBounds, TextColor, HorizontalAlignment.Center, VerticalTextAlignment);
+            }
+            else if (!string.IsNullOrEmpty(Text))
+            {
+                renderer.DrawText(Font, Text, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
+            }
+            else if (Icon != Icons.NONE)
+            {
+                renderer.DrawIcon(Icon, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
+            }
+        }
+
 
         internal bool NeedsNewBitmap
         {

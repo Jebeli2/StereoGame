@@ -122,7 +122,7 @@ namespace StereoGame.Extended.Gui
                         BorderShineColor = Color.FromArgb(200,200, 200, 200),
                         BorderShadowColor = Color.FromArgb(200,10, 10, 10),
                         BorderThickness = 0,
-                        Padding = new Padding(8,30,8,8),
+                        Padding = new Padding(4,30,4,4),
                         ActiveStyle = new ControlStyle
                         {
                             BorderColor = Color.FromArgb(200,62,92,154),
@@ -190,6 +190,45 @@ namespace StereoGame.Extended.Gui
                             BorderThickness =1,
 
                         }
+                    },
+                    new ControlStyle(typeof(CheckBox))
+                    {
+                        //BorderThickness = 0,
+                        BackgroundColor = Color.Transparent,
+                        CheckedStyle = new ControlStyle
+                        {
+                            BorderShineColor = Color.FromArgb(188,200, 200, 200),
+                            BorderShadowColor = Color.FromArgb(188,10, 10, 10),
+                            BorderThickness =1,
+                        },
+                        HoverStyle = new ControlStyle
+                        {
+                            BackgroundColor = Color.FromArgb(64,64,64),
+                            BorderShineColor = Color.FromArgb(188,200, 200, 200),
+                            BorderShadowColor = Color.FromArgb(188,10, 10, 10),
+                            BorderThickness =1,
+                        },
+                        CheckedHoverStyle = new ControlStyle
+                        {
+                            BackgroundColor = Color.FromArgb(64,64,64),
+                            BorderShineColor = Color.FromArgb(188,200, 200, 200),
+                            BorderShadowColor = Color.FromArgb(188,10, 10, 10),
+                            BorderThickness =1,
+                        },
+                        //CheckedStyle = new ControlStyle
+                        //{
+                        //    BackgroundColor = Color.Transparent,
+                        //    BorderShineColor = Color.FromArgb(188,200, 200, 200),
+                        //    BorderShadowColor = Color.FromArgb(188,10, 10, 10),
+                        //    BorderThickness = 0,
+                        //},
+                        //CheckedHoverStyle = new ControlStyle
+                        //{
+                        //    BackgroundColor = Color.Transparent,
+                        //    BorderShineColor = Color.FromArgb(188,200, 200, 200),
+                        //    BorderShadowColor = Color.FromArgb(188,10, 10, 10),
+                        //    BorderThickness = 0,
+                        //}
                     }
 
                 }

@@ -26,9 +26,14 @@ namespace StereoGame.Extended.Gui
             if (BoundingRectangle.Contains(args.X, args.Y))
             {
                 Checked = !Checked;
-                CheckedStateChanged?.Invoke(this, EventArgs.Empty);
+                OnCheckedChanged(EventArgs.Empty);
             }
             return true;
+        }
+
+        protected virtual void OnCheckedChanged(EventArgs e)
+        {
+            CheckedStateChanged?.Invoke(this, e);
         }
     }
 }

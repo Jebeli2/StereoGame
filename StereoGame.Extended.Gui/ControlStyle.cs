@@ -39,6 +39,7 @@ namespace StereoGame.Extended.Gui
             BackgroundColor = other.BackgroundColor;
             BorderColor = other.BorderColor;
             BorderShadowColor = other.BorderShadowColor;
+            BorderShineColor = other.BorderShineColor;
             BorderThickness = other.BorderThickness;
             TextColor = other.TextColor;
             Padding = other.Padding;

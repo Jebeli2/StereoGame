@@ -179,6 +179,8 @@
             t2.CheckedStateChanged += (s, e) => { ToggleBoxes(); };
             _ = new ToggleButton(p1) { Icon = Icons.CIRCLE_WITH_PLUS };
             _ = new ToggleButton(p1) { Icon = Icons.DRIVE };
+            _ = new Label(buttonDemo, "Check boxes");
+            _ = new CheckBox(buttonDemo, "Check Box");
 
             //buttonDemo.WindowClosed += (s, e) => { };
 
