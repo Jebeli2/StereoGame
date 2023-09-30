@@ -26,6 +26,8 @@
         private int dragSizeStartY;
         private bool moveWindowToFrontOnActivate = true;
         private readonly Queue<Window> activationWindows = new();
+        private TimeSpan lastTime;
+        private static readonly TimeSpan tickDuration = TimeSpan.FromSeconds(1.0 / 60);
         public GuiSystem(Game game) : base(game)
         {
             DrawOrder = 1000;
@@ -61,6 +63,7 @@
                 CheckScreenSize();
                 mouseListener.Update(gameTime);
                 CheckWindowActivationQueue();
+                CheckTimer(mouseListener, gameTime);
                 UpdateControl(activeScreen, gameTime);
             }
         }
@@ -141,6 +144,16 @@
             if (activeScreen != null && activeScreen.Visible && (screenWidth != Width || screenHeight != Height))
             {
                 InitScreen(activeScreen);
+            }
+        }
+
+        private void CheckTimer(MouseListener mouseListener, GameTime gameTime)
+        {
+            TimeSpan timeDiff = gameTime.Since(lastTime);
+            if (timeDiff >= tickDuration)
+            {
+                lastTime = gameTime.TotalGameTime;
+                MouseTimerTick(mouseListener.LastMouseMoveEventArgs);
             }
         }
 
@@ -274,6 +287,17 @@
                 }
             }
             return preSizeControl != null;
+        }
+
+        private void MouseTimerTick(MouseEventArgs e)
+        {
+            if (activeScreen == null || !activeScreen.Visible) return;
+            Control? c = preFocusedControl ?? focusedControl;
+            if (c != null)
+            {
+                var pea = PointerEventArgs.FromMouseEventArgs(e);
+                PropagateDown(c, x => x.OnPointerTimerTick(pea));
+            }
         }
 
 

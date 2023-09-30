@@ -16,6 +16,13 @@
         private int doubleClickMilliseconds = 500;
         private int dragThreshold = 2;
         private bool hasDoubleClicked;
+        private MouseEventArgs lastMouseMoveEventArgs;
+
+        public MouseListener()
+        {
+            currentState = Mouse.GetState();
+            lastMouseMoveEventArgs = new MouseEventArgs(currentState, previousState, MouseButton.None, TimeSpan.Zero);
+        }
 
         public event EventHandler<MouseEventArgs>? MouseDown;
         public event EventHandler<MouseEventArgs>? MouseUp;
@@ -27,6 +34,8 @@
         public event EventHandler<MouseEventArgs>? MouseDrag;
         public event EventHandler<MouseEventArgs>? MouseDragEnd;
         public bool HasMouseMoved => (previousState.X != currentState.X) || (previousState.Y != currentState.Y);
+
+        public MouseEventArgs LastMouseMoveEventArgs => lastMouseMoveEventArgs;
 
         public void Update(GameTime gameTime)
         {
@@ -45,7 +54,8 @@
 
             if (HasMouseMoved)
             {
-                MouseMoved?.Invoke(this, new MouseEventArgs(currentState, previousState, MouseButton.None, currentTime));
+                lastMouseMoveEventArgs = new MouseEventArgs(currentState, previousState, MouseButton.None, currentTime);
+                MouseMoved?.Invoke(this, lastMouseMoveEventArgs);
             }
 
             previousState = currentState;

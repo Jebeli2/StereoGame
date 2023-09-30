@@ -153,6 +153,7 @@
 
 
             buttonDemo = new Window(guiTestScreen);
+            buttonDemo.SetPosition(200, 50);
             buttonDemo.MinWidth = 200;
             buttonDemo.MinHeight = 500;
             buttonDemo.Title = "Button Demo";
@@ -179,6 +180,7 @@
             _ = new CheckBox(buttonDemo, "Check Box");
 
             propDemo = new Window(guiTestScreen);
+            propDemo.SetPosition(400, 50);
             propDemo.MinWidth = 200;
             propDemo.MinHeight = 500;
             propDemo.Title = "Prop Demo";
@@ -189,6 +191,8 @@
             prop1.ModifyProp(true, false, 0x2222, 0, 0x5555, 0);
             var prop2 = new PropControl(propDemo);
             prop2.ModifyProp(true, false, 0x0, 0, 0x555, 0);
+            var prop3 = new PropControl(propDemo);
+            prop3.ModifyProp(true, true, 0x2000, 0x2000, 0x1000, 0x2000);
 
         }
 

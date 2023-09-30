@@ -6,7 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class MouseEventArgs:EventArgs
+    public class MouseEventArgs : EventArgs
     {
         private readonly MouseState currentState;
         private readonly MouseState previousState;

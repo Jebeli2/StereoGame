@@ -32,7 +32,8 @@
         private int knobStartX;
         private int knobStartY;
         private bool knobHit;
-
+        private bool containerHit;
+        private int timerDelay;
         public PropControl(Control? parent)
             : base(parent)
         {
@@ -194,12 +195,15 @@
                 knobStartY = args.Y - (knob.Y - bounds.Y);
                 Console.WriteLine($"Knob Hit: {args.X}/{args.Y} KS: {knobStartX}/{knobStartY}");
                 knobHit = true;
+                containerHit = false;
             }
             else
             {
                 knobHit = false;
+                containerHit = true;
                 Console.WriteLine($"Knob Miss: {args.X}/{args.Y}");
                 HandleContainerHit(knob, args.X, args.Y);
+                timerDelay = 4;
             }
             return base.OnPointerDown(args);
         }
@@ -207,6 +211,7 @@
         public override bool OnPointerUp(PointerEventArgs args)
         {
             knobHit = false;
+            containerHit = false;
             return base.OnPointerUp(args);
         }
 
@@ -217,6 +222,19 @@
                 HandleKnobMove(args.X, args.Y);
             }
             return base.OnPointerMove(args);
+        }
+
+        public override bool OnPointerTimerTick(PointerEventArgs args)
+        {
+            timerDelay--;
+            if (timerDelay <= 0 && containerHit)
+            {
+                Rectangle container = GetBounds();
+                Rectangle knob = CalcKnobSize(container);
+                HandleContainerHit(knob, args.X, args.Y);
+                timerDelay = 2;
+            }
+            return base.OnPointerTimerTick(args);
         }
 
         private void HandleKnobMove(int x, int y)

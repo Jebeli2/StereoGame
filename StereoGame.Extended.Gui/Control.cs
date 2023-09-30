@@ -975,7 +975,7 @@
                 bitmap.BlendMode = BlendMode.Blend;
             }
         }
-
+        public virtual bool OnPointerTimerTick(PointerEventArgs args) { return true; }
         public virtual bool OnPointerDown(PointerEventArgs args) { return true; }
         public virtual bool OnPointerUp(PointerEventArgs args) { return true; }
         public virtual bool OnPointerMove(PointerEventArgs args) { return true; }
