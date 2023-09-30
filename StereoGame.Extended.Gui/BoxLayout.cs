@@ -109,10 +109,7 @@ namespace StereoGame.Extended.Gui
                         break;
                 }
 
-                child.X = pos.X;
-                child.Y = pos.Y;
-                child.Width = targetSize.Width;
-                child.Height = targetSize.Height;
+                child.SetBounds(pos.X, pos.Y, targetSize.Width, targetSize.Height);
                 child.PerformLayout(context);
                 position += targetSize.GetAxis(axis1);
             }

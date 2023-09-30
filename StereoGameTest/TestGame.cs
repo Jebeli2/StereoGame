@@ -120,29 +120,25 @@
             //}
             mainScreen = new Screen();
             titleWindow = new Window(mainScreen);
-            titleWindow.X = 20;
-            titleWindow.Y = 50;
-            titleWindow.Width = 200;
-            titleWindow.Height = 200;
+            titleWindow.MinWidth = 120;
+            titleWindow.MinHeight = 120;
             titleWindow.Title = "Stereo";
             titleWindow.WindowClosed += (s, e) => { Exit(); };
 
-            var button1 = new Button(titleWindow, "Test GUI") { X = 10, Y = 10, Width = 180, Height = 30 };
+            var button1 = new Button(titleWindow, "Test GUI");
 
             button1.Clicked += (s, e) => { gui.ActivateScreenAndWindow(guiTestScreen, guiTestWindow); };
 
-            var button2 = new Button(titleWindow, "Test MAP") { X = 10, Y = 50, Width = 180, Height = 30 };
-            var button3 = new Button(titleWindow, "Test SOM") { X = 10, Y = 90, Width = 180, Height = 30 };
+            var button2 = new Button(titleWindow, "Test MAP");
+            var button3 = new Button(titleWindow, "Test SOM");
 
             gui.ActivateScreenAndWindow(mainScreen, titleWindow);
 
 
             guiTestScreen = new Screen();
             guiTestWindow = new Window(guiTestScreen);
-            guiTestWindow.X = 100;
-            guiTestWindow.Y = 100;
-            guiTestWindow.Width = 200;
-            guiTestWindow.Height = 200;
+            guiTestWindow.MinWidth = 120;
+            guiTestWindow.MinHeight = 120;
             guiTestWindow.Title = "GUI Test";
             guiTestWindow.WindowClosed += (s, e) => { gui.ActivateScreenAndWindow(mainScreen, titleWindow); };
 
@@ -155,10 +151,8 @@
 
 
             buttonDemo = new Window(guiTestScreen);
-            buttonDemo.X = 200;
-            buttonDemo.Y = 100;
-            buttonDemo.Width = 200;
-            buttonDemo.Height = 200;
+            buttonDemo.MinWidth = 200;
+            buttonDemo.MinHeight = 500;
             buttonDemo.Title = "Button Demo";
             buttonDemo.Visible = false;
             buttonDemo.DefaultWindowCloseAction = WindowCloseAction.Hide;

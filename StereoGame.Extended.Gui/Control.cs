@@ -6,6 +6,7 @@
     using System.Collections.Generic;
     using System.Drawing;
     using System.Linq;
+    using System.Reflection.Metadata;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -44,6 +45,7 @@
         private bool _checked;
         private bool active;
 
+        protected bool layoutNeeded;
         protected bool valid;
         protected bool superBitmap;
         private Texture? bitmap;
@@ -106,7 +108,7 @@
                 if (layout != value)
                 {
                     layout = value;
-
+                    InvalidateLayout();
                 }
             }
         }
@@ -156,6 +158,7 @@
             {
                 children.Add(child);
                 child.parent = this;
+                InvalidateLayout();
                 return true;
             }
             return false;
@@ -166,6 +169,7 @@
             if (children.Remove(child))
             {
                 child.parent = null;
+                InvalidateLayout();
                 return true;
             }
             return false;
@@ -193,15 +197,22 @@
                 {
                     Size pref = child.GetPreferredSize(context);
                     Size fix = child.GetFixedSize();
-                    int w = fix.Width != 0 ? fix.Width : pref.Width;
-                    int h = fix.Height != 0 ? fix.Height : pref.Height;
-                    child.Width = w;
-                    child.Height = h;
-                    child.PerformLayout(context);
+                    Size cs = pref.GetValidSize(ref fix);
+                    child.SetSize(cs.Width, cs.Height);
+                    if (child.LayoutNeeded) child.PerformLayout(context);
                 }
             }
             additionalSizeIncrease = 0;
+            layoutNeeded = false;
             valid = false;
+        }
+
+        public bool LayoutNeeded => layoutNeeded;
+
+        public virtual void InvalidateLayout()
+        {
+            layoutNeeded = true;
+            //valid = false;
         }
 
         public virtual void Invalidate()
@@ -213,73 +224,120 @@
         public int X
         {
             get { return x; }
-            set
-            {
-                if (x != value)
-                {
-                    x = value;
-                }
-            }
+            //set
+            //{
+            //    if (x != value)
+            //    {
+            //        x = value;
+            //    }
+            //}
         }
 
         public int Y
         {
             get { return y; }
-            set
-            {
-                if (y != value)
-                {
-                    y = value;
-                }
-            }
+            //set
+            //{
+            //    if (y != value)
+            //    {
+            //        y = value;
+            //    }
+            //}
         }
 
         public int Width
         {
             get { return width; }
-            set
-            {
-                if (width != value)
-                {
-                    width = value;
-                }
-            }
+            //set { SetSize(value, height); }
         }
 
         public int Height
         {
             get { return height; }
-            set
-            {
-                if (height != value)
-                {
-                    height = value;
-                }
-            }
+            //set { SetSize(width, value); }
         }
 
         public int FixedWidth
         {
             get { return fixedWidth; }
-            set
-            {
-                if (fixedWidth != value)
-                {
-                    fixedWidth = value;
-                }
-            }
+            //set { SetFixedSize(value, fixedHeight); }
         }
 
         public int FixedHeight
         {
             get { return fixedHeight; }
-            set
+            //set { SetFixedSize(fixedWidth, value); }
+        }
+
+        public bool SetFixedBounds(int x, int y, int width, int height)
+        {
+            ValidateSize(ref width, ref height);
+            if (this.x != x || this.y != y || fixedWidth != width || fixedHeight != height)
             {
-                if (fixedHeight != value)
-                {
-                    fixedHeight = value;
-                }
+                this.x = x;
+                this.y = y;
+                fixedWidth = width;
+                fixedHeight = height;
+                if (fixedWidth > 0) { this.width = fixedWidth; }
+                if (fixedHeight > 0) { this.height = fixedHeight; }
+                InvalidateLayout();
+                return true;
             }
+            return false;
+        }
+
+        public bool SetBounds(int x, int y, int width, int height)
+        {
+            ValidateSize(ref width, ref height);
+            if (this.x != x || this.y != y || this.width != width || this.height != height)
+            {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                InvalidateLayout();
+                return true;
+            }
+            return false;
+        }
+
+        public bool SetSize(int width, int height)
+        {
+            ValidateSize(ref width, ref height);
+            if (this.width != width || this.height != height)
+            {
+                this.width = width;
+                this.height = height;
+                InvalidateLayout();
+                return true;
+            }
+            return false;
+        }
+
+        public bool SetFixedSize(int width, int height)
+        {
+            ValidateSize(ref fixedWidth, ref fixedHeight);
+            if (fixedWidth != width || fixedHeight != height)
+            {
+                fixedWidth = width;
+                fixedHeight = height;
+                if (fixedWidth > 0) { this.width = fixedWidth; }
+                if (fixedHeight > 0) { this.height = fixedHeight; }
+                InvalidateLayout();
+                return true;
+            }
+            return false;
+        }
+
+        public bool SetPosition(int x, int y)
+        {
+            if (this.x != x || this.y != y)
+            {
+                this.x = x;
+                this.y = y;
+                return true;
+            }
+            return false;
         }
 
 
@@ -329,6 +387,24 @@
                     maxHeight = value;
                 }
             }
+        }
+
+        protected void ValidateSize(ref int width, ref int height)
+        {
+            if (width > maxWidth) { width = maxWidth; }
+            if (height > maxHeight) { height = maxHeight; }
+            if (width < minWidth && width > 0) { width = minWidth; }
+            if (height < minHeight && height > 0) { height = minHeight; }
+
+        }
+
+        protected void ValidateBounds(ref int x, ref int y, ref int width, ref int height)
+        {
+            if (width > maxWidth) { width = maxWidth; }
+            if (height > maxHeight) { height = maxHeight; }
+            if (width < minWidth) { width = minWidth; }
+            if (height < minHeight) { height = minHeight; }
+
         }
 
         public bool ExcludeFromLayout
@@ -716,8 +792,6 @@
             }
             if (newRect != startRect)
             {
-                x = newRect.X;
-                y = newRect.Y;
                 if (newRect.Width > width)
                 {
                     additionalSizeIncrease = Math.Max(additionalSizeIncrease, newRect.Width - width);
@@ -726,12 +800,7 @@
                 {
                     additionalSizeIncrease = Math.Max(additionalSizeIncrease, newRect.Height - height);
                 }
-                width = newRect.Width;
-                height = newRect.Height;
-                fixedWidth = width;
-                fixedHeight = height;
-                Invalidate();
-                return true;
+                return SetFixedBounds(newRect.X, newRect.Y, newRect.Width, newRect.Height);
             }
             return false;
         }
@@ -758,7 +827,7 @@
             return false;
         }
 
-        public abstract Size GetContentSize(IGuiSystem context);
+        //public abstract Size GetContentSize(IGuiSystem context);
 
         public virtual HitTestResult GetHitTestResult(int x, int y)
         {
@@ -778,7 +847,13 @@
         {
             return parent != null && ((parent == control) || parent.HasParent(control));
         }
-        public virtual void Update(IGuiSystem gui, GameTime gameTime) { }
+        public virtual void Update(IGuiSystem gui, GameTime gameTime)
+        {
+            if (layoutNeeded)
+            {
+                PerformLayout(gui);
+            }
+        }
 
         public virtual void Draw(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, int offsetX = 0, int offsetY = 0)
         {

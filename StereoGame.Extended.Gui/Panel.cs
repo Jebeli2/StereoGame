@@ -15,9 +15,6 @@ namespace StereoGame.Extended.Gui
             layout = new BoxLayout(Orientation.Horizontal, Alignment.Fill, 0, 10);
         }
 
-        public override Size GetContentSize(IGuiSystem context)
-        {
-            return new Size(Width, Height);
-        }
+
     }
 }

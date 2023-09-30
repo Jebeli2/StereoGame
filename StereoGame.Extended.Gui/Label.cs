@@ -25,7 +25,7 @@ namespace StereoGame.Extended.Gui
             VerticalTextAlignment = VerticalAlignment.Top;
         }
 
-        public override Size GetContentSize(IGuiSystem context)
+        private Size CalcContentSize()
         {
             Size size = Size.Empty;
             Size? textSize = Font?.MeasureText(Text);
@@ -44,7 +44,7 @@ namespace StereoGame.Extended.Gui
 
         public override Size GetPreferredSize(IGuiSystem context)
         {
-            Size ct = GetContentSize(context);
+            Size ct = CalcContentSize();
             return ct + Padding.Size;
         }
 

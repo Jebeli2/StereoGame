@@ -31,6 +31,7 @@
             : base(screen)
         {
             windowId = ++nextWindowId;
+            SetPosition(33, 33);
             defaultCloseAction = WindowCloseAction.None;
             superBitmap = true;
             textIsTitle = true;
@@ -54,6 +55,8 @@
             set => Text = value;
         }
 
+        public bool Maximized => maximized;
+
         public void Maximize()
         {
             Screen? screen = Screen;
@@ -66,11 +69,7 @@
                     oldWidth = Width;
                     oldHeight = Height;
                     maximized = true;
-                    X = 0;
-                    Y = 0;
-                    Width = screen.Width;
-                    Height = screen.Height;
-                    Invalidate();
+                    SetFixedBounds(0, 0, screen.Width, screen.Height);
                 }
             }
         }
@@ -79,12 +78,8 @@
         {
             if (maximized)
             {
-                Width = oldWidth;
-                Height = oldHeight;
-                X = oldX;
-                Y = oldY;
+                SetFixedBounds(oldX, oldY, oldWidth, oldHeight);
                 maximized = false;
-                Invalidate();
             }
         }
 
@@ -94,11 +89,17 @@
             AdjustSysButtons();
         }
 
+        public override void InvalidateLayout()
+        {
+            base.InvalidateLayout();
+            AdjustSysButtons();
+        }
+
         private void AdjustSysButtons()
         {
             if (minmaxButton != null)
             {
-                minmaxButton.X = Width - 30;
+                minmaxButton.SetFixedBounds(Width - 30, 2, 28, 28);
                 if (maximized)
                 {
                     minmaxButton.Icon = Icons.RESIZE_100_PERCENT;
@@ -114,12 +115,7 @@
         {
             SysButton cb = new SysButton(this, Icons.CROSS);
             cb.ExcludeFromLayout = true;
-            cb.X = 2;
-            cb.Y = 2;
-            cb.FixedWidth = 28;
-            cb.FixedHeight = 28;
-            cb.Width = 28;
-            cb.Height = 28;
+            cb.SetFixedBounds(2, 2, 28, 28);
             cb.Clicked += Cb_Clicked;
             return cb;
         }
@@ -128,12 +124,7 @@
         {
             SysButton mmb = new SysButton(this, Icons.RESIZE_FULL_SCREEN);
             mmb.ExcludeFromLayout = true;
-            mmb.X = Width - 30;
-            mmb.Y = 2;
-            mmb.FixedWidth = 28;
-            mmb.FixedHeight = 28;
-            mmb.Width = 28;
-            mmb.Height = 28;
+            mmb.SetFixedBounds(Width - 30, 2, 28, 28);
             mmb.Clicked += Mmb_Clicked;
             return mmb;
         }
@@ -184,11 +175,6 @@
                 defaultAction = args.WindowCloseAction;
             }
             return defaultAction;
-        }
-
-        public override Size GetContentSize(IGuiSystem context)
-        {
-            return new Size(Width, Height);
         }
 
         public override HitTestResult GetHitTestResult(int x, int y)

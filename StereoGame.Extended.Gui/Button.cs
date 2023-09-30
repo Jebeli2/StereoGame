@@ -78,7 +78,8 @@
             return base.OnPointerLeave(args);
         }
 
-        public override Size GetContentSize(IGuiSystem context)
+
+        private Size CalcContentSize()
         {
             Size size = Size.Empty;
             Size? textSize = Font?.MeasureText(Text);
@@ -101,7 +102,7 @@
             {
                 return layout.GetPreferredSize(context, this);
             }
-            Size ct = GetContentSize(context);
+            Size ct = CalcContentSize();
             return ct + Padding.Size;
         }
 

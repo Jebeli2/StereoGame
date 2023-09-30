@@ -148,13 +148,8 @@
         {
             screenWidth = Width;
             screenHeight = Height;
-            screen.X = 0;
-            screen.Y = 0;
-            screen.FixedWidth = screenWidth;
-            screen.FixedHeight = screenHeight;
-            screen.Width = screenWidth;
-            screen.Height = screenHeight;
-            screen.PerformLayout(this);
+            screen.SetFixedBounds(0, 0, screenWidth, screenHeight);
+            screen.InvalidateWindows();
         }
 
         private Control? FindControlAt(int x, int y)
@@ -272,7 +267,8 @@
                     if (sizingCounter > sizingMod)
                     {
                         sizingCounter = 0;
-                        CheckSizingLayout();
+                        preSizeControl.InvalidateLayout();
+                        //CheckSizingLayout();
                     }
                     return true;
                 }
@@ -280,23 +276,23 @@
             return preSizeControl != null;
         }
 
-        private bool CheckEndSizing(PointerEventArgs pea)
-        {
-            return CheckSizingLayout();
-        }
+        //private bool CheckEndSizing(PointerEventArgs pea)
+        //{
+        //    return CheckSizingLayout();
+        //}
 
-        private bool CheckSizingLayout()
-        {
-            if (preSizeControl != null)
-            {
-                if (sizeStartRect != preSizeControl.BoundingRectangle)
-                {
-                    preSizeControl.PerformLayout(this);
-                    return true;
-                }
-            }
-            return false;
-        }
+        //private bool CheckSizingLayout()
+        //{
+        //    if (preSizeControl != null)
+        //    {
+        //        if (sizeStartRect != preSizeControl.BoundingRectangle)
+        //        {
+        //            preSizeControl.PerformLayout(this);
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
 
         private void MouseListener_MouseDown(object? sender, MouseEventArgs e)
         {
@@ -314,11 +310,11 @@
             if (activeScreen == null || !activeScreen.Visible) return;
             var postFocusedControl = FindControlAt(e.X, e.Y);
             var pea = PointerEventArgs.FromMouseEventArgs(e);
-            if (CheckEndSizing(pea))
-            {
+            //if (CheckEndSizing(pea))
+            //{
 
-                Mouse.ClearSystemCursor();
-            }
+            Mouse.ClearSystemCursor();
+            //}
             if (preFocusedControl == postFocusedControl)
             {
                 SetFocus(postFocusedControl);
