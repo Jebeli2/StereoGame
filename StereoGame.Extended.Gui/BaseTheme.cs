@@ -16,10 +16,13 @@
         public const int ICONWIDTH = 20;
         public const int ICONHEIGHT = 20;
 
+        private static readonly string spaceText = " ";
         private static BaseTheme? instance;
 
         public Color ShinePen { get; set; }
         public Color ShadowPen { get; set; }
+        public Color SelectedTextBackPen { get; set; }
+        public Color SelectedTextPen { get; set; }
         public Color TextPen { get; set; }
         public Color TextHoverPen { get; set; }
         public Color SysTextPen { get; set; }
@@ -48,11 +51,15 @@
         public Color KnobTopHoverPen { get; set; }
         public Color KnobBottomHoverPen { get; set; }
 
+        public Color StrTopBackPen { get; set; }
+        public Color StrBottomBackPen { get; set; }
 
         public BaseTheme()
         {
             ShinePen = Color.FromArgb(250, 92, 92, 92);
             ShadowPen = Color.FromArgb(250, 29, 29, 29);
+            SelectedTextBackPen = Color.FromArgb(230, 62, 92, 154);
+            SelectedTextPen = Color.FromArgb(255, 255, 255, 255);
             TextPen = Color.FromArgb(238, 238, 238);
             TextHoverPen = Color.FromArgb(240, 240, 240);
             SysTextPen = Color.FromArgb(160, 220, 220, 220);
@@ -80,6 +87,10 @@
             KnobBottomPen = Color.FromArgb(100, 128, 128, 128);
             KnobTopHoverPen = Color.FromArgb(100, 220, 220, 220);
             KnobBottomHoverPen = Color.FromArgb(100, 128, 128, 128);
+
+            StrTopBackPen = Color.FromArgb(32, 0, 0, 0);
+            StrBottomBackPen = Color.FromArgb(92, 0, 0, 0);
+
         }
 
         public static ITheme Instance
@@ -190,6 +201,54 @@
             if (!scrollBar.Borderless)
             {
                 renderer.DrawBorder(bounds, ShinePen, ShadowPen);
+            }
+        }
+
+        public void DrawStrControl(IGuiSystem gui, IGuiRenderer renderer, GameTime time, StrControl str, ref Rectangle bounds)
+        {
+            renderer.FillVertGradient(bounds, StrTopBackPen, StrBottomBackPen);
+            if (!str.Borderless) { renderer.DrawBorder(bounds, ShadowPen, ShinePen); }
+            Rectangle inner = bounds;
+            inner.Inflate(-1, -1);
+            string buffer = str.Buffer;
+            int x = inner.X;
+            int y = inner.Y;
+            int last = buffer.Length;
+            int dispPos = str.DispPos;
+            TextFont? font = str.Font;
+            if (font != null)
+            {
+                for (int i = dispPos; i < last + 1; i++)
+                {
+                    char c = ' ';
+                    ReadOnlySpan<char> txt;
+                    if (i < last)
+                    {
+                        c = buffer[i];
+                        txt = buffer.AsSpan(i, 1);
+                    }
+                    else
+                    {
+                        txt = spaceText;
+                    }
+                    bool selected = (i >= str.BufferSelStart && i < str.BufferSelEnd);
+                    font.GetGlyphMetrics(c, out _, out _, out _, out _, out int advance);
+                    if (selected)
+                    {
+                        renderer.FillRectangle(new Rectangle(x, y, advance, inner.Height), SelectedTextBackPen);
+                        renderer.DrawText(font, txt, x, y, 0, 0, SelectedTextPen, HorizontalAlignment.Left, VerticalAlignment.Top);
+                    }
+                    else
+                    {
+                        renderer.DrawText(font, txt, x, y, 0, 0, TextPen, HorizontalAlignment.Left, VerticalAlignment.Top);
+
+                    }
+                    if (i == str.BufferPos && str.ShowCaret)
+                    {
+                        renderer.DrawVerticalLine(x, y, y + font.FontHeight, TextPen);
+                    }
+                    x += advance;
+                }
             }
         }
 

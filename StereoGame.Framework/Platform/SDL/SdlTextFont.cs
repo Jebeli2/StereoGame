@@ -55,5 +55,10 @@ namespace StereoGame.Framework.Platform.SDL
             }
             return new Size(w, h);
         }
+
+        public override int GetGlyphMetrics(char c, out int minx, out int maxx, out int miny, out int maxy, out int advance)
+        {
+            return SDL2TTF.GlyphMetrics32(handle, (uint)c, out minx, out maxx, out miny, out maxy, out advance);
+        }
     }
 }

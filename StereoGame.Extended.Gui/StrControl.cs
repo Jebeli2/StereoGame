@@ -1,6 +1,7 @@
 ﻿namespace StereoGame.Extended.Gui
 {
     using StereoGame.Framework;
+    using StereoGame.Framework.Graphics;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
@@ -17,6 +18,8 @@
         private int bufferSelStart;
         private int bufferSelEnd;
         private int intValue;
+        private int dispPos;
+        private bool showCaret;
         private double doubleValue;
         private StrFlags flags;
         public StrControl(Control? parent, string buffer = "")
@@ -46,8 +49,19 @@
                 bufferSelStart = 0;
                 bufferSelEnd = 0;
                 bufferPos = value;
-                NormSelection();
+                AdjustDispPos();
+                Invalidate();
             }
+        }
+
+        public int DispPos
+        {
+            get { return dispPos; }
+        }
+
+        public bool ShowCaret
+        {
+            get { return showCaret; }
         }
 
         public int IntValue
@@ -102,6 +116,7 @@
             bufferSelStart = start;
             bufferSelEnd = end;
             NormSelection();
+            Invalidate();
         }
 
         private void SetBufferSel(int pos)
@@ -120,47 +135,68 @@
             }
         }
 
-        protected bool WrapAtChar(int x, char s)
+        private void AdjustDispPos()
         {
-            return false;
+            int cd = CalcBufferPosDispPos(Font);
+            if (cd != 0)
+            {
+                Rectangle bounds = GetBounds();
+                if (cd > bounds.Width)
+                {
+                    while (cd > bounds.Width)
+                    {
+                        dispPos++;
+                        cd = CalcBufferPosDispPos(Font);
+                    }
+                }
+                else if (cd < bounds.Width)
+                {
+                    while (cd < bounds.Width && dispPos > 0)
+                    {
+                        dispPos--;
+                        cd = CalcBufferPosDispPos(Font);
+                    }
+                }
+            }
+            else
+            {
+                dispPos = 0;
+            }
         }
-
-        protected bool MapPosition(int mx, int my, out int pos)
+        private int CalcBufferPosDispPos(TextFont? font)
         {
-            pos = -1;
-            int nLines = 0;
+            int x = 0;
+            if (font != null)
+            {
+                for (int i = dispPos; i < bufferPos + 1; i++)
+                {
+                    char ch = ' ';
+                    if (i < buffer.Length) { ch = buffer[i]; }
+                    font.GetGlyphMetrics(ch, out _, out _, out _, out _, out int advance);
+                    x += advance;
+                }
+            }
+            return x;
+        }
+        private bool MapPosition(TextFont font, int mx, int my, out int pos)
+        {
+            pos = 0;
             int x = 0;
             int y = 0;
-            if (my < y) return false;
+            int lineSkip = font.FontLineSkip;
             if (mx < x) return false;
-            for (int i = 0; i < buffer.Length; i++)
+            if (my < y) return false;
+            for (int i = dispPos; i < buffer.Length; i++)
             {
                 char ch = buffer[i];
-                if (WrapAtChar(x, ch))
+                font.GetGlyphMetrics(ch, out _, out _, out _, out _, out int advance);
+                int gx = advance;
+                if ((my >= y && my <= (y + lineSkip)) && (mx >= x && mx <= x + gx))
                 {
-                    x = 0;
-                    nLines++;
+                    pos = i;
+                    return true;
                 }
-                if (ch == '\n')
-                {
-                    x = 0;
-                    nLines++;
-                }
-                else if (ch == '\t')
-                {
-                    x += textTabWidth;
-                }
-                else
-                {
-                    Size gs = Font?.MeasureText("" + ch) ?? new Size(lineSkip, lineSkip);
-                    int gx = gs.Width;
-                    if ((my >= y && my <= (y + lineSkip)) && (mx >= x && mx <= x + gx))
-                    {
-                        pos = i;
-                        return true;
-                    }
-                    x += gx;
-                }
+                x += gx;
             }
             if ((my >= y && my <= (y + lineSkip)) && (mx >= x))
             {
@@ -170,13 +206,60 @@
             return false;
         }
 
+        private bool GetPos(int x, int y, out int pos)
+        {
+            if (Font != null)
+            {
+                if (MapPosition(Font, x, y, out pos))
+                {
+                    return true;
+                }
+            }
+            pos = -1;
+            return false;
+        }
+
+        public override bool OnPointerDown(PointerEventArgs args)
+        {
+            showCaret = true;
+            Pressed = true;
+            ScreenToControl(args.X, args.Y, out int x, out int y);
+            if (GetPos(x, y, out int pos))
+            {
+
+                BufferPos = pos;
+                return true;
+            }
+            return base.OnPointerDown(args);
+        }
         public override bool OnPointerUp(PointerEventArgs args)
         {
-            if (MapPosition(args.X, args.Y, out int pos))
+            showCaret = false;
+            if (Pressed)
+            {
+                Pressed = false;
+            }
+            ScreenToControl(args.X, args.Y, out int x, out int y);
+            if (GetPos(x, y, out int pos))
             {
                 SetBufferSel(pos);
+                return true;
             }
             return base.OnPointerUp(args);
+        }
+
+        public override bool OnPointerMove(PointerEventArgs args)
+        {
+            if (Active && Pressed)
+            {
+                ScreenToControl(args.X, args.Y, out int x, out int y);
+                if (GetPos(x, y, out int pos))
+                {
+                    SetBufferSel(pos);
+                    return true;
+                }
+            }
+            return base.OnPointerMove(args);
         }
 
         public override Size GetPreferredSize(IGuiSystem context)
@@ -193,39 +276,7 @@
 
         protected override void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
         {
-            base.DrawControl(gui, renderer, gameTime, ref bounds);
-            string buff = buffer + " ";
-            Rectangle cFrame = bounds;
-            cFrame.Inflate(-2, -2);
-            int x = cFrame.X;
-            int y = cFrame.Y;
-            bool selected = false;
-            Rectangle charRect = cFrame;
-            var ha = Framework.Graphics.HorizontalAlignment.Left;
-            var va = Framework.Graphics.VerticalAlignment.Top;
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                var c = buffer[i];
-
-                selected = (i >= bufferSelStart && i < bufferSelEnd);
-                if (selected)
-                {
-                    renderer.DrawText(Font, "" + c, charRect, TextColor, ha, va);
-                }
-                else
-                {
-                    renderer.DrawText(Font, "" + c, charRect, TextColor, ha, va);
-                }
-                if (i == bufferPos) // drawCursor
-                {
-                    if (Focused)
-                    {
-                        renderer.DrawVerticalLine(x, y, y + lineSkip - 1, TextColor);
-                    }
-                }
-                int ax = Font?.MeasureText("" + c).Width ?? lineSkip;
-                charRect.X += ax;
-            }
+            Theme?.DrawStrControl(gui, renderer, gameTime, this, ref bounds);
         }
     }
 }

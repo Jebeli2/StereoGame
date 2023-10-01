@@ -713,6 +713,12 @@
         public bool SuperBitmap => superBitmap;
         public Texture? Bitmap => bitmap;
 
+        public void ScreenToControl(int sx, int sy, out int x, out int y)
+        {
+            Point sp = ScreenPosition;
+            x = sx - sp.X;
+            y = sy - sp.Y;
+        }
         public Rectangle BoundingRectangle
         {
             get
@@ -727,6 +733,20 @@
             {
                 var rect = BoundingRectangle;
                 return new Rectangle(rect.Left + padding.Left, rect.Top + padding.Top, rect.Width - padding.Horizontal, rect.Height - padding.Vertical);
+            }
+        }
+
+        public virtual Point ScreenPosition
+        {
+            get
+            {
+                Point pos = new Point(x, y);
+                if (parent != null)
+                {
+                    Point parentPos = parent.ScreenPosition;
+                    pos.Offset(parentPos);
+                }
+                return pos;
             }
         }
 

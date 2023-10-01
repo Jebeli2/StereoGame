@@ -185,6 +185,10 @@ namespace StereoGame.Framework.Graphics
         {
             DrawText(font, text, rect.X, rect.Y, rect.Width, rect.Height, color, horizontalAlignment, verticalAlignment, 0, 0);
         }
+        public void DrawText(TextFont? font, ReadOnlySpan<char> text, float x, float y, float width, float height, Color color, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)
+        {
+            DrawText(font, text, x, y, width, height, color, horizontalAlignment, verticalAlignment, 0, 0);
+        }
         protected abstract void DrawText(TextFont? font, ReadOnlySpan<char> text, float x, float y, float width, float height, Color color, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment, float offsetX, float offsetY);
 
         public void DrawIcon(Icons icon, Rectangle rect, Color color, HorizontalAlignment horizontalAlignment, VerticalAlignment verticalAlignment)

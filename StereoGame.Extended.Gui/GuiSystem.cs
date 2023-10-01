@@ -13,6 +13,7 @@
         private int screenHeight;
         private readonly MouseListener mouseListener;
         private Window? activeWindow;
+        private Control? activeControl;
         private Control? preFocusedControl;
         private Control? focusedControl;
         private Control? hoveredControl;
@@ -307,6 +308,7 @@
             preFocusedControl = FindControlAt(e.X, e.Y);
             var pea = PointerEventArgs.FromMouseEventArgs(e);
             CheckWindowFocus(pea);
+            SetActiveControl(preFocusedControl);
             if (!CheckDragOrSizeStart(pea))
             {
                 PropagateDown(hoveredControl, x => x.OnPointerDown(pea));
@@ -392,6 +394,19 @@
                 {
                     activeWindow.Active = true;
                     if (moveWindowToFrontOnActivate) { activeScreen?.WindowToFront(activeWindow); }
+                }
+            }
+        }
+
+        private void SetActiveControl(Control? control)
+        {
+            if (activeControl != control)
+            {
+                if (activeControl != null) activeControl.Active = false;
+                activeControl = control;
+                if (activeControl != null)
+                {
+                    activeControl.Active = true;
                 }
             }
         }

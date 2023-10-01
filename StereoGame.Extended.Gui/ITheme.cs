@@ -22,6 +22,7 @@
         void DrawLabel(IGuiSystem gui, IGuiRenderer renderer, GameTime time, Label label, ref Rectangle bounds);
         void DrawPropControl(IGuiSystem gui, IGuiRenderer renderer, GameTime time, PropControl prop, ref Rectangle bounds, ref Rectangle knob);
         void DrawScrollBar(IGuiSystem gui, IGuiRenderer renderer, GameTime time, ScrollBar scrollBar, ref Rectangle bounds);
+        void DrawStrControl(IGuiSystem gui, IGuiRenderer renderer, GameTime time, StrControl str, ref Rectangle bounds);
 
     }
 }

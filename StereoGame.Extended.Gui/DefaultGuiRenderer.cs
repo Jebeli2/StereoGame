@@ -44,6 +44,17 @@
                 gd.DrawText(font, text, rect, color, horizontalAlignment, verticalAlignment);
             }
         }
+
+        public void DrawText(TextFont? font, ReadOnlySpan<char> text, float x, float y, float width, float height, Color color, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, VerticalAlignment verticalAlignment = VerticalAlignment.Center, Rectangle? clippingRect = null)
+        {
+            if (CheckGraphicsDevice() && font != null && text != null && text.Length > 0)
+            {
+                gd.BlendMode = BlendMode.Blend;
+                gd.DrawText(font, text, x, y, width, height, color, horizontalAlignment, verticalAlignment);
+
+            }
+        }
+
         public void DrawIcon(Icons icon, Rectangle rect, Color color, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, VerticalAlignment verticalAlignment = VerticalAlignment.Center, Rectangle? clippingRect = null)
         {
             if (CheckGraphicsDevice() && icon != Icons.NONE)
