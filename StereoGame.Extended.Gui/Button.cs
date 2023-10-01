@@ -34,6 +34,7 @@
         {
             Text = text;
             Icon = icon;
+            Padding = new Padding(3);
         }
 
         public event EventHandler<EventArgs>? Clicked;
@@ -104,7 +105,7 @@
 
         private Size CalcContentSize()
         {
-            Size size = Size.Empty;
+            Size size = new Size(Padding.Horizontal, Padding.Vertical);
             Size? textSize = Font?.MeasureText(Text);
             if (textSize != null)
             {
@@ -127,6 +128,11 @@
             }
             Size ct = CalcContentSize();
             return ct + Padding.Size;
+        }
+
+        protected override void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
+        {
+            Theme.DrawButton(gui, renderer, gameTime, this, ref bounds);
         }
 
         public void Click()

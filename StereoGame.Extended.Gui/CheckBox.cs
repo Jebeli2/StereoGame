@@ -37,18 +37,15 @@
 
         protected override void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
         {
-            base.DrawControl(gui, renderer, gameTime, ref bounds);
-            //Rectangle iconBounds = bounds;
-            //iconBounds.Width = (ICONWIDTH * 3) / 2;
-            //renderer.DrawBorder(iconBounds, BorderShineColor, BorderShadowColor, 1);
+            Theme.DrawCheckBox(gui, renderer, gameTime, this, ref bounds);
         }
 
-        protected override Rectangle AdjustBorderBounds(ref Rectangle bounds)
-        {
-            Rectangle adjustedRect = bounds;
-            adjustedRect.Width = (ICONWIDTH * 3) / 2;
-            return adjustedRect;
-        }
+        //protected override Rectangle AdjustBorderBounds(ref Rectangle bounds)
+        //{
+        //    Rectangle adjustedRect = bounds;
+        //    adjustedRect.Width = (ICONWIDTH * 3) / 2;
+        //    return adjustedRect;
+        //}
 
     }
 }

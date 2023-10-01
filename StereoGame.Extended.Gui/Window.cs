@@ -31,6 +31,7 @@
             : base(screen)
         {
             windowId = ++nextWindowId;
+            Padding = new Padding(4, 30, 4, 4);
             SetPosition(33, 33);
             defaultCloseAction = WindowCloseAction.None;
             superBitmap = true;
@@ -224,16 +225,18 @@
         }
 
 
+
         protected override void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
         {
-            base.DrawControl(gui, renderer, gameTime, ref bounds);
-            renderer.DrawWindowBorder(bounds, BorderColor, BorderShineColor, BorderShadowColor, Padding);
-            Rectangle titleRect = bounds;
-            titleRect.Height = Padding.Top;
-            titleRect.Inflate(-1, -1);
-            titleRect.X += 32;
-            titleRect.Width -= 32;
-            renderer.DrawText(Font, Title, titleRect, TextColor, HorizontalAlignment.Left);
+            Theme.DrawWindow(gui, renderer, gameTime, this, ref bounds);
+            //base.DrawControl(gui, renderer, gameTime, ref bounds);
+            //renderer.DrawWindowBorder(bounds, BorderColor, BorderShineColor, BorderShadowColor, Padding);
+            //Rectangle titleRect = bounds;
+            //titleRect.Height = Padding.Top;
+            //titleRect.Inflate(-1, -1);
+            //titleRect.X += 32;
+            //titleRect.Width -= 32;
+            //renderer.DrawText(Font, Title, titleRect, TextColor, HorizontalAlignment.Left);
         }
 
         public override string ToString()

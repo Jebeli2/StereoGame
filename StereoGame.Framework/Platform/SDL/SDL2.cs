@@ -654,6 +654,13 @@
             public const int SDL_TEXTUREACCESS_STREAMING = 1;
             public const int SDL_TEXTUREACCESS_TARGET = 2;
 
+            [StructLayout(LayoutKind.Sequential)]
+            public struct SDL_Vertex
+            {
+                public PointF position;
+                public int color;
+                public PointF tex_coord;
+            }
             public enum SDL_ScaleMode
             {
                 SDL_ScaleModeNearest,
@@ -1045,6 +1052,8 @@
             private static extern int SDL_GetTextureBlendMode(IntPtr texture, out SDL_BlendMode blendMode);
             [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
             private static extern int SDL_SetTextureBlendMode(IntPtr texture, SDL_BlendMode blendMode);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderGeometry(IntPtr renderer, IntPtr texture, [In] SDL_Vertex[] vertices, int num_vertices, [In] int[] indices, int num_indices);
 
             public static IntPtr CreateRenderer(IntPtr window, int index, SDL_RendererFlags flags) => SDL_CreateRenderer(window, index, flags);
             public static void DestroyRenderer(IntPtr renderer) => SDL_DestroyRenderer(renderer);
@@ -1136,6 +1145,7 @@
             public static int SetTextureColorMod(IntPtr texture, byte r, byte g, byte b) => SDL_SetTextureColorMod(texture, r, g, b);
             public static int GetTextureBlendMode(IntPtr texture, out SDL_BlendMode blendMode) => SDL_GetTextureBlendMode(texture, out blendMode);
             public static int SetTextureBlendMode(IntPtr texture, SDL_BlendMode blendMode) => SDL_SetTextureBlendMode(texture, blendMode);
+            public static int RenderGeometry(IntPtr renderer, IntPtr texture, [In] SDL_Vertex[] vertices, int num_vertices, [In] int[] indices, int num_indices) => SDL_RenderGeometry(renderer, texture, vertices, num_vertices, indices, num_indices);
 
 
 

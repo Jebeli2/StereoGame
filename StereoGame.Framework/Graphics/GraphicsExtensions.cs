@@ -39,5 +39,10 @@ namespace StereoGame.Framework.Graphics
                 }
             }
         }
+
+        public static void FillVertGradient(this GraphicsDevice device, Rectangle rect, Color top, Color bottom)
+        {
+            device.FillColorRect(ref rect, top, top, bottom, bottom);
+        }
     }
 }

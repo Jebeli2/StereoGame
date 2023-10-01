@@ -49,4 +49,12 @@ namespace StereoGame.Extended.Gui
         RightBottom,
         Split
     }
+
+    [Flags]
+    public enum StrFlags
+    {
+        None = 0,
+        Integer = 1,
+        Double = 2
+    }
 }

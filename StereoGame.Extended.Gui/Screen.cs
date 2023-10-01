@@ -11,7 +11,12 @@
     {
 
         public Screen()
-            : base(null)
+            : this(null)
+        {
+        }
+
+        public Screen(ITheme? theme)
+            : base(null, theme ?? BaseTheme.Instance)
         {
 
         }

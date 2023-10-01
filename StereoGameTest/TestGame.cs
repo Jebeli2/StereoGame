@@ -30,6 +30,7 @@
         private Window? guiTestWindow;
         private Window? buttonDemo;
         private Window? propDemo;
+        private Window? strDemo;
 
         private Lines lines;
         private RainingBoxes boxes;
@@ -60,10 +61,8 @@
 
         protected override void LoadContent()
         {
-            //bg = Content.Load<Texture>(@"c:\Local\mods\fantasycore\images\menus\backgrounds\badlands.png");
             bg = Content.Load<Texture>(nameof(Properties.Resources.badlands));
             button = Content.Load<Texture>(nameof(Properties.Resources.Button));
-            //font = Content.Load<TextFont>(@"c:\Local\mods\fantasycore\fonts\LiberationSans-Regular.ttf", 16);
             font = Content.Load<TextFont>(nameof(Properties.Resources.LiberationSans_Regular), 16);
             guiFont = Content.Load<TextFont>(nameof(Properties.Resources.Roboto_Regular), 16);
             music = Content.Load<Music>(nameof(Properties.Resources.JesuJoy));
@@ -111,15 +110,8 @@
         }
         private void InitGui(TextFont? font)
         {
-            Skin.DefaultSkin.DefaultFont = font;
-            //var buttonStyle = Skin.DefaultSkin.GetStyle(typeof(Button));
-            //if (button != null && buttonStyle != null)
-            //{
-            //    NinePatchRegion npr = new NinePatchRegion(button, new Padding(2));
-            //    buttonStyle.BackgroundRegion = npr;
-            //    buttonStyle.BorderThickness = 0;
-            //}
             mainScreen = new Screen();
+            mainScreen.Font = font;
             titleWindow = new Window(mainScreen);
             titleWindow.MinWidth = 120;
             titleWindow.MinHeight = 120;
@@ -137,6 +129,7 @@
 
 
             guiTestScreen = new Screen();
+            guiTestScreen.Font = font;
             guiTestWindow = new Window(guiTestScreen);
             guiTestWindow.MinWidth = 120;
             guiTestWindow.MinHeight = 120;
@@ -145,11 +138,13 @@
 
             var b1 = new Button(guiTestWindow, "Buttons");
             var b2 = new Button(guiTestWindow, "Props");
-            var b3 = new Button(guiTestWindow, "Back");
+            var b3 = new Button(guiTestWindow, "Strings");
+            var b4 = new Button(guiTestWindow, "Back");
 
             b1.Clicked += (s, e) => { if (buttonDemo != null) { buttonDemo.Visible ^= true; } };
             b2.Clicked += (s, e) => { if (propDemo != null) { propDemo.Visible ^= true; } };
-            b3.Clicked += (s, e) => { gui.ActivateScreenAndWindow(mainScreen, titleWindow); };
+            b3.Clicked += (s, e) => { if (strDemo != null) { strDemo.Visible ^= true; } };
+            b4.Clicked += (s, e) => { gui.ActivateScreenAndWindow(mainScreen, titleWindow); };
 
 
             buttonDemo = new Window(guiTestScreen);
@@ -170,9 +165,9 @@
             _ = new Button(buttonDemo, "Radio button 2");
             _ = new Label(buttonDemo, "A tool palette");
             var p1 = new Panel(buttonDemo);
-            var t1 = new ToggleButton(p1) { Icon = Icons.LINE_GRAPH, Checked = true };
+            var t1 = new ToggleButton(p1) { Icon = Icons.LINE_GRAPH, Checked = Components.Contains(lines) };
             t1.CheckedStateChanged += (s, e) => { ToggleLines(); };
-            var t2 = new ToggleButton(p1) { Icon = Icons.BOX, Checked = true };
+            var t2 = new ToggleButton(p1) { Icon = Icons.BOX, Checked = Components.Contains(boxes) };
             t2.CheckedStateChanged += (s, e) => { ToggleBoxes(); };
             _ = new ToggleButton(p1) { Icon = Icons.CIRCLE_WITH_PLUS };
             _ = new ToggleButton(p1) { Icon = Icons.DRIVE };
@@ -199,6 +194,16 @@
             _ = new Label(propDemo, "Scroll Bars");
             _ = new ScrollBar(propDemo, Orientation.Horizontal, 1, 100, 50);
             _ = new ScrollBar(propDemo, Orientation.Horizontal, 1, 1000, 10);
+
+            strDemo = new Window(guiTestScreen);
+            strDemo.SetPosition(600, 50);
+            strDemo.MinWidth = 200;
+            strDemo.MinHeight = 500;
+            strDemo.Title = "String Demo";
+            strDemo.Visible = false;
+            strDemo.DefaultWindowCloseAction = WindowCloseAction.Hide;
+            _ = new Label(strDemo, "String Controls");
+            _ = new StrControl(strDemo, "Hello World!");
         }
 
     }

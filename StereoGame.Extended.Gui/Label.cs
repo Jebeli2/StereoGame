@@ -48,6 +48,11 @@ namespace StereoGame.Extended.Gui
             return ct + Padding.Size;
         }
 
+        protected override void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
+        {
+            Theme.DrawLabel(gui, renderer, gameTime, this, ref bounds);
+        }
+
 
     }
 }

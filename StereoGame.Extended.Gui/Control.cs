@@ -44,12 +44,14 @@
         private bool pressed;
         private bool _checked;
         private bool active;
+        private bool borderless;
 
         protected bool layoutNeeded;
         protected bool valid;
         protected bool superBitmap;
         private Texture? bitmap;
 
+        private ITheme? theme;
         protected ILayout? layout;
         protected bool alwaysUseIconSpace;
         protected bool textIsTitle;
@@ -65,40 +67,46 @@
         private Color textColor;
 
 
-        private Skin skin;
+        //        private Skin skin;
 
         private string? text;
         private Icons icon;
 
 
         protected Control()
-            : this(null)
+            : this(null, null)
+        {
+        }
+        protected Control(ITheme? theme)
+            : this(null, theme)
         {
         }
 
-        protected Control(Control? parent)
+        protected Control(Control? parent, ITheme? theme = null)
         {
             controlId = ++nextId;
             enabled = true;
             visible = true;
             maxWidth = int.MaxValue;
             maxHeight = int.MaxValue;
-            skin = Skin.DefaultSkin;
-            skin.Apply(this);
+            this.theme = theme;
+            //skin = Skin.DefaultSkin;
+            //skin.Apply(this);
             parent?.Add(this);
         }
 
-        public Skin Skin
+        public ITheme Theme
         {
-            get { return skin; }
-            set
-            {
-                if (skin != value)
-                {
-                    skin = value;
-                    skin.Apply(this);
-                }
-            }
+            get { return theme ?? parent?.Theme ?? BaseTheme.Instance; }
+        }
+
+        public bool AlwaysUseIconSpace => alwaysUseIconSpace;
+        public bool TextIsTitle => textIsTitle;
+
+        public void SetTheme(ITheme? value)
+        {
+            theme = value;
+            Invalidate();
         }
 
         public ILayout? Layout
@@ -213,7 +221,6 @@
         public virtual void InvalidateLayout()
         {
             layoutNeeded = true;
-            //valid = false;
         }
 
         public virtual void Invalidate()
@@ -222,53 +229,17 @@
             parent?.Invalidate();
         }
 
-        public int X
-        {
-            get { return x; }
-            //set
-            //{
-            //    if (x != value)
-            //    {
-            //        x = value;
-            //    }
-            //}
-        }
+        public int X => x;
 
-        public int Y
-        {
-            get { return y; }
-            //set
-            //{
-            //    if (y != value)
-            //    {
-            //        y = value;
-            //    }
-            //}
-        }
+        public int Y => y;
 
-        public int Width
-        {
-            get { return width; }
-            //set { SetSize(value, height); }
-        }
+        public int Width => width;
 
-        public int Height
-        {
-            get { return height; }
-            //set { SetSize(width, value); }
-        }
+        public int Height => height;
 
-        public int FixedWidth
-        {
-            get { return fixedWidth; }
-            //set { SetFixedSize(value, fixedHeight); }
-        }
+        public int FixedWidth => fixedWidth;
 
-        public int FixedHeight
-        {
-            get { return fixedHeight; }
-            //set { SetFixedSize(fixedWidth, value); }
-        }
+        public int FixedHeight => fixedHeight;
 
         public bool SetFixedBounds(int x, int y, int width, int height)
         {
@@ -491,7 +462,7 @@
                 if (enabled != value)
                 {
                     enabled = value;
-                    skin.Apply(this);
+                    Invalidate();
                 }
             }
         }
@@ -508,6 +479,21 @@
                 }
             }
         }
+
+        public bool Borderless
+        {
+            get { return borderless; }
+            set
+            {
+                if (borderless != value)
+                {
+                    borderless = value;
+                    Invalidate();
+                }
+            }
+        }
+
+
 
         public bool Focused
         {
@@ -530,7 +516,7 @@
                 if (active != value)
                 {
                     active = value;
-                    skin.Apply(this);
+                    Invalidate();
                 }
             }
         }
@@ -542,7 +528,7 @@
                 if (hovered != value)
                 {
                     hovered = value;
-                    skin.Apply(this);
+                    Invalidate();
                 }
             }
         }
@@ -555,7 +541,7 @@
                 if (pressed != value)
                 {
                     pressed = value;
-                    skin.Apply(this);
+                    Invalidate();
                 }
             }
         }
@@ -568,7 +554,7 @@
                 if (_checked != value)
                 {
                     _checked = value;
-                    skin.Apply(this);
+                    Invalidate();
                 }
 
             }
@@ -685,7 +671,7 @@
             {
                 if (font != null) return font;
                 if (parent != null) { return parent.Font; }
-                if (skin != null) { return skin.DefaultFont; }
+                //if (skin != null) { return skin.DefaultFont; }
                 return null;
             }
             set
@@ -878,61 +864,60 @@
 
         protected virtual void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
         {
-            DrawControlBorder(gui, renderer, gameTime, ref bounds);
-            DrawControlText(gui, renderer, gameTime, ref bounds);
+            Theme.DrawControl(gui, renderer, gameTime, this, ref bounds);
         }
 
-        protected virtual Rectangle AdjustBorderBounds(ref Rectangle bounds)
-        {
-            return bounds;
-        }
+        //protected virtual Rectangle AdjustBorderBounds(ref Rectangle bounds)
+        //{
+        //    return bounds;
+        //}
 
-        protected void DrawControlBorder(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle rect)
-        {
-            Rectangle bounds = AdjustBorderBounds(ref rect);
-            if (backgroundRegion != null)
-            {
-                renderer.DrawRegion(backgroundRegion, bounds);
-            }
-            else if (!backgroundColor.IsEmpty && backgroundColor != Color.Transparent)
-            {
-                renderer.FillRectangle(bounds, backgroundColor);
-            }
-            if (borderThickness != 0)
-            {
-                renderer.DrawBorder(bounds, borderShineColor, borderShadowColor, borderThickness);
-            }
-        }
+        //protected void DrawControlBorder(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle rect)
+        //{
+        //    Rectangle bounds = AdjustBorderBounds(ref rect);
+        //    if (backgroundRegion != null)
+        //    {
+        //        renderer.DrawRegion(backgroundRegion, bounds);
+        //    }
+        //    else if (!backgroundColor.IsEmpty && backgroundColor != Color.Transparent)
+        //    {
+        //        renderer.FillRectangle(bounds, backgroundColor);
+        //    }
+        //    if (borderThickness != 0)
+        //    {
+        //        renderer.DrawBorder(bounds, borderShineColor, borderShadowColor, borderThickness);
+        //    }
+        //}
 
-        protected void DrawControlText(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
-        {
-            if (textIsTitle) return;
-            if (!string.IsNullOrEmpty(Text) && (Icon != Icons.NONE || alwaysUseIconSpace))
-            {
-                Rectangle textBounds = bounds;
-                Rectangle iconBounds = bounds;
-                iconBounds.Width = (ICONWIDTH * 3) / 2;
-                switch (HorizontalTextAlignment)
-                {
-                    case HorizontalAlignment.Left:
-                        textBounds.X += ICONWIDTH * 2;
-                        textBounds.Width -= ICONWIDTH * 2;
-                        break;
-                    case HorizontalAlignment.Right:
-                        break;
-                }
-                renderer.DrawText(Font, Text, textBounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
-                renderer.DrawIcon(Icon, iconBounds, TextColor, HorizontalAlignment.Center, VerticalTextAlignment);
-            }
-            else if (!string.IsNullOrEmpty(Text))
-            {
-                renderer.DrawText(Font, Text, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
-            }
-            else if (Icon != Icons.NONE)
-            {
-                renderer.DrawIcon(Icon, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
-            }
-        }
+        //protected void DrawControlText(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
+        //{
+        //    if (textIsTitle) return;
+        //    if (!string.IsNullOrEmpty(Text) && (Icon != Icons.NONE || alwaysUseIconSpace))
+        //    {
+        //        Rectangle textBounds = bounds;
+        //        Rectangle iconBounds = bounds;
+        //        iconBounds.Width = (ICONWIDTH * 3) / 2;
+        //        switch (HorizontalTextAlignment)
+        //        {
+        //            case HorizontalAlignment.Left:
+        //                textBounds.X += ICONWIDTH * 2;
+        //                textBounds.Width -= ICONWIDTH * 2;
+        //                break;
+        //            case HorizontalAlignment.Right:
+        //                break;
+        //        }
+        //        renderer.DrawText(Font, Text, textBounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
+        //        renderer.DrawIcon(Icon, iconBounds, TextColor, HorizontalAlignment.Center, VerticalTextAlignment);
+        //    }
+        //    else if (!string.IsNullOrEmpty(Text))
+        //    {
+        //        renderer.DrawText(Font, Text, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
+        //    }
+        //    else if (Icon != Icons.NONE)
+        //    {
+        //        renderer.DrawIcon(Icon, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
+        //    }
+        //}
 
 
         internal bool NeedsNewBitmap

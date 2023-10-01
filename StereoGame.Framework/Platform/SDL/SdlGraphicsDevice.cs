@@ -24,6 +24,9 @@
         private readonly Stack<IntPtr> prevTargets = new();
         private readonly TextFont? defaultFont;
         private readonly TextFont? iconFont;
+        private readonly int[] rectIndices = new int[] { 2, 0, 1, 1, 3, 2 };
+        private const int NUM_RECT_INDICES = 6;
+        private readonly Sdl.Renderer.SDL_Vertex[] rectVertices = new Sdl.Renderer.SDL_Vertex[4];
 
 
         public SdlGraphicsDevice(Game game, SdlGamePlatform platform, SdlGameWindow window, PresentationParameters pp)
@@ -151,6 +154,22 @@
             _ = Sdl.Renderer.RenderFillRect(handle, ref rect);
         }
 
+        public override void FillColorRect(ref Rectangle rect, Color colorTopLeft, Color colorTopRight, Color colorBottomLeft, Color colorBottomRight)
+        {
+            rectVertices[0].color = ToSDLColor(colorTopLeft);
+            rectVertices[0].position.X = rect.X;
+            rectVertices[0].position.Y = rect.Y;
+            rectVertices[1].color = ToSDLColor(colorTopRight);
+            rectVertices[1].position.X = rect.Right - 1;
+            rectVertices[1].position.Y = rect.Y;
+            rectVertices[2].color = ToSDLColor(colorBottomLeft);
+            rectVertices[2].position.X = rect.X;
+            rectVertices[2].position.Y = rect.Bottom - 1;
+            rectVertices[3].color = ToSDLColor(colorBottomRight);
+            rectVertices[3].position.X = rect.Right - 1;
+            rectVertices[3].position.Y = rect.Bottom - 1;
+            _ = Sdl.Renderer.RenderGeometry(handle, IntPtr.Zero, rectVertices, 4, rectIndices, NUM_RECT_INDICES);
+        }
 
         protected override void DrawRect(ref Rectangle rect)
         {

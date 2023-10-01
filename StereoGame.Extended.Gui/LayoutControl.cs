@@ -10,8 +10,13 @@ namespace StereoGame.Extended.Gui
 {
     public abstract class LayoutControl : Control
     {
-        protected LayoutControl(Control? parent) : base(parent)
+        protected LayoutControl(Control? parent = null, ITheme? theme = null) : base(parent, theme)
         {
+        }
+
+        protected override void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
+        {
+            Theme.DrawLayoutControl(gui, renderer, gameTime, this, ref bounds);
         }
     }
 }

@@ -32,6 +32,7 @@
         private int knobStartX;
         private int knobStartY;
         private bool knobHit;
+        private bool knobHover;
         private bool containerHit;
         private int timerDelay;
         public PropControl(Control? parent)
@@ -89,6 +90,9 @@
             set { freeVert = value; }
         }
 
+        public bool KnobHit => knobHit;
+        public bool KnobHover => knobHover;
+
         public void ModifyProp(bool freeHoriz, bool freeVert, int horizPot, int vertPot, int horizBody, int vertBody)
         {
             this.freeHoriz = freeHoriz;
@@ -131,14 +135,12 @@
         private Rectangle CalcKnobSize(Rectangle container)
         {
             Rectangle knob = container;
-            knob.X = container.X + 2 + BorderThickness;
-            knob.Y = container.Y + 2 + BorderThickness;
-            knob.Width = container.Width - 4 - 2 * BorderThickness;
-            knob.Height = container.Height - 4 - 2 * BorderThickness;
+            knob.X = container.X + 2;
+            knob.Y = container.Y + 2;
+            knob.Width = container.Width - 3;
+            knob.Height = container.Height - 3;
             cWidth = knob.Width;
             cHeight = knob.Height;
-            //int leftBorder = container.Left;
-            //int topBorder = container.Top;
             if (freeHoriz)
             {
                 knob.Width = cWidth * horizBody / MAXBODY;
@@ -186,9 +188,8 @@
 
         protected override void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
         {
-            base.DrawControl(gui, renderer, gameTime, ref bounds);
             Rectangle knob = CalcKnobSize(bounds);
-            renderer.FillRectangle(knob, KnobColor);
+            Theme.DrawPropControl(gui, renderer, gameTime, this, ref bounds, ref knob);
         }
 
         public override bool OnPointerDown(PointerEventArgs args)
@@ -201,11 +202,13 @@
                 knobStartY = args.Y - (knob.Y - bounds.Y);
                 Console.WriteLine($"Knob Hit: {args.X}/{args.Y} KS: {knobStartX}/{knobStartY}");
                 knobHit = true;
+                knobHover = true;
                 containerHit = false;
             }
             else
             {
                 knobHit = false;
+                knobHover = false;
                 containerHit = true;
                 Console.WriteLine($"Knob Miss: {args.X}/{args.Y}");
                 HandleContainerHit(knob, args.X, args.Y);
@@ -218,6 +221,7 @@
         {
             knobHit = false;
             containerHit = false;
+            knobHover = false;
             return base.OnPointerUp(args);
         }
 

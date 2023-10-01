@@ -9,7 +9,6 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using static System.Net.Mime.MediaTypeNames;
 
     internal class DefaultGuiRenderer : IGuiRenderer
     {
@@ -53,7 +52,13 @@
                 gd.DrawIcon(icon, rect, color, horizontalAlignment, verticalAlignment);
             }
         }
-
+        public void FillVertGradient(Rectangle rect, Color top, Color bottom)
+        {
+            if (CheckGraphicsDevice())
+            {
+                gd.FillVertGradient(rect, top, bottom);
+            }
+        }
         public void FillRectangle(Rectangle rect, Color color, Rectangle? clippingRect = null)
         {
             if (CheckGraphicsDevice())

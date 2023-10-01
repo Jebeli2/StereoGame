@@ -1,5 +1,6 @@
 ﻿namespace StereoGame.Extended.Gui
 {
+    using StereoGame.Framework;
     using StereoGame.Framework.Graphics;
     using System;
     using System.Collections.Generic;
@@ -37,15 +38,18 @@
             prop = new PropControl(this)
             {
                 FreeHoriz = !vert,
-                FreeVert = vert
+                FreeVert = vert,
+                Borderless = true
             };
             arrowInc = new SysButton(this, vert ? Icons.TRIANGLE_DOWN : Icons.TRIANGLE_RIGHT)
             {
-                Repeat = true
+                Repeat = true,
+                Borderless = true,
             };
             arrowDec = new SysButton(this, vert ? Icons.TRIANGLE_UP : Icons.TRIANGLE_LEFT)
             {
-                Repeat = true
+                Repeat = true,
+                Borderless = true,
             };
 
             prop.PropChanged += Prop_PropChanged;
@@ -259,5 +263,9 @@
             }
         }
 
+        protected override void DrawControl(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
+        {
+            Theme.DrawScrollBar(gui, renderer, gameTime, this, ref bounds);
+        }
     }
 }

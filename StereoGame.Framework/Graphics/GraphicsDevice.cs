@@ -164,6 +164,8 @@ namespace StereoGame.Framework.Graphics
 
         protected abstract void FillRect(ref Rectangle rect);
 
+        public abstract void FillColorRect(ref Rectangle rect, Color colorTopLeft, Color colorTopRight, Color colorBottomLeft, Color colorBottomRight);
+
         public void DrawRect(Rectangle rect)
         {
             DrawRect(ref rect);
