@@ -1547,6 +1547,9 @@
 
         public static class Keyboard
         {
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern Keymod SDL_GetModState();
+
             public struct Keysym
             {
                 public int Scancode;
@@ -1630,6 +1633,8 @@
                 //    [MarshalAs(UnmanagedType.ByValArray,SizeConst = 32)]
                 //    public byte[] Text;
             }
+
+            public static Keymod GetModState() => SDL_GetModState();
 
             //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             //public delegate Keymod d_sdl_getmodstate();

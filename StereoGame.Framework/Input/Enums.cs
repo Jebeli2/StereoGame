@@ -17,6 +17,11 @@
         XButton2 = 16
     }
 
+    public enum KeyState
+    {
+        Up,
+        Down,
+    }
     public enum SystemCursor
     {
         Arrow,

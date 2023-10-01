@@ -37,6 +37,7 @@
             mouseListener.MouseMoved += MouseListener_MouseMoved;
             mouseListener.MouseDown += MouseListener_MouseDown;
             mouseListener.MouseUp += MouseListener_MouseUp;
+
         }
 
         public int ScreenWidth => screenWidth;

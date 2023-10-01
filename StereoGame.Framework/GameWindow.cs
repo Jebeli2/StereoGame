@@ -62,6 +62,9 @@ namespace StereoGame.Framework
         public event EventHandler<EventArgs>? ClientSizeChanged;
         public event EventHandler<EventArgs>? OrientationChanged;
         public event EventHandler<EventArgs>? ScreenDeviceNameChanged;
+        public event EventHandler<InputKeyEventArgs>? KeyDown;
+        public event EventHandler<InputKeyEventArgs>? KeyUp;
+        public event EventHandler<TextInputEventArgs>? TextInput;
 
         public abstract void BeginScreenDeviceChange(bool willBeFullScreen);
         public abstract void EndScreenDeviceChange(string screenDeviceName, int clientWidth, int clientHeight);
@@ -80,6 +83,20 @@ namespace StereoGame.Framework
 
         protected void OnDeactivated()
         {
+        }
+
+        internal void OnKeyDown(InputKeyEventArgs e)
+        {
+            KeyDown?.Invoke(this, e);
+        }
+        internal void OnKeyUp(InputKeyEventArgs e)
+        {
+            KeyUp?.Invoke(this, e);
+        }
+
+        internal void OnTextInput(TextInputEventArgs e)
+        {
+            TextInput?.Invoke(this, e);
         }
         protected void OnOrientationChanged()
         {

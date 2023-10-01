@@ -11,13 +11,16 @@
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading.Tasks;
-
+    
     internal class SdlGamePlatform : GamePlatform
     {
         private int isExiting;
         private readonly SdlGameWindow view;
         private SdlGraphicsDevice? renderer;
         private SdlAudioDevice? audio;
+        private readonly List<Keys> keys = new();
+        private IntPtr textMem;
+        private readonly byte[] textBuffer = new byte[64];
         public SdlGamePlatform(Game game) : base(game)
         {
             string dllDir = Path.Combine(Environment.CurrentDirectory, IntPtr.Size == 4 ? "x86" : "x64");
@@ -36,7 +39,10 @@
             Sdl.SetHint("SDL_HINT_RENDER_BATCHING", "1");
             Sdl.SetHint("SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH", "1");
             Sdl.SetHint("SDL_HINT_RENDER_SCALE_QUALITY", "1");
+            Keyboard.SetKeys(keys);
+            textMem = Marshal.AllocHGlobal(64);
             Window = view = new SdlGameWindow(game);
+
         }
 
         public override GameRunBehavior DefaultRunBehavior => GameRunBehavior.Synchronous;
@@ -78,8 +84,38 @@
                     case Sdl.EventType.ControllerAxisMotion:
                         break;
                     case Sdl.EventType.KeyDown:
-                        break;
+                        {
+                            var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                            if (!keys.Contains(key))
+                            {
+                                keys.Add(key);
+                            }
+                            view.OnKeyDown(new InputKeyEventArgs(key));
+                            break;
+                        }
                     case Sdl.EventType.KeyUp:
+                        {
+                            var key = KeyboardUtil.ToXna(ev.Key.Keysym.Sym);
+                            keys.Remove(key);
+                            view.OnKeyUp(new InputKeyEventArgs(key));
+                            break;
+                        }
+                    case Sdl.EventType.TextInput:
+                        Marshal.StructureToPtr(ev, textMem, false);
+                        Marshal.Copy(textMem, textBuffer, 0, 56);
+                        int length = 0;
+                        while (textBuffer[length + 12] != 0 && length < 32)
+                        {
+                            length++;
+                        }
+                        if (length > 0)
+                        {
+                            string str = Encoding.UTF8.GetString(textBuffer, 12, length);
+                            if (!string.IsNullOrEmpty(str))
+                            {
+                                view.OnTextInput(new TextInputEventArgs(str));
+                            }
+                        }
                         break;
                     case Sdl.EventType.MouseWheel:
                         const int wheelDelta = 120;
@@ -177,6 +213,7 @@
             SDL2TTF.Quit();
             SDL2Image.Quit();
             Sdl.Quit();
+            Marshal.FreeHGlobal(textMem);
             base.Dispose(disposing);
         }
 
