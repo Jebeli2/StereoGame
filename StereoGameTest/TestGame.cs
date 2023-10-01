@@ -193,7 +193,12 @@
             prop2.ModifyProp(true, false, 0x0, 0, 0x555, 0);
             var prop3 = new PropControl(propDemo);
             prop3.ModifyProp(true, true, 0x2000, 0x2000, 0x1000, 0x2000);
-
+            _ = new Label(propDemo, "Sliders");
+            _ = new Slider(propDemo, Orientation.Horizontal);
+            _ = new Slider(propDemo, Orientation.Horizontal, 100, 1, 55);
+            _ = new Label(propDemo, "Scroll Bars");
+            _ = new ScrollBar(propDemo, Orientation.Horizontal, 1, 100, 50);
+            _ = new ScrollBar(propDemo, Orientation.Horizontal, 1, 1000, 10);
         }
 
     }

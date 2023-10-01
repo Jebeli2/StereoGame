@@ -12,6 +12,8 @@
     public class Button : Control
     {
         private bool pointerDown;
+        private bool repeat;
+        private int timerDelay;
         public Button(string? text = null)
             : this(null, text)
         {
@@ -36,12 +38,19 @@
 
         public event EventHandler<EventArgs>? Clicked;
 
+        public bool Repeat
+        {
+            get { return repeat; }
+            set { repeat = value; }
+        }
+
         public override bool OnPointerDown(PointerEventArgs args)
         {
             if (Enabled)
             {
                 pointerDown = true;
                 Pressed = true;
+                timerDelay = 2;
             }
             return base.OnPointerDown(args);
         }
@@ -76,6 +85,20 @@
                 Pressed = false;
             }
             return base.OnPointerLeave(args);
+        }
+
+        public override bool OnPointerTimerTick(PointerEventArgs args)
+        {
+            if (Enabled && repeat && Pressed)
+            {
+                timerDelay--;
+                if (timerDelay <= 0)
+                {
+                    timerDelay = 0;
+                    Click();
+                }
+            }
+            return base.OnPointerTimerTick(args);
         }
 
 

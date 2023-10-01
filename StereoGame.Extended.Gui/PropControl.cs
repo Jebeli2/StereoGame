@@ -40,6 +40,7 @@
             freeHoriz = true;
         }
 
+        public event EventHandler<EventArgs>? PropChanged;
         public int HorizPot
         {
             get { return horizPot; }
@@ -98,7 +99,12 @@
             this.vertBody = vertBody;
             CalcKnobSize();
             Invalidate();
-            //OnPropChanged();
+            OnPropChanged();
+        }
+
+        protected virtual void OnPropChanged()
+        {
+            PropChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public override Size GetPreferredSize(IGuiSystem context)
@@ -290,6 +296,20 @@
                 }
             }
             ModifyProp(freeHoriz, freeVert, dx, dy, horizBody, vertBody);
+        }
+
+        internal static void FindScrollerValues(int total, int visible, int top, int overlap, out int body, out int pot)
+        {
+            int hidden = total > visible ? total - visible : 0;
+            if (top > hidden) top = hidden;
+            body = (hidden > 0) ? ((visible - overlap) * MAXBODY) / (total - overlap) : MAXBODY;
+            pot = (hidden > 0) ? (top * MAXPOT) / hidden : 0;
+        }
+
+        internal static int FindScrollerTop(int total, int visible, int pot)
+        {
+            int hidden = total > visible ? total - visible : 0;
+            return ((hidden * pot) + (MAXPOT / 2)) / MAXPOT;
         }
     }
 }

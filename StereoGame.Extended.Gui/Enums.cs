@@ -41,4 +41,12 @@ namespace StereoGame.Extended.Gui
         Remove,
         Dispose
     }
+
+    public enum ArrowPlace
+    {
+        None,
+        LeftTop,
+        RightBottom,
+        Split
+    }
 }

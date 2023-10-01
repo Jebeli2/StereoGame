@@ -219,8 +219,8 @@ namespace StereoGame.Extended.Gui
                     new ControlStyle(typeof(PropControl))
                     {
                         //BackgroundColor = Color.FromArgb(52,52,52),
-                        BackgroundColor = Color.FromArgb(64,64,64),
-                        KnobColor = Color.FromArgb(100,100,100),
+                        BackgroundColor = Color.FromArgb(32,32,34),
+                        KnobColor = Color.FromArgb(80,80,80),
                         BorderColor = Color.Transparent,
                         BorderShineColor  = Color.Transparent,
                         BorderShadowColor= Color.Transparent,
@@ -228,10 +228,15 @@ namespace StereoGame.Extended.Gui
                         HoverStyle = new ControlStyle
                         {
                             //BackgroundColor = Color.FromArgb(64,64,64),
-                            KnobColor = Color.FromArgb(120,120,120),
+                            KnobColor = Color.FromArgb(100,100,102),
                         },
+                    },
+                    new ControlStyle(typeof(ScrollBar))
+                    {
+                        BackgroundColor = Color.FromArgb(32,32,34),
 
                     }
+
 
                 }
             };
