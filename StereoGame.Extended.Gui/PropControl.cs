@@ -104,6 +104,7 @@
             CalcKnobSize();
             Invalidate();
             OnPropChanged();
+            //Console.WriteLine($"HP:{horizPot} HB: {horizBody} HR: {hpotRes}");
         }
 
         protected virtual void OnPropChanged()
@@ -200,7 +201,7 @@
             {
                 knobStartX = args.X - (knob.X - bounds.X);
                 knobStartY = args.Y - (knob.Y - bounds.Y);
-                Console.WriteLine($"Knob Hit: {args.X}/{args.Y} KS: {knobStartX}/{knobStartY}");
+                //Console.WriteLine($"Knob Hit: {args.X}/{args.Y} KS: {knobStartX}/{knobStartY}");
                 knobHit = true;
                 knobHover = true;
                 containerHit = false;
@@ -210,7 +211,7 @@
                 knobHit = false;
                 knobHover = false;
                 containerHit = true;
-                Console.WriteLine($"Knob Miss: {args.X}/{args.Y}");
+                //Console.WriteLine($"Knob Miss: {args.X}/{args.Y}");
                 HandleContainerHit(knob, args.X, args.Y);
                 timerDelay = 4;
             }

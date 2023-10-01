@@ -18,6 +18,7 @@
         private int value;
         private int visibleAmount;
         private int overlap;
+        private int autoIncrement;
         private int increment;
         private readonly PropControl prop;
         private readonly SysButton arrowInc;
@@ -158,12 +159,12 @@
 
         private void ArrowDec_Clicked(object? sender, EventArgs e)
         {
-            Value -= increment;
+            Value -= Math.Max(autoIncrement, increment);
         }
 
         private void ArrowInc_Clicked(object? sender, EventArgs e)
         {
-            Value += increment;
+            Value += Math.Max(autoIncrement, increment);
         }
 
         private void Prop_PropChanged(object? sender, EventArgs e)
@@ -179,6 +180,9 @@
             int total = max - min;
             PropControl.FindScrollerValues(total, visibleAmount, value, overlap, out int body, out int pot);
             prop.ModifyProp(prop.FreeHoriz, prop.FreeVert, pot, pot, body, body);
+            //int potRes = orientation == Orientation.Horizontal ? prop.HPotRes : prop.VPotRes;
+            autoIncrement = visibleAmount;
+            //autoIncrement = PropControl.MAXPOT / (orientation == Orientation.Horizontal ? prop.HPotRes : prop.VPotRes);
 
         }
         private Control[] GetControls()

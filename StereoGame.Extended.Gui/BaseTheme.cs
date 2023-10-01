@@ -21,6 +21,9 @@
         public Color ShinePen { get; set; }
         public Color ShadowPen { get; set; }
         public Color TextPen { get; set; }
+        public Color TextHoverPen { get; set; }
+        public Color SysTextPen { get; set; }
+        public Color SysHoverTextPen { get; set; }
 
         public Color WindowActiveBackPen { get; set; }
         public Color WindowInactiveActiveBackPen { get; set; }
@@ -50,7 +53,10 @@
         {
             ShinePen = Color.FromArgb(250, 92, 92, 92);
             ShadowPen = Color.FromArgb(250, 29, 29, 29);
-            TextPen = Color.FromArgb(240, 240, 240);
+            TextPen = Color.FromArgb(238, 238, 238);
+            TextHoverPen = Color.FromArgb(240, 240, 240);
+            SysTextPen = Color.FromArgb(160, 220, 220, 220);
+            SysHoverTextPen = Color.FromArgb(222, 245, 245, 245);
 
             WindowActiveBackPen = Color.FromArgb(230, 45, 45, 45);
             WindowInactiveActiveBackPen = Color.FromArgb(230, 43, 43, 43);
@@ -133,7 +139,7 @@
         public void DrawButton(IGuiSystem gui, IGuiRenderer renderer, GameTime time, Button button, ref Rectangle bounds)
         {
             DrawControlBorder(gui, renderer, button, ref bounds);
-            DrawControlText(gui, renderer, button, ref bounds);
+            DrawControlText(gui, renderer, button, TextPen, TextHoverPen, ref bounds);
         }
 
         public void DrawSysButton(IGuiSystem gui, IGuiRenderer renderer, GameTime time, SysButton sysButton, ref Rectangle bounds)
@@ -142,24 +148,24 @@
             {
                 renderer.DrawBorder(bounds, ShadowPen, ShinePen);
             }
-            else if (sysButton.Hovered)
+            else if (sysButton.Hovered && !sysButton.Borderless)
             {
                 renderer.DrawBorder(bounds, ShinePen, ShadowPen);
             }
-            DrawControlText(gui, renderer, sysButton, ref bounds);
+            DrawControlText(gui, renderer, sysButton, SysTextPen, SysHoverTextPen, ref bounds);
         }
 
         public void DrawCheckBox(IGuiSystem gui, IGuiRenderer renderer, GameTime time, CheckBox checkBox, ref Rectangle bounds)
         {
             Rectangle border = AdjustCheckBoxBounds(ref bounds);
             DrawControlBorder(gui, renderer, checkBox, ref border);
-            DrawControlText(gui, renderer, checkBox, ref bounds);
+            DrawControlText(gui, renderer, checkBox, TextPen, TextHoverPen, ref bounds);
         }
 
 
         public void DrawLabel(IGuiSystem gui, IGuiRenderer renderer, GameTime time, Label label, ref Rectangle bounds)
         {
-            DrawControlText(gui, renderer, label, ref bounds);
+            DrawControlText(gui, renderer, label, TextPen, TextHoverPen, ref bounds);
         }
 
         public void DrawPropControl(IGuiSystem gui, IGuiRenderer renderer, GameTime time, PropControl prop, ref Rectangle bounds, ref Rectangle knob)
@@ -221,10 +227,10 @@
             }
         }
 
-        private void DrawControlText(IGuiSystem gui, IGuiRenderer renderer, Control control, ref Rectangle bounds)
+        private void DrawControlText(IGuiSystem gui, IGuiRenderer renderer, Control control, Color textPen, Color hoverPen, ref Rectangle bounds)
         {
             if (control.TextIsTitle) return;
-            Color tc = TextPen;
+            Color tc = control.Hovered ? hoverPen : textPen;
             if (!string.IsNullOrEmpty(control.Text) && (control.Icon != Icons.NONE || control.AlwaysUseIconSpace))
             {
                 Rectangle textBounds = bounds;
