@@ -114,6 +114,9 @@ namespace StereoGame.Framework.Graphics
         public abstract void PushTarget(Texture? texture);
         public abstract void PopTarget();
 
+        public abstract void PushClip(Rectangle clip);
+        public abstract void PopClip();
+
         public void DrawTexture(Texture? texture)
         {
             if (texture != null)

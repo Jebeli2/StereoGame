@@ -110,6 +110,22 @@
             }
         }
 
+        public void PushClip(Rectangle rect)
+        {
+            if (CheckGraphicsDevice())
+            {
+                gd.PushClip(rect);
+            }
+        }
+        public void PopClip()
+        {
+            if (CheckGraphicsDevice())
+            {
+                gd.PopClip();
+            }
+        }
+
+
         private void DrawInnerBorder(Rectangle rect, Color shine, Color shadow, Rectangle? clippingRect = null)
         {
             if (CheckGraphicsDevice())

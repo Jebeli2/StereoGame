@@ -22,6 +22,7 @@
         private int textCacheLimit = 100;
         private int iconCacheLimit = 100;
         private readonly Stack<IntPtr> prevTargets = new();
+        private readonly Stack<Rectangle> prevClips = new();
         private readonly TextFont? defaultFont;
         private readonly TextFont? iconFont;
         private readonly int[] rectIndices = new int[] { 2, 0, 1, 1, 3, 2 };
@@ -134,6 +135,38 @@
                 _ = Sdl.Renderer.SetRenderDrawBlendMode(handle, (int)blendMode);
                 _ = Sdl.Renderer.SetRenderDrawColor(handle, colorR, colorG, colorB, colorA);
             }
+        }
+
+        private Rectangle CombineClip(Rectangle clip)
+        {
+            if (prevClips.Count > 0)
+            {
+                Rectangle current = prevClips.Peek();
+                return Rectangle.Intersect(current, clip);
+            }
+            return clip;
+        }
+        public override void PushClip(Rectangle clip)
+        {
+            clip = CombineClip(clip);
+            _ = Sdl.Renderer.RenderSetClipRect(handle, ref clip);
+            prevClips.Push(clip);
+
+        }
+
+        public override void PopClip()
+        {
+            if (prevClips.Count > 0) { _ = prevClips.Pop(); }
+            if (prevClips.Count > 0)
+            {
+                Rectangle clip = prevClips.Peek();
+                _ = Sdl.Renderer.RenderSetClipRect(handle, ref clip);
+            }
+            else
+            {
+                _ = Sdl.Renderer.RenderSetClipRect(handle, IntPtr.Zero);
+            }
+
         }
 
         protected override void DrawTexture(Texture? texture, ref Rectangle src, ref Rectangle dst)

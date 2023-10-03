@@ -12,6 +12,7 @@
         private int screenWidth;
         private int screenHeight;
         private readonly MouseListener mouseListener;
+        private readonly KeyboardListener keyboardListener;
         private Window? activeWindow;
         private Control? activeControl;
         private Control? preFocusedControl;
@@ -37,8 +38,12 @@
             mouseListener.MouseMoved += MouseListener_MouseMoved;
             mouseListener.MouseDown += MouseListener_MouseDown;
             mouseListener.MouseUp += MouseListener_MouseUp;
-
+            keyboardListener = new KeyboardListener();
+            keyboardListener.KeyPressed += KeyboardListener_KeyPressed;
+            keyboardListener.KeyReleased += KeyboardListener_KeyReleased;
+            keyboardListener.KeyTyped += KeyboardListener_KeyTyped;
         }
+
 
         public int ScreenWidth => screenWidth;
         public int ScreenHeight => screenHeight;
@@ -64,6 +69,7 @@
             {
                 CheckScreenSize();
                 mouseListener.Update(gameTime);
+                keyboardListener.Update(gameTime);
                 CheckWindowActivationQueue();
                 CheckTimer(mouseListener, gameTime);
                 UpdateControl(activeScreen, gameTime);
@@ -302,6 +308,20 @@
             }
         }
 
+        private void KeyboardListener_KeyTyped(object? sender, KeyboardEventArgs e)
+        {
+            PropagateDown(focusedControl, x => x.OnKeyTyped(e));
+        }
+
+        private void KeyboardListener_KeyReleased(object? sender, KeyboardEventArgs e)
+        {
+            PropagateDown(focusedControl, x => x.OnKeyReleased(e));
+        }
+
+        private void KeyboardListener_KeyPressed(object? sender, KeyboardEventArgs e)
+        {
+            PropagateDown(focusedControl, x => x.OnKeyPressed(e));
+        }
 
         private void MouseListener_MouseDown(object? sender, MouseEventArgs e)
         {
@@ -401,6 +421,8 @@
 
         private void SetActiveControl(Control? control)
         {
+            if (control is Screen) return;
+            if (control is Window) return;
             if (activeControl != control)
             {
                 if (activeControl != null) activeControl.Active = false;

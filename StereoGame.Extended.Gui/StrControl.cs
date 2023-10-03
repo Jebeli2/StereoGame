@@ -2,6 +2,7 @@
 {
     using StereoGame.Framework;
     using StereoGame.Framework.Graphics;
+    using StereoGame.Framework.Input;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
@@ -19,6 +20,7 @@
         private int bufferSelEnd;
         private int intValue;
         private int dispPos;
+        private bool lockDispPos;
         private bool showCaret;
         private double doubleValue;
         private StrFlags flags;
@@ -26,6 +28,7 @@
             : base(parent)
         {
             textIsTitle = true;
+            showCaret = true;
             this.buffer = buffer;
             textTabWidth = 4 * 24;
             lineSkip = 24;
@@ -37,6 +40,7 @@
             get { return buffer; }
             set { buffer = value; }
         }
+
 
         public int BufferPos
         {
@@ -116,6 +120,7 @@
             bufferSelStart = start;
             bufferSelEnd = end;
             NormSelection();
+            AdjustDispPos();
             Invalidate();
         }
 
@@ -137,21 +142,24 @@
 
         private void AdjustDispPos()
         {
+            if (lockDispPos) { return; }
             int cd = CalcBufferPosDispPos(Font);
             if (cd != 0)
             {
                 Rectangle bounds = GetBounds();
-                if (cd > bounds.Width)
+                Rectangle inner = bounds;
+                inner.Inflate(-1, -1);
+                if (cd > inner.Width)
                 {
-                    while (cd > bounds.Width)
+                    while (cd > inner.Width)
                     {
                         dispPos++;
                         cd = CalcBufferPosDispPos(Font);
                     }
                 }
-                else if (cd < bounds.Width)
+                else if (cd < inner.Width)
                 {
-                    while (cd < bounds.Width && dispPos > 0)
+                    while (cd < inner.Width && dispPos > 0)
                     {
                         dispPos--;
                         cd = CalcBufferPosDispPos(Font);
@@ -221,12 +229,11 @@
 
         public override bool OnPointerDown(PointerEventArgs args)
         {
-            showCaret = true;
             Pressed = true;
             ScreenToControl(args.X, args.Y, out int x, out int y);
             if (GetPos(x, y, out int pos))
             {
-
+                lockDispPos = true;
                 BufferPos = pos;
                 return true;
             }
@@ -234,7 +241,6 @@
         }
         public override bool OnPointerUp(PointerEventArgs args)
         {
-            showCaret = false;
             if (Pressed)
             {
                 Pressed = false;
@@ -243,8 +249,10 @@
             if (GetPos(x, y, out int pos))
             {
                 SetBufferSel(pos);
+                lockDispPos = false;
                 return true;
             }
+            lockDispPos = false;
             return base.OnPointerUp(args);
         }
 
@@ -260,6 +268,50 @@
                 }
             }
             return base.OnPointerMove(args);
+        }
+
+        public override bool OnKeyPressed(KeyboardEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Keys.Enter: return true;
+                case Keys.Delete:
+                    RemoveOrDelText(false);
+                    break;
+                case Keys.Back:
+                    RemoveOrDelText(true);
+                    break;
+                case Keys.Home:
+                    BufferPos = 0;
+                    break;
+                case Keys.End:
+                    BufferPos = Buffer.Length;
+                    break;
+                case Keys.Left:
+                    if (BufferPos > 0)
+                    {
+                        BufferPos--;
+                    }
+                    break;
+                case Keys.Right:
+                    if (BufferPos < Buffer.Length)
+                    {
+                        BufferPos++;
+                    }
+                    break;
+                default:
+                    if (args.Character != null)
+                    {
+                        ReplaceOrAddText("" + args.Character.Value);
+                    }
+                    break;
+            }
+            return base.OnKeyPressed(args);
+        }
+
+        public override bool OnKeyTyped(KeyboardEventArgs args)
+        {
+            return base.OnKeyTyped(args);
         }
 
         public override Size GetPreferredSize(IGuiSystem context)
@@ -278,5 +330,105 @@
         {
             Theme?.DrawStrControl(gui, renderer, gameTime, this, ref bounds);
         }
+
+        private void RemoveOrDelText(bool backSpace)
+        {
+            if (bufferSelStart >= 0 && bufferSelEnd > 0)
+            {
+                int start = bufferSelStart;
+                int len = bufferSelEnd - start;
+                string temp = buffer.Remove(start,len);                
+                if (MaybeChangeBuffer(temp))
+                {
+                    bufferSelStart = 0;
+                    bufferSelEnd = 0;
+                    BufferPos = start;
+                }
+            }
+            else if (backSpace)
+            {
+                if (bufferPos > 0)
+                {
+                    string temp = buffer.Remove(bufferPos - 1, 1);
+                    if (MaybeChangeBuffer(temp))
+                    {
+                        BufferPos--;
+                    }
+                }
+            }
+            else
+            {
+                if (bufferPos < buffer.Length)
+                {
+                    string temp = buffer.Remove(bufferPos, 1);
+                    MaybeChangeBuffer(temp);
+                    Invalidate();
+                }
+            }
+        }
+        private void ReplaceOrAddText(string text)
+        {
+            if (bufferSelStart >= 0 && bufferSelEnd > 0)
+            {
+                int start = bufferSelStart;
+                int len = bufferSelEnd - start;
+                string temp = buffer.Remove(start, len);
+                temp = temp.Insert(start, text);
+                if (MaybeChangeBuffer(temp))
+                {
+                    BufferPos = start + text.Length;
+                }
+            }
+            else
+            {
+                string temp = buffer.Insert(bufferPos, text);
+                if (MaybeChangeBuffer(temp))
+                {
+                    BufferPos += text.Length;
+                }
+            }
+        }
+
+        protected virtual bool MaybeChangeBuffer(string newBuffer)
+        {
+            if (!string.Equals(buffer, newBuffer))
+            {
+                if (flags == StrFlags.Integer)
+                {
+                    if (string.IsNullOrEmpty(newBuffer))
+                    {
+                        intValue = 0;
+                    }
+                    else if (!int.TryParse(newBuffer, out int result))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        intValue = result;
+                    }
+                }
+                else if (flags == StrFlags.Double)
+                {
+                    if (string.IsNullOrEmpty(newBuffer))
+                    {
+                        doubleValue = 0;
+                    }
+                    else if (!double.TryParse(newBuffer, out double result))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        doubleValue = result;
+                    }
+
+                }
+                buffer = newBuffer;
+                return true;
+            }
+            return false;
+        }
+
     }
 }

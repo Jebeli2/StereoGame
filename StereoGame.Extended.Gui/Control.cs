@@ -2,6 +2,7 @@
 {
     using StereoGame.Framework;
     using StereoGame.Framework.Graphics;
+    using StereoGame.Framework.Input;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
@@ -1000,6 +1001,10 @@
             }
             return true;
         }
+
+        public virtual bool OnKeyPressed(KeyboardEventArgs args) { return true; }
+        public virtual bool OnKeyReleased(KeyboardEventArgs args) { return true; }
+        public virtual bool OnKeyTyped(KeyboardEventArgs args) { return true; }
 
         protected void ToBack(Control control)
         {

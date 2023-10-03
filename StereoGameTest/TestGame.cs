@@ -204,6 +204,7 @@
             strDemo.DefaultWindowCloseAction = WindowCloseAction.Hide;
             _ = new Label(strDemo, "String Controls");
             _ = new StrControl(strDemo, "Hello World!");
+            _ = new StrControl(strDemo) { IntValue = 1234 };
         }
 
     }

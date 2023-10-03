@@ -9,7 +9,6 @@
     using System.Reflection.Emit;
     using System.Text;
     using System.Threading.Tasks;
-    using static System.Net.Mime.MediaTypeNames;
 
     public class BaseTheme : ITheme
     {
@@ -218,6 +217,7 @@
             TextFont? font = str.Font;
             if (font != null)
             {
+                renderer.PushClip(inner);
                 for (int i = dispPos; i < last + 1; i++)
                 {
                     char c = ' ';
@@ -243,12 +243,13 @@
                         renderer.DrawText(font, txt, x, y, 0, 0, TextPen, HorizontalAlignment.Left, VerticalAlignment.Top);
 
                     }
-                    if (i == str.BufferPos && str.ShowCaret)
+                    if (i == str.BufferPos && str.Active && str.ShowCaret)
                     {
                         renderer.DrawVerticalLine(x, y, y + font.FontHeight, TextPen);
                     }
                     x += advance;
                 }
+                renderer.PopClip();
             }
         }
 

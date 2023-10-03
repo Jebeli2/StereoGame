@@ -1054,6 +1054,12 @@
             private static extern int SDL_SetTextureBlendMode(IntPtr texture, SDL_BlendMode blendMode);
             [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
             private static extern int SDL_RenderGeometry(IntPtr renderer, IntPtr texture, [In] SDL_Vertex[] vertices, int num_vertices, [In] int[] indices, int num_indices);
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderSetClipRect(IntPtr renderer, ref Rectangle rect);
+
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern int SDL_RenderSetClipRect(IntPtr renderer, IntPtr rect);
+
 
             public static IntPtr CreateRenderer(IntPtr window, int index, SDL_RendererFlags flags) => SDL_CreateRenderer(window, index, flags);
             public static void DestroyRenderer(IntPtr renderer) => SDL_DestroyRenderer(renderer);
@@ -1146,6 +1152,8 @@
             public static int GetTextureBlendMode(IntPtr texture, out SDL_BlendMode blendMode) => SDL_GetTextureBlendMode(texture, out blendMode);
             public static int SetTextureBlendMode(IntPtr texture, SDL_BlendMode blendMode) => SDL_SetTextureBlendMode(texture, blendMode);
             public static int RenderGeometry(IntPtr renderer, IntPtr texture, [In] SDL_Vertex[] vertices, int num_vertices, [In] int[] indices, int num_indices) => SDL_RenderGeometry(renderer, texture, vertices, num_vertices, indices, num_indices);
+            public static int RenderSetClipRect(IntPtr renderer, ref Rectangle rect) => SDL_RenderSetClipRect(renderer, ref rect);
+            public static int RenderSetClipRect(IntPtr renderer, IntPtr rect) => SDL_RenderSetClipRect(renderer, rect);
 
 
 
