@@ -19,21 +19,15 @@ namespace StereoGame.Extended.Gui
         {
         }
 
-        public event EventHandler<EventArgs>? CheckedStateChanged;
         public override bool OnPointerUp(PointerEventArgs args)
         {
             base.OnPointerUp(args);
             if (BoundingRectangle.Contains(args.X, args.Y))
             {
                 Checked = !Checked;
-                OnCheckedChanged(EventArgs.Empty);
             }
             return true;
         }
 
-        protected virtual void OnCheckedChanged(EventArgs e)
-        {
-            CheckedStateChanged?.Invoke(this, e);
-        }
     }
 }

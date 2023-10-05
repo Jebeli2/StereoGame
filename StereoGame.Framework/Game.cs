@@ -102,12 +102,10 @@
         }
 
         internal static Game Instance => instance!;
-
         public GameServiceContainer Services => services;
         public GameComponentCollection Components => components;
         public ContentManager Content => content;
         public GamePlatform Platform => platform;
-
         public AudioDevice AudioDevice
         {
             get
@@ -119,7 +117,6 @@
                 return audioDevice;
             }
         }
-
         public GraphicsDevice GraphicsDevice
         {
             get
@@ -143,7 +140,6 @@
                 return graphicsDevice;
             }
         }
-
         internal GraphicsDeviceManager GraphicsDeviceManager
         {
             get
@@ -159,6 +155,15 @@
                 }
                 graphicsDeviceManager = value;
             }
+        }
+
+        internal void ApplyChanges(GraphicsDeviceManager manager)
+        {
+            platform.BeginScreenDeviceChange(manager.IsFullScreen);
+            
+            int w = manager.PreferredBackBufferWidth;
+            int h = manager.PreferredBackBufferHeight;
+            platform.EndScreenDeviceChange(string.Empty, w, h);
         }
 
         public GameWindow Window
@@ -268,7 +273,7 @@
 
         public void Tick()
         {
-            RetryTick:
+        RetryTick:
             if (!IsActive && InactiveSleepTime.TotalMilliseconds >= 1.0)
             {
                 Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);

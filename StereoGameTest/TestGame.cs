@@ -108,6 +108,17 @@
                 Components.Add(lines);
             }
         }
+
+        private void ToggleFullScreen()
+        {
+            IGraphicsDeviceManager? gdm = Services.GetService<IGraphicsDeviceManager>();
+            gdm?.ToggleFullScreen();
+        }
+
+        private bool IsFullScreen
+        {
+            get { return Services.GetService<IGraphicsDeviceManager>()?.IsFullScreen ?? false; }
+        }
         private void InitGui(TextFont? font)
         {
             mainScreen = new Screen();
@@ -172,7 +183,10 @@
             _ = new ToggleButton(p1) { Icon = Icons.CIRCLE_WITH_PLUS };
             _ = new ToggleButton(p1) { Icon = Icons.DRIVE };
             _ = new Label(buttonDemo, "Check boxes");
-            _ = new CheckBox(buttonDemo, "Check Box");
+            var p2 = new Panel(buttonDemo);
+            _ = new CheckBox(p2, "Check Box");
+            var fsCb = new CheckBox(p2, "Fullscreen") { Checked = IsFullScreen };
+            fsCb.CheckedStateChanged += (s, e) => { ToggleFullScreen(); };
 
             propDemo = new Window(guiTestScreen);
             propDemo.SetPosition(400, 50);
@@ -205,6 +219,7 @@
             _ = new Label(strDemo, "String Controls");
             _ = new StrControl(strDemo, "Hello World!");
             _ = new StrControl(strDemo) { IntValue = 1234 };
+            _ = new StrControl(strDemo) { DoubleValue = 12.34 };
         }
 
     }

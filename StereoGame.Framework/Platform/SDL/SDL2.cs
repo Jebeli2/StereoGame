@@ -1557,6 +1557,14 @@
         {
             [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
             private static extern Keymod SDL_GetModState();
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_StartTextInput();
+
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern bool SDL_IsTextInputActive();
+
+            [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SDL_StopTextInput();
 
             public struct Keysym
             {
@@ -1643,7 +1651,10 @@
             }
 
             public static Keymod GetModState() => SDL_GetModState();
+            public static void StartTextInput() => SDL_StartTextInput();
+            public static bool IsTextInputActive() => SDL_IsTextInputActive();
 
+            public static void StopTextInput() => SDL_StopTextInput();
             //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
             //public delegate Keymod d_sdl_getmodstate();
             //public static readonly d_sdl_getmodstate GetModState = FuncLoader.LoadFunction<d_sdl_getmodstate>(NativeLibrary, "SDL_GetModState");

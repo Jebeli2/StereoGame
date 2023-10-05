@@ -11,5 +11,8 @@ namespace StereoGame.Framework
         bool BeginDraw();
         void CreateDevice();
         void EndDraw();
+        void ToggleFullScreen();
+
+        bool IsFullScreen { get; }
     }
 }

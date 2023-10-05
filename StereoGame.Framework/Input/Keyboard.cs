@@ -8,10 +8,6 @@
 
     public static partial class Keyboard
     {
-        /// <summary>
-        /// Returns the current keyboard state.
-        /// </summary>
-        /// <returns>Current keyboard state.</returns>
 		public static KeyboardState GetState()
         {
             return PlatformGetState();

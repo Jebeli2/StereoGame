@@ -11,7 +11,7 @@
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading.Tasks;
-    
+
     internal class SdlGamePlatform : GamePlatform
     {
         private int isExiting;
@@ -177,6 +177,8 @@
         {
             view.Size = new System.Drawing.Size(pp.BackBufferWidth, pp.BackBufferHeight);
             renderer = new SdlGraphicsDevice(Game, this, view, pp);
+            BeginScreenDeviceChange(pp.IsFullScreen);
+            EndScreenDeviceChange(string.Empty, pp.BackBufferWidth, pp.BackBufferHeight);
             return renderer;
         }
 

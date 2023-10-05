@@ -18,7 +18,7 @@ namespace StereoGame.Framework
         private bool synchronizedWithVerticalRetrace = true;
         private bool disposed;
         private bool drawBegun;
-        private bool hardwareModeSwitch = true;
+        private bool hardwareModeSwitch = false;
         private bool wantFullScreen;
         private GraphicsProfile graphicsProfile;
         private bool shouldApplyChanges;
@@ -59,6 +59,22 @@ namespace StereoGame.Framework
             {
                 shouldApplyChanges = true;
                 graphicsProfile = value;
+            }
+        }
+
+        public void ToggleFullScreen()
+        {
+            IsFullScreen = !IsFullScreen;
+            ApplyChanges();
+        }
+
+        public bool IsFullScreen
+        {
+            get { return wantFullScreen; }
+            set
+            {
+                shouldApplyChanges = true;
+                wantFullScreen = value;
             }
         }
 
@@ -206,6 +222,7 @@ namespace StereoGame.Framework
         {
             if (graphicsDevice == null) { CreateDevice(); }
             if (!shouldApplyChanges) return;
+            Game.Instance.ApplyChanges(this);
             shouldApplyChanges = false;
 
         }

@@ -8,6 +8,11 @@ namespace StereoGame.Framework.Input
 {
     public class KeyboardEventArgs : EventArgs
     {
+        private readonly string? text;
+        public KeyboardEventArgs(TextInputEventArgs inputEventArgs) 
+        { 
+            text = inputEventArgs.Text;
+        }
         public KeyboardEventArgs(Keys key, KeyboardState keyboardState)
         {
             Key = key;
@@ -22,13 +27,23 @@ namespace StereoGame.Framework.Input
 
             if (keyboardState.IsKeyDown(Keys.LeftAlt) || keyboardState.IsKeyDown(Keys.RightAlt))
                 Modifiers |= KeyboardModifiers.Alt;
+
+            char? c = ToChar(Key, Modifiers);
+            if (c != null)
+            {
+                text = "" + c.Value;
+            }
+            else
+            {
+                text = null;
+            }
         }
 
         public Keys Key { get; }
         public KeyboardModifiers Modifiers { get; }
 
         public char? Character => ToChar(Key, Modifiers);
-
+        public string? Text => text;
         private static char? ToChar(Keys key, KeyboardModifiers modifiers = KeyboardModifiers.None)
         {
             var isShiftDown = (modifiers & KeyboardModifiers.Shift) == KeyboardModifiers.Shift;

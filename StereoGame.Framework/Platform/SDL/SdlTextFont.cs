@@ -11,6 +11,7 @@ namespace StereoGame.Framework.Platform.SDL
 {
     internal class SdlTextFont : TextFont
     {
+        private readonly StringBuilder stringBuilder = new();
         private readonly IntPtr handle;
         private readonly IntPtr mem;
 
@@ -44,12 +45,24 @@ namespace StereoGame.Framework.Platform.SDL
             SDL2TTF.CloseFont(handle);
             if (mem != IntPtr.Zero) { Marshal.FreeHGlobal(mem); }
         }
-
-        public override Size MeasureText(string? text)
+        public override Size MeasureText(ReadOnlySpan<char> text)
         {
             int w = 0;
             int h = 0;
-            if (!string.IsNullOrEmpty(text))
+            if (text.Length > 0)
+            {
+                stringBuilder.Clear();
+                stringBuilder.Append(text);
+                _ = SDL2TTF.SizeUTF8(handle, stringBuilder, out w, out h);
+            }
+            return new Size(w, h);
+        }
+
+        public override Size MeasureText(StringBuilder text)
+        {
+            int w = 0;
+            int h = 0;
+            if (text.Length> 0)
             {
                 _ = SDL2TTF.SizeUTF8(handle, text, out w, out h);
             }

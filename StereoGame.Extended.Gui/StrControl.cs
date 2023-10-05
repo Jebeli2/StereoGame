@@ -12,7 +12,8 @@
 
     public class StrControl : Control
     {
-        private string buffer;
+        //private string buffer;
+        private StringBuilder strBuffer;
         private int bufferPos;
         private int textTabWidth;
         private int lineSkip;
@@ -29,7 +30,7 @@
         {
             textIsTitle = true;
             showCaret = true;
-            this.buffer = buffer;
+            strBuffer = new StringBuilder(buffer);
             textTabWidth = 4 * 24;
             lineSkip = 24;
 
@@ -37,8 +38,8 @@
 
         public string Buffer
         {
-            get { return buffer; }
-            set { buffer = value; }
+            get { return strBuffer.ToString(); }
+            set { strBuffer = new StringBuilder(value); }
         }
 
 
@@ -47,8 +48,8 @@
             get { return bufferPos; }
             set
             {
-                if (value == -1) value = buffer.Length;
-                if (value > buffer.Length) value = buffer.Length;
+                if (value <= -1) value = strBuffer.Length;
+                if (value > strBuffer.Length) value = strBuffer.Length;
                 if (value < 0) value = 0;
                 bufferSelStart = 0;
                 bufferSelEnd = 0;
@@ -77,7 +78,8 @@
             set
             {
                 intValue = value;
-                buffer = value.ToString();
+                strBuffer.Clear();
+                strBuffer.Append(value);
                 flags |= StrFlags.Integer;
                 flags &= ~StrFlags.Double;
             }
@@ -89,7 +91,8 @@
             set
             {
                 doubleValue = value;
-                buffer = value.ToString("F");
+                strBuffer.Clear();
+                strBuffer.Append(value.ToString("F"));
                 flags |= StrFlags.Double;
                 flags &= ~StrFlags.Integer;
             }
@@ -179,7 +182,7 @@
                 for (int i = dispPos; i < bufferPos + 1; i++)
                 {
                     char ch = ' ';
-                    if (i < buffer.Length) { ch = buffer[i]; }
+                    if (i < strBuffer.Length) { ch = strBuffer[i]; }
                     font.GetGlyphMetrics(ch, out _, out _, out _, out _, out int advance);
                     x += advance;
                 }
@@ -194,9 +197,9 @@
             int lineSkip = font.FontLineSkip;
             if (mx < x) return false;
             if (my < y) return false;
-            for (int i = dispPos; i < buffer.Length; i++)
+            for (int i = dispPos; i < strBuffer.Length; i++)
             {
-                char ch = buffer[i];
+                char ch = strBuffer[i];
                 font.GetGlyphMetrics(ch, out _, out _, out _, out _, out int advance);
                 int gx = advance;
                 if ((my >= y && my <= (y + lineSkip)) && (mx >= x && mx <= x + gx))
@@ -208,7 +211,7 @@
             }
             if ((my >= y && my <= (y + lineSkip)) && (mx >= x))
             {
-                pos = buffer.Length;
+                pos = strBuffer.Length;
                 return true;
             }
             return false;
@@ -300,10 +303,10 @@
                     }
                     break;
                 default:
-                    if (args.Character != null)
-                    {
-                        ReplaceOrAddText("" + args.Character.Value);
-                    }
+                    //if (args.Character != null)
+                    //{
+                    //    -ReplaceOrAddText("" + args.Character.Value);
+                    //}
                     break;
             }
             return base.OnKeyPressed(args);
@@ -311,13 +314,18 @@
 
         public override bool OnKeyTyped(KeyboardEventArgs args)
         {
+            if (args.Text != null)
+            {
+                ReplaceOrAddText(args.Text); 
+                return true;
+            }
             return base.OnKeyTyped(args);
         }
 
         public override Size GetPreferredSize(IGuiSystem context)
         {
             Size size = new Size(4, 4);
-            Size? textSize = Font?.MeasureText(buffer);
+            Size? textSize = Font?.MeasureText(strBuffer);
             if (textSize != null)
             {
                 size.Width += textSize.Value.Width;
@@ -333,11 +341,13 @@
 
         private void RemoveOrDelText(bool backSpace)
         {
+            StringBuilder temp = new StringBuilder(strBuffer.ToString());
             if (bufferSelStart >= 0 && bufferSelEnd > 0)
             {
                 int start = bufferSelStart;
                 int len = bufferSelEnd - start;
-                string temp = buffer.Remove(start,len);                
+             
+                temp.Remove(start,len);                
                 if (MaybeChangeBuffer(temp))
                 {
                     bufferSelStart = 0;
@@ -349,7 +359,7 @@
             {
                 if (bufferPos > 0)
                 {
-                    string temp = buffer.Remove(bufferPos - 1, 1);
+                    temp.Remove(bufferPos - 1, 1);
                     if (MaybeChangeBuffer(temp))
                     {
                         BufferPos--;
@@ -358,9 +368,9 @@
             }
             else
             {
-                if (bufferPos < buffer.Length)
+                if (bufferPos < strBuffer.Length)
                 {
-                    string temp = buffer.Remove(bufferPos, 1);
+                    temp.Remove(bufferPos, 1);
                     MaybeChangeBuffer(temp);
                     Invalidate();
                 }
@@ -368,12 +378,13 @@
         }
         private void ReplaceOrAddText(string text)
         {
+            StringBuilder temp = new StringBuilder(strBuffer.ToString());
             if (bufferSelStart >= 0 && bufferSelEnd > 0)
             {
                 int start = bufferSelStart;
                 int len = bufferSelEnd - start;
-                string temp = buffer.Remove(start, len);
-                temp = temp.Insert(start, text);
+                temp.Remove(start, len);
+                temp.Insert(start, text);
                 if (MaybeChangeBuffer(temp))
                 {
                     BufferPos = start + text.Length;
@@ -381,7 +392,7 @@
             }
             else
             {
-                string temp = buffer.Insert(bufferPos, text);
+                temp.Insert(bufferPos, text);
                 if (MaybeChangeBuffer(temp))
                 {
                     BufferPos += text.Length;
@@ -389,17 +400,17 @@
             }
         }
 
-        protected virtual bool MaybeChangeBuffer(string newBuffer)
+        protected virtual bool MaybeChangeBuffer(StringBuilder newBuffer)
         {
-            if (!string.Equals(buffer, newBuffer))
+            if (!strBuffer.Equals(newBuffer))
             {
                 if (flags == StrFlags.Integer)
                 {
-                    if (string.IsNullOrEmpty(newBuffer))
+                    if (newBuffer.Length == 0)
                     {
                         intValue = 0;
                     }
-                    else if (!int.TryParse(newBuffer, out int result))
+                    else if (!int.TryParse(newBuffer.ToString(), out int result))
                     {
                         return false;
                     }
@@ -410,11 +421,11 @@
                 }
                 else if (flags == StrFlags.Double)
                 {
-                    if (string.IsNullOrEmpty(newBuffer))
+                    if (newBuffer.Length == 0)
                     {
                         doubleValue = 0;
                     }
-                    else if (!double.TryParse(newBuffer, out double result))
+                    else if (!double.TryParse(newBuffer.ToString(), out double result))
                     {
                         return false;
                     }
@@ -424,7 +435,7 @@
                     }
 
                 }
-                buffer = newBuffer;
+                strBuffer = newBuffer;
                 return true;
             }
             return false;

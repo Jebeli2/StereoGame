@@ -62,7 +62,8 @@ namespace StereoGame.Framework.Graphics
             }
         }
 
-        public abstract Size MeasureText(string? text);
+        public abstract Size MeasureText(ReadOnlySpan<char> text);
+        public abstract Size MeasureText(StringBuilder text);
         public abstract int GetGlyphMetrics(char c, out int minx, out int maxx, out int miny, out int maxy, out int advance);
         public override string ToString()
         {

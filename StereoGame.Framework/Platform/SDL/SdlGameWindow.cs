@@ -97,6 +97,7 @@
         public void SetCursorVisible(bool visible)
         {
             mouseVisible = visible;
+           
             //Sdl.Mouse.ShowCursor(visible ? 1 : 0);
         }
 

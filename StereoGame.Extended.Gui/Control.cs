@@ -96,6 +96,8 @@
             parent?.Add(this);
         }
 
+        public event EventHandler<EventArgs>? CheckedStateChanged;
+
         public ITheme Theme
         {
             get { return theme ?? parent?.Theme ?? BaseTheme.Instance; }
@@ -517,6 +519,14 @@
                 if (active != value)
                 {
                     active = value;
+                    if (active)
+                    {
+                        OnActivated();
+                    }
+                    else
+                    {
+                        OnDeactivated();
+                    }
                     Invalidate();
                 }
             }
@@ -555,6 +565,7 @@
                 if (_checked != value)
                 {
                     _checked = value;
+                    OnCheckedChanged(EventArgs.Empty);
                     Invalidate();
                 }
 
@@ -672,7 +683,6 @@
             {
                 if (font != null) return font;
                 if (parent != null) { return parent.Font; }
-                //if (skin != null) { return skin.DefaultFont; }
                 return null;
             }
             set
@@ -847,9 +857,6 @@
             }
             return false;
         }
-
-        //public abstract Size GetContentSize(IGuiSystem context);
-
         public virtual HitTestResult GetHitTestResult(int x, int y)
         {
             if (Contains(x, y))
@@ -887,59 +894,6 @@
         {
             Theme.DrawControl(gui, renderer, gameTime, this, ref bounds);
         }
-
-        //protected virtual Rectangle AdjustBorderBounds(ref Rectangle bounds)
-        //{
-        //    return bounds;
-        //}
-
-        //protected void DrawControlBorder(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle rect)
-        //{
-        //    Rectangle bounds = AdjustBorderBounds(ref rect);
-        //    if (backgroundRegion != null)
-        //    {
-        //        renderer.DrawRegion(backgroundRegion, bounds);
-        //    }
-        //    else if (!backgroundColor.IsEmpty && backgroundColor != Color.Transparent)
-        //    {
-        //        renderer.FillRectangle(bounds, backgroundColor);
-        //    }
-        //    if (borderThickness != 0)
-        //    {
-        //        renderer.DrawBorder(bounds, borderShineColor, borderShadowColor, borderThickness);
-        //    }
-        //}
-
-        //protected void DrawControlText(IGuiSystem gui, IGuiRenderer renderer, GameTime gameTime, ref Rectangle bounds)
-        //{
-        //    if (textIsTitle) return;
-        //    if (!string.IsNullOrEmpty(Text) && (Icon != Icons.NONE || alwaysUseIconSpace))
-        //    {
-        //        Rectangle textBounds = bounds;
-        //        Rectangle iconBounds = bounds;
-        //        iconBounds.Width = (ICONWIDTH * 3) / 2;
-        //        switch (HorizontalTextAlignment)
-        //        {
-        //            case HorizontalAlignment.Left:
-        //                textBounds.X += ICONWIDTH * 2;
-        //                textBounds.Width -= ICONWIDTH * 2;
-        //                break;
-        //            case HorizontalAlignment.Right:
-        //                break;
-        //        }
-        //        renderer.DrawText(Font, Text, textBounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
-        //        renderer.DrawIcon(Icon, iconBounds, TextColor, HorizontalAlignment.Center, VerticalTextAlignment);
-        //    }
-        //    else if (!string.IsNullOrEmpty(Text))
-        //    {
-        //        renderer.DrawText(Font, Text, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
-        //    }
-        //    else if (Icon != Icons.NONE)
-        //    {
-        //        renderer.DrawIcon(Icon, bounds, TextColor, HorizontalTextAlignment, VerticalTextAlignment);
-        //    }
-        //}
-
 
         internal bool NeedsNewBitmap
         {
@@ -1006,6 +960,18 @@
         public virtual bool OnKeyReleased(KeyboardEventArgs args) { return true; }
         public virtual bool OnKeyTyped(KeyboardEventArgs args) { return true; }
 
+        protected virtual void OnActivated()
+        {
+
+        }
+
+        protected virtual void OnDeactivated()
+        { 
+        }
+        protected virtual void OnCheckedChanged(EventArgs e)
+        {
+            CheckedStateChanged?.Invoke(this, e);
+        }
         protected void ToBack(Control control)
         {
             if (children.Count > 1)

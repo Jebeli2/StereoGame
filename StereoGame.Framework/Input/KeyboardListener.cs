@@ -23,6 +23,12 @@
             repeatPress = true;
             initialDelay = 800;
             repeatDelay = 50;
+            Game.Instance.Window.TextInput += Window_TextInput;
+        }
+
+        private void Window_TextInput(object? sender, TextInputEventArgs e)
+        {
+            KeyTyped?.Invoke(this, new KeyboardEventArgs(e));
         }
 
         public event EventHandler<KeyboardEventArgs>? KeyTyped;
@@ -55,8 +61,8 @@
 
                     KeyPressed?.Invoke(this, args);
 
-                    if (args.Character.HasValue)
-                        KeyTyped?.Invoke(this, args);
+                    //if (args.Character.HasValue)
+                    //    KeyTyped?.Invoke(this, args);
 
                     previousKey = key;
                     lastPressTime = gameTime.TotalGameTime;
@@ -86,8 +92,8 @@
 
                 KeyPressed?.Invoke(this, args);
 
-                if (args.Character.HasValue)
-                    KeyTyped?.Invoke(this, args);
+                //if (args.Character.HasValue)
+                //    KeyTyped?.Invoke(this, args);
 
                 lastPressTime = gameTime.TotalGameTime;
                 isInitial = false;
